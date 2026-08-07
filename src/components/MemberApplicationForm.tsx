@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -14,11 +15,12 @@ const DEPARTMENTS = [
 ];
 
 export default function MemberApplicationForm() {
-  const [status, setStatus] = useState<"idle" | "sent">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("sent");
+    setStatus("sending");
+    window.setTimeout(() => setStatus("sent"), 600);
   }
 
   return (
@@ -96,11 +98,29 @@ export default function MemberApplicationForm() {
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
           </div>
+          <div className="flex items-start gap-2.5 sm:col-span-2">
+            <input
+              id="member-consent"
+              name="consent"
+              type="checkbox"
+              required
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
+            />
+            <label htmlFor="member-consent" className="text-xs text-muted">
+              Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Bewerbung gespeichert
+              werden. Weitere Infos in der{" "}
+              <Link href="/datenschutz" className="text-accent hover:underline">
+                Datenschutzerklärung
+              </Link>
+              . *
+            </label>
+          </div>
           <button
             type="submit"
-            className="sm:col-span-2 rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+            disabled={status === "sending"}
+            className="sm:col-span-2 rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
           >
-            Bewerbung senden
+            {status === "sending" ? "Wird gesendet…" : "Bewerbung senden"}
           </button>
         </motion.form>
       )}

@@ -1,14 +1,24 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+const SUBJECTS = [
+  "Allgemeine Anfrage",
+  "Sponsoring",
+  "Presse",
+  "Mitmachen / Bewerbung",
+  "Sonstiges",
+];
+
 export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sent">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("sent");
+    setStatus("sending");
+    window.setTimeout(() => setStatus("sent"), 600);
   }
 
   return (
@@ -34,7 +44,9 @@ export default function ContactForm() {
           className="space-y-4"
         >
           <div>
-            <label htmlFor="name" className="text-sm font-medium">Name</label>
+            <label htmlFor="name" className="text-sm font-medium">
+              Name <span className="text-accent">*</span>
+            </label>
             <input
               id="name"
               name="name"
@@ -43,7 +55,9 @@ export default function ContactForm() {
             />
           </div>
           <div>
-            <label htmlFor="email" className="text-sm font-medium">E-Mail</label>
+            <label htmlFor="email" className="text-sm font-medium">
+              E-Mail <span className="text-accent">*</span>
+            </label>
             <input
               id="email"
               name="email"
@@ -53,7 +67,24 @@ export default function ContactForm() {
             />
           </div>
           <div>
-            <label htmlFor="message" className="text-sm font-medium">Nachricht</label>
+            <label htmlFor="subject" className="text-sm font-medium">Betreff</label>
+            <select
+              id="subject"
+              name="subject"
+              defaultValue={SUBJECTS[0]}
+              className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
+            >
+              {SUBJECTS.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="message" className="text-sm font-medium">
+              Nachricht <span className="text-accent">*</span>
+            </label>
             <textarea
               id="message"
               name="message"
@@ -62,11 +93,29 @@ export default function ContactForm() {
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
           </div>
+          <div className="flex items-start gap-2.5">
+            <input
+              id="consent"
+              name="consent"
+              type="checkbox"
+              required
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
+            />
+            <label htmlFor="consent" className="text-xs text-muted">
+              Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden.
+              Weitere Infos in der{" "}
+              <Link href="/datenschutz" className="text-accent hover:underline">
+                Datenschutzerklärung
+              </Link>
+              . *
+            </label>
+          </div>
           <button
             type="submit"
-            className="rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+            disabled={status === "sending"}
+            className="rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
           >
-            Nachricht senden
+            {status === "sending" ? "Wird gesendet…" : "Nachricht senden"}
           </button>
         </motion.form>
       )}

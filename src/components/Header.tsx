@@ -100,6 +100,8 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
               className={`relative flex items-center gap-1 py-1 text-sm font-medium transition-colors ${
                 moreActive ? "text-foreground" : "text-muted hover:text-foreground"
               }`}
@@ -170,7 +172,8 @@ export default function Header() {
         <button
           className="relative flex h-9 w-9 items-center justify-center rounded-md border border-border md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Menü öffnen"
+          aria-label={open ? "Menü schließen" : "Menü öffnen"}
+          aria-expanded={open}
         >
           <span className="sr-only">Menü</span>
           <div className="space-y-1">

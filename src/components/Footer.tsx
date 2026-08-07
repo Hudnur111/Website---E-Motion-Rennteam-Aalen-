@@ -67,8 +67,16 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-border py-6">
-        <div className="container-page flex flex-col items-center justify-between gap-2 text-xs text-muted sm:flex-row">
+        <div className="container-page flex flex-col items-center justify-between gap-3 text-xs text-muted sm:flex-row">
           <span>&copy; {new Date().getFullYear()} E-Motion Rennteam Aalen</span>
+          <div className="flex items-center gap-4">
+            <Link href="/impressum" className="transition-colors hover:text-foreground">
+              Impressum
+            </Link>
+            <Link href="/datenschutz" className="transition-colors hover:text-foreground">
+              Datenschutz
+            </Link>
+          </div>
           <span>Formula Student Germany | Hochschule Aalen</span>
         </div>
       </div>
