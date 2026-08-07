@@ -28,7 +28,9 @@ export default function SponsorsPage() {
         return (
           <div key={tier} className="mt-14">
             <Reveal delay={ti * 0.05}>
-              <h2 className="border-b border-border pb-3 text-xl font-bold">{tier}-Partner</h2>
+              <h2 className="border-b border-border pb-3 text-xl font-bold">
+                {tier === "Partner" ? "Partner" : `${tier}-Partner`}
+              </h2>
             </Reveal>
             <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((sponsor) => (
