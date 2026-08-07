@@ -24,7 +24,7 @@ export default function NewsPage() {
           <StaggerItem key={post.slug}>
             <Link
               href={`/news/${post.slug}`}
-              className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(198,255,30,0.35)]"
+              className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(74,99,247,0.35)]"
             >
               <div className="aspect-video overflow-hidden bg-surface-2">
                 {post.coverImage ? (

@@ -70,6 +70,41 @@ export type Page = {
   slug: string;
 };
 
+export type BlogPost = {
+  title: string;
+  date: string;
+  author?: string;
+  excerpt?: string;
+  coverImage?: string;
+  body: string;
+  slug: string;
+};
+
+export type GalleryImage = {
+  title: string;
+  image: string;
+  category?: string;
+  order?: number;
+  slug: string;
+};
+
+export type Result = {
+  title: string;
+  year: number;
+  event: string;
+  placement?: string;
+  description?: string;
+  slug: string;
+};
+
+export type Position = {
+  title: string;
+  department?: string;
+  commitment?: string;
+  body: string;
+  slug: string;
+};
+
 export function getTeam(): TeamMember[] {
   return readCollection<TeamMember>("team").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
@@ -99,4 +134,28 @@ export function getNewsBySlug(slug: string): NewsPost | undefined {
 
 export function getPage(slug: string): Page | undefined {
   return readCollection<Page>("pages").find((page) => page.slug === slug);
+}
+
+export function getBlogPosts(): BlogPost[] {
+  return readCollection<BlogPost>("blog").sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+export function getBlogPostBySlug(slug: string): BlogPost | undefined {
+  return getBlogPosts().find((post) => post.slug === slug);
+}
+
+export function getGallery(): GalleryImage[] {
+  return readCollection<GalleryImage>("gallery").sort(
+    (a, b) => (a.order ?? 99) - (b.order ?? 99)
+  );
+}
+
+export function getResults(): Result[] {
+  return readCollection<Result>("results").sort((a, b) => b.year - a.year);
+}
+
+export function getPositions(): Position[] {
+  return readCollection<Position>("positions");
 }

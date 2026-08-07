@@ -111,7 +111,7 @@ export default function Home() {
                 <StaggerItem key={post.slug}>
                   <Link
                     href={`/news/${post.slug}`}
-                    className="group block h-full rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-8px_rgba(198,255,30,0.35)]"
+                    className="group block h-full rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-8px_rgba(74,99,247,0.35)]"
                   >
                     <time className="text-xs uppercase tracking-wide text-muted">
                       {new Date(post.date).toLocaleDateString("de-DE", {

@@ -30,7 +30,7 @@ export default function TeamPage() {
               .filter((member) => member.department === department)
               .map((member) => (
                 <StaggerItem key={member.slug}>
-                  <div className="group h-full rounded-xl border border-border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(198,255,30,0.35)]">
+                  <div className="group h-full rounded-xl border border-border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(74,99,247,0.35)]">
                     <div className="aspect-square overflow-hidden rounded-lg bg-surface-2">
                       {member.photo ? (
                         <Image

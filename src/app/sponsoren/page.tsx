@@ -37,7 +37,7 @@ export default function SponsorsPage() {
                     href={sponsor.website ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(198,255,30,0.35)]"
+                    className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(74,99,247,0.35)]"
                   >
                     {sponsor.logo ? (
                       <Image

@@ -1,15 +1,19 @@
 import Link from "next/link";
+import SocialIcons from "@/components/SocialIcons";
+import NewsletterForm from "@/components/NewsletterForm";
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-3">
+      <div className="checkered-divider" />
+      <div className="container-page grid gap-10 py-14 md:grid-cols-4">
         <div>
-          <div className="text-lg font-bold text-accent">E-MOTION</div>
+          <div className="text-lg font-bold text-gradient-accent">E-MOTION</div>
           <p className="mt-2 max-w-xs text-sm text-muted">
             Formula Student Electric Racing Team der Hochschule Aalen.
             Elektrisch. Ambitioniert. Aalen.
           </p>
+          <SocialIcons className="mt-4 flex gap-3" />
         </div>
 
         <div>
@@ -17,23 +21,38 @@ export default function Footer() {
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li><Link href="/team" className="transition-colors hover:text-accent">Team</Link></li>
             <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent">Fahrzeuge</Link></li>
+            <li><Link href="/erfolge" className="transition-colors hover:text-accent">Erfolge</Link></li>
             <li><Link href="/sponsoren" className="transition-colors hover:text-accent">Sponsoren</Link></li>
-            <li><Link href="/news" className="transition-colors hover:text-accent">News</Link></li>
-            <li><Link href="/kontakt" className="transition-colors hover:text-accent">Kontakt</Link></li>
+            <li><Link href="/mitmachen" className="transition-colors hover:text-accent">Mitmachen</Link></li>
           </ul>
         </div>
 
         <div>
-          <div className="text-sm font-semibold text-foreground">Kontakt</div>
+          <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li>Hochschule Aalen</li>
-            <li>Beethovenstraße 1, 73430 Aalen</li>
-            <li>
-              <a href="mailto:info@e-motion-aalen.de" className="hover:text-foreground">
-                info@e-motion-aalen.de
-              </a>
-            </li>
+            <li><Link href="/news" className="transition-colors hover:text-accent">News</Link></li>
+            <li><Link href="/blog" className="transition-colors hover:text-accent">Blog</Link></li>
+            <li><Link href="/galerie" className="transition-colors hover:text-accent">Galerie</Link></li>
+            <li><Link href="/kontakt" className="transition-colors hover:text-accent">Kontakt</Link></li>
           </ul>
+          <div className="mt-4 space-y-1 text-sm text-muted">
+            <p>Hochschule Aalen</p>
+            <p>Beethovenstraße 1, 73430 Aalen</p>
+            <a href="mailto:info@e-motion-aalen.de" className="block hover:text-foreground">
+              info@e-motion-aalen.de
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <div className="text-sm font-semibold text-foreground">Newsletter</div>
+          <p className="mt-3 text-sm text-muted">
+            Kein Update mehr verpassen – Rennergebnisse, Baufortschritt und Events direkt
+            ins Postfach.
+          </p>
+          <div className="mt-4">
+            <NewsletterForm />
+          </div>
         </div>
       </div>
 
