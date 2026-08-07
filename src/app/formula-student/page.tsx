@@ -10,7 +10,7 @@ export default function FormulaStudentPage() {
         <p className="text-sm font-semibold uppercase tracking-widest text-accent">
           Formula Student
         </p>
-        <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Was ist die Formula Student?</h1>
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Was ist die Formula Student?</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Wenn Studierende von Hochschulen und Universitäten antreten, um in der Formula Student
           zu konkurrieren, dann haben sie einen langen Weg hinter sich. Einen Formula-Student-

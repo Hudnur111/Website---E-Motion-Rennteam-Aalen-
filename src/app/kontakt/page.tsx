@@ -11,7 +11,7 @@ export default function ContactPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent">Kontakt</p>
-        <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
           {page?.heroTitle ?? "Kontaktiere uns"}
         </h1>
         <p className="mt-4 max-w-2xl text-muted">

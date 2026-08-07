@@ -27,32 +27,37 @@ export default function HeroContent({
   subtitle: string;
 }) {
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={container}
+      className="mx-auto max-w-4xl text-center"
+    >
       <motion.p
         variants={item}
-        className="mb-4 text-sm font-semibold uppercase tracking-widest text-accent"
+        className="mb-5 text-sm font-semibold uppercase tracking-widest text-accent"
       >
         {eyebrow}
       </motion.p>
       <motion.h1
         variants={item}
-        className="max-w-3xl text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl lg:text-7xl"
+        className="mx-auto text-6xl font-extrabold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl"
       >
         <span className="text-gradient-accent">{title}</span>
       </motion.h1>
-      <motion.p variants={item} className="mt-6 max-w-xl text-lg text-muted">
+      <motion.p variants={item} className="mx-auto mt-7 max-w-2xl text-xl text-muted">
         {subtitle}
       </motion.p>
-      <motion.div variants={item} className="mt-10 flex flex-wrap gap-4">
+      <motion.div variants={item} className="mt-10 flex flex-wrap justify-center gap-4">
         <Link
           href="/fahrzeuge"
-          className="group relative overflow-hidden rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+          className="group relative overflow-hidden rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
         >
           <span className="relative z-10">Unser Fahrzeug entdecken</span>
         </Link>
         <Link
           href="/sponsoren#werden"
-          className="rounded-md border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:bg-surface"
+          className="rounded-full border border-border px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:bg-surface"
         >
           Sponsor werden
         </Link>

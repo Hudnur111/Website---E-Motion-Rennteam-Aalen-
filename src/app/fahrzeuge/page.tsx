@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import ScrollScale from "@/components/motion/ScrollScale";
 
 export const metadata = { title: "Fahrzeuge | E-Motion Rennteam Aalen" };
 
@@ -8,64 +10,79 @@ export default function VehiclesPage() {
   const vehicles = getVehicles();
 
   return (
-    <div className="container-page py-20">
-      <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Fahrzeuge</p>
-        <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Unsere Boliden</h1>
-        <p className="mt-4 max-w-2xl text-muted">
-          Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug –
-          von der Simulation bis zur Rennstrecke.
-        </p>
-      </Reveal>
+    <div className="py-20">
+      <div className="container-page">
+        <Reveal className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent">Fahrzeuge</p>
+          <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
+            Unsere Boliden
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
+            Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
+            der Simulation bis zur Rennstrecke.
+          </p>
+        </Reveal>
+      </div>
 
-      <div className="mt-14 space-y-16">
+      <div className="mt-20 space-y-32">
         {vehicles.map((vehicle, i) => (
-          <Reveal key={vehicle.slug} direction={i % 2 === 0 ? "left" : "right"}>
-            <div className="group grid gap-8 rounded-2xl border border-border bg-surface p-6 transition-colors duration-300 hover:border-accent/40 md:grid-cols-2 md:p-10">
-              <div className="aspect-video overflow-hidden rounded-xl bg-surface-2">
-                {vehicle.coverImage ? (
-                  <Image
-                    src={vehicle.coverImage}
-                    alt={vehicle.name}
-                    width={800}
-                    height={450}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-muted">
-                    Fahrzeugbild folgt
-                  </div>
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold">{vehicle.name}</h2>
+          <section key={vehicle.slug} className={i % 2 === 1 ? "bg-surface/40 py-24" : "py-2"}>
+            <div className="container-page">
+              <Reveal className="text-center">
+                <div className="flex items-center justify-center gap-3">
+                  <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+                    {vehicle.year}
+                  </p>
                   {vehicle.current && (
                     <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
                       Aktuell
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-sm text-muted">{vehicle.year}</p>
-                <p className="mt-3 text-muted">{vehicle.tagline}</p>
-                {vehicle.body && <p className="mt-4 text-sm text-muted">{vehicle.body}</p>}
-
-                {vehicle.specs && vehicle.specs.length > 0 && (
-                  <dl className="mt-6 grid grid-cols-2 gap-4">
-                    {vehicle.specs.map((spec) => (
-                      <div
-                        key={spec.label}
-                        className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-accent/60"
-                      >
-                        <dt className="text-xs uppercase tracking-wide text-muted">{spec.label}</dt>
-                        <dd className="mt-1 text-lg font-semibold">{spec.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-              </div>
+                <h2 className="mx-auto mt-3 text-4xl font-extrabold tracking-tight sm:text-6xl">
+                  {vehicle.name}
+                </h2>
+                <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
+              </Reveal>
             </div>
-          </Reveal>
+
+            {vehicle.coverImage && (
+              <div className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen px-4 sm:px-8">
+                <ScrollScale className="mx-auto aspect-[16/9] w-full max-w-6xl overflow-hidden rounded-[1.5rem] border border-border/60 bg-surface sm:aspect-[21/9] sm:rounded-[2.5rem]">
+                  <Image
+                    src={vehicle.coverImage}
+                    alt={vehicle.name}
+                    width={1600}
+                    height={900}
+                    className="h-full w-full object-cover"
+                  />
+                </ScrollScale>
+              </div>
+            )}
+
+            <div className="container-page">
+              {vehicle.body && (
+                <Reveal className="mx-auto mt-14 max-w-2xl text-center text-muted">
+                  {vehicle.body}
+                </Reveal>
+              )}
+
+              {vehicle.specs && vehicle.specs.length > 0 && (
+                <StaggerGroup className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
+                  {vehicle.specs.map((spec) => (
+                    <StaggerItem key={spec.label}>
+                      <div className="rounded-2xl border border-border bg-background p-5 text-center transition-colors hover:border-accent/60">
+                        <div className="text-xs uppercase tracking-wide text-muted">
+                          {spec.label}
+                        </div>
+                        <div className="mt-1.5 text-lg font-semibold">{spec.value}</div>
+                      </div>
+                    </StaggerItem>
+                  ))}
+                </StaggerGroup>
+              )}
+            </div>
+          </section>
         ))}
       </div>
     </div>
