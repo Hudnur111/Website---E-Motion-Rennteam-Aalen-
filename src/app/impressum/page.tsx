@@ -30,6 +30,21 @@ export default function ImpressumPage() {
         </section>
 
         <section>
+          <h2 className="text-base font-semibold text-foreground">Website</h2>
+          <p className="mt-2">
+            Programmierung und Leitung: Denny Svalina, Abteilung Powertrain
+            <br />
+            E-Mail:{" "}
+            <a
+              href="mailto:denny.svalia@emotion-rennteam.de"
+              className="text-accent hover:underline"
+            >
+              denny.svalia@emotion-rennteam.de
+            </a>
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-base font-semibold text-foreground">Kontakt</h2>
           <p className="mt-2">
             Telefon: 07361 5762191
