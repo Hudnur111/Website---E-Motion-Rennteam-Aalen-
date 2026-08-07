@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const NAV_LINKS = [
+  { href: "/formula-student", label: "Formula Student" },
   { href: "/team", label: "Team" },
   { href: "/fahrzeuge", label: "Fahrzeuge" },
   { href: "/erfolge", label: "Erfolge" },
