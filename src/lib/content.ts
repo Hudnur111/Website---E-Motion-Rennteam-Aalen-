@@ -146,10 +146,35 @@ export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   return getBlogPosts().find((post) => post.slug === slug);
 }
 
+const GALLERY_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "galerie-upload");
+const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+
+function getAutoGalleryImages(): GalleryImage[] {
+  if (!fs.existsSync(GALLERY_UPLOAD_DIR)) return [];
+
+  return fs
+    .readdirSync(GALLERY_UPLOAD_DIR)
+    .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
+    .map((file) => {
+      const title = path
+        .basename(file, path.extname(file))
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/^./, (c) => c.toUpperCase());
+      return {
+        title: title || "Foto",
+        image: `/uploads/galerie-upload/${file}`,
+        slug: `auto-${file}`,
+      };
+    });
+}
+
 export function getGallery(): GalleryImage[] {
-  return readCollection<GalleryImage>("gallery").sort(
+  const curated = readCollection<GalleryImage>("gallery").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
   );
+  return [...curated, ...getAutoGalleryImages()];
 }
 
 export function getResults(): Result[] {

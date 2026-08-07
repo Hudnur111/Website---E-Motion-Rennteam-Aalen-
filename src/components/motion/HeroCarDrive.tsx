@@ -4,51 +4,48 @@ import { motion } from "framer-motion";
 
 export default function HeroCarDrive() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 -bottom-2 z-0 overflow-hidden sm:-bottom-4">
+    <div className="pointer-events-none absolute inset-x-0 -bottom-4 z-10 overflow-hidden sm:-bottom-6">
       <motion.div
-        initial={{ x: "-30vw", opacity: 0 }}
-        animate={{ x: "130vw", opacity: [0, 1, 1, 0] }}
+        initial={{ x: "-40vw", opacity: 0 }}
+        animate={{ x: "140vw", opacity: [0, 1, 1, 0] }}
         transition={{
-          duration: 2.6,
+          duration: 3.2,
+          delay: 0.4,
           ease: [0.45, 0, 0.2, 1],
-          opacity: { duration: 2.6, times: [0, 0.12, 0.82, 1] },
+          opacity: { duration: 3.2, times: [0, 0.1, 0.85, 1] },
+          repeat: Infinity,
+          repeatDelay: 6,
         }}
-        className="w-[280px] sm:w-[360px]"
+        className="w-[220px] sm:w-[300px]"
       >
         <svg
-          viewBox="0 0 240 70"
+          viewBox="0 0 240 90"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="h-auto w-full text-accent"
+          className="h-auto w-full text-accent drop-shadow-[0_0_12px_rgba(74,99,247,0.7)]"
         >
           <path
-            d="M8 48c8-1 14-2 20-6 6-5 10-14 20-18 9-4 22-5 32-5h34c9 0 16 3 21 9l6 7h48c8 0 14 3 18 9"
+            d="M2 62 H16 c2-10 10-17 20-17 h6 l10-14 c3-4 8-7 13-7 h44 c6 0 11 3 14 8 l7 12 h30 c11 0 20 8 21 18 h4"
+            fill="currentColor"
+            fillOpacity="0.12"
             stroke="currentColor"
-            strokeWidth="2.5"
+            strokeWidth="4"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
-            d="M14 48c0 0 30 2 46 2s70-1 84 0 62 2 70-3"
+            d="M96 24 l-8 21 h56 l-10-21"
+            fill="currentColor"
+            fillOpacity="0.25"
             stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
+            strokeWidth="4"
             strokeLinejoin="round"
           />
-          <path
-            d="M96 20v22M150 25l10 17"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <circle cx="58" cy="52" r="13" stroke="currentColor" strokeWidth="3" />
-          <circle cx="182" cy="52" r="13" stroke="currentColor" strokeWidth="3" />
-          <path
-            d="M2 44c4 2 8 2 12 1"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
+          <path d="M164 39 h20 M2 55 h20" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+          <circle cx="54" cy="66" r="17" fill="#050608" stroke="currentColor" strokeWidth="5" />
+          <circle cx="54" cy="66" r="6" fill="currentColor" />
+          <circle cx="188" cy="66" r="17" fill="#050608" stroke="currentColor" strokeWidth="5" />
+          <circle cx="188" cy="66" r="6" fill="currentColor" />
         </svg>
       </motion.div>
     </div>
