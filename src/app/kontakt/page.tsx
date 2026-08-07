@@ -41,8 +41,16 @@ export default function ContactPage() {
           <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
             <h2 className="font-semibold">E-Mail</h2>
             <p className="mt-2 text-sm text-muted">
-              <a href="mailto:info@e-motion-aalen.de" className="text-accent hover:underline">
-                info@e-motion-aalen.de
+              <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent hover:underline">
+                vorstand@emotion-rennteam.de
+              </a>
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
+            <h2 className="font-semibold">Telefon</h2>
+            <p className="mt-2 text-sm text-muted">
+              <a href="tel:+4973615762191" className="text-accent hover:underline">
+                07361 5762191
               </a>
             </p>
           </div>

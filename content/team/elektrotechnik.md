@@ -5,4 +5,4 @@ department: Elektrotechnik / High-Voltage
 order: 2
 ---
 
-Verantwortlich für Batteriesystem, Leistungselektronik und Hochvolt-Sicherheit des EM23.
+Verantwortlich für Batteriesystem, Leistungselektronik und Hochvolt-Sicherheit des ERT-14/26.

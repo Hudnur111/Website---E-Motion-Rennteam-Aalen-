@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import SocialIcons from "@/components/SocialIcons";
 import NewsletterForm from "@/components/NewsletterForm";
@@ -8,8 +9,14 @@ export default function Footer() {
       <div className="checkered-divider" />
       <div className="container-page grid gap-10 py-14 md:grid-cols-4">
         <div>
-          <div className="text-lg font-bold text-gradient-accent">E-MOTION</div>
-          <p className="mt-2 max-w-xs text-sm text-muted">
+          <Image
+            src="/uploads/logo.png"
+            alt="E-Motion Rennteam Aalen"
+            width={1000}
+            height={563}
+            className="h-10 w-auto"
+          />
+          <p className="mt-3 max-w-xs text-sm text-muted">
             Formula Student Electric Racing Team der Hochschule Aalen.
             Elektrisch. Ambitioniert. Aalen.
           </p>
@@ -38,8 +45,11 @@ export default function Footer() {
           <div className="mt-4 space-y-1 text-sm text-muted">
             <p>Hochschule Aalen</p>
             <p>Beethovenstraße 1, 73430 Aalen</p>
-            <a href="mailto:info@e-motion-aalen.de" className="block hover:text-foreground">
-              info@e-motion-aalen.de
+            <a href="mailto:vorstand@emotion-rennteam.de" className="block hover:text-foreground">
+              vorstand@emotion-rennteam.de
+            </a>
+            <a href="tel:+4973615762191" className="block hover:text-foreground">
+              07361 5762191
             </a>
           </div>
         </div>

@@ -1,5 +1,5 @@
 ---
-title: "EM23 bei der Fahrzeugpräsentation"
+title: "Fahrzeugpräsentation auf der Bühne"
 image: /uploads/em-fahrzeug-buehne.jpg
 category: "Event"
 order: 1

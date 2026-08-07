@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -60,12 +61,16 @@ export default function Header() {
       }`}
     >
       <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="group flex items-center gap-2 font-bold tracking-tight">
-          <span className="relative text-lg text-accent">
-            E-MOTION
-            <span className="absolute -inset-x-2 -inset-y-1 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
-          </span>
-          <span className="hidden text-sm text-muted sm:inline">Rennteam Aalen</span>
+        <Link href="/" className="group relative flex items-center">
+          <Image
+            src="/uploads/logo.png"
+            alt="E-Motion Rennteam Aalen"
+            width={1000}
+            height={563}
+            priority
+            className="h-9 w-auto"
+          />
+          <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

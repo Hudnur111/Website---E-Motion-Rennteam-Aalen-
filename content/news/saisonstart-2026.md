@@ -1,7 +1,9 @@
 ---
-title: "Saisonstart 2026: Entwicklung des EM24 beginnt"
+title: "Rollout 2026: Der ERT-14/26 ist enthüllt"
 date: "2026-01-15T09:00:00.000Z"
-excerpt: "Das Team startet in die neue Saison mit ambitionierten Zielen für den Nachfolger des EM23."
+excerpt: "Beim Rollout 2026 haben wir unseren neuen Boliden ERT-14/26 mit Startnummer E61 vor Team, Sponsoren und Gästen enthüllt."
 ---
 
-Nach einer erfolgreichen Saison 2025 hat das E-Motion Rennteam offiziell mit der Entwicklung des neuen Fahrzeugs begonnen. Im Fokus stehen ein noch leichteres Monocoque und eine überarbeitete Aerodynamik.
+Nach Monaten intensiver Entwicklungsarbeit war es soweit: Beim Rollout 2026 hat das E-Motion Rennteam Aalen seinen neuen Boliden, den ERT-14/26, offiziell der Öffentlichkeit vorgestellt. Mit Startnummer E61 tritt das Fahrzeug in der kommenden Saison bei den Formula-Student-Wettbewerben an.
+
+Vor vollem Haus präsentierte das Team die Neuerungen gegenüber dem Vorgängerfahrzeug ERT-12/24 – von der überarbeiteten Aerodynamik bis zum optimierten Antriebsstrang. Ein besonderer Dank gilt allen Sponsoren und Partnern, die die Entwicklung erst möglich gemacht haben.
