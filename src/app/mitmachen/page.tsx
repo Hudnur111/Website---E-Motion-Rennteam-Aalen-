@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getPositions } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import MemberApplicationForm from "@/components/MemberApplicationForm";
 
 export const metadata = { title: "Mitmachen | E-Motion Rennteam Aalen" };
 
@@ -41,29 +41,28 @@ export default function JoinPage() {
               </div>
               <h3 className="mt-4 text-lg font-semibold">{position.title}</h3>
               <p className="mt-2 flex-1 text-sm text-muted">{position.body}</p>
-              <Link
-                href="/kontakt"
+              <a
+                href="#bewerbung"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent transition-all hover:gap-2 hover:underline"
               >
                 Jetzt bewerben <span aria-hidden>&rarr;</span>
-              </Link>
+              </a>
             </div>
           </StaggerItem>
         ))}
       </StaggerGroup>
 
-      <Reveal delay={0.1} className="mt-20 rounded-2xl border border-accent/40 bg-surface p-10 text-center">
-        <h2 className="text-2xl font-bold">Keine passende Position dabei?</h2>
-        <p className="mx-auto mt-3 max-w-xl text-muted">
-          Wir freuen uns auch über Initiativbewerbungen – schreib uns einfach, was dich
-          interessiert.
-        </p>
-        <Link
-          href="/kontakt"
-          className="mt-6 inline-block rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
-        >
-          Kontakt aufnehmen
-        </Link>
+      <Reveal id="bewerbung" delay={0.1} className="mt-20 scroll-mt-24 rounded-2xl border border-accent/40 bg-surface p-8 sm:p-10">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Bewirb dich jetzt</h2>
+          <p className="mx-auto mt-3 max-w-xl text-muted">
+            Egal ob für eine offene Position oder als Initiativbewerbung – wir freuen uns auf
+            deine Nachricht.
+          </p>
+        </div>
+        <div className="mx-auto mt-8 max-w-2xl">
+          <MemberApplicationForm />
+        </div>
       </Reveal>
     </div>
   );

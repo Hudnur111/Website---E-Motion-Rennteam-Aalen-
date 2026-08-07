@@ -1,8 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import SponsorForm from "@/components/SponsorForm";
 
 export const metadata = { title: "Sponsoren | E-Motion Rennteam Aalen" };
 
@@ -61,17 +61,17 @@ export default function SponsorsPage() {
         );
       })}
 
-      <Reveal className="mt-20 rounded-2xl border border-accent/40 bg-surface p-10 text-center" delay={0.1}>
-        <h2 className="text-2xl font-bold">Interesse an einem Sponsoring?</h2>
-        <p className="mx-auto mt-3 max-w-xl text-muted">
-          Werde Teil unseres Erfolgs und unterstütze das E-Motion Rennteam Aalen.
-        </p>
-        <Link
-          href="/kontakt"
-          className="mt-6 inline-block rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
-        >
-          Jetzt Kontakt aufnehmen
-        </Link>
+      <Reveal id="werden" className="mt-24 scroll-mt-24 rounded-2xl border border-accent/40 bg-surface p-8 sm:p-10" delay={0.1}>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Interesse an einem Sponsoring?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-muted">
+            Werdet Teil unseres Erfolgs und unterstützt das E-Motion Rennteam Aalen. Füllt einfach
+            das Formular aus – wir melden uns zeitnah bei euch.
+          </p>
+        </div>
+        <div className="mx-auto mt-8 max-w-2xl">
+          <SponsorForm />
+        </div>
       </Reveal>
     </div>
   );

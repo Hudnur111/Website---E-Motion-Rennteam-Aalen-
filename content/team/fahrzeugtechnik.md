@@ -2,7 +2,7 @@
 name: Lukas Weber
 role: Leitung Fahrzeugtechnik
 department: Fahrzeugtechnik
-order: 3
+order: 10
 ---
 
-Verantwortlich für Monocoque, Fahrwerk und Gesamtfahrzeugintegration.
+Verantwortlich für Monocoque, Gesamtfahrzeugintegration und Package.

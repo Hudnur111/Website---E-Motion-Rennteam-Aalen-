@@ -51,7 +51,7 @@ export default function HeroContent({
           <span className="relative z-10">Unser Fahrzeug entdecken</span>
         </Link>
         <Link
-          href="/sponsoren"
+          href="/sponsoren#werden"
           className="rounded-md border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:bg-surface"
         >
           Sponsor werden
