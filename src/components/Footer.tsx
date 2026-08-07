@@ -15,11 +15,11 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold text-foreground">Navigation</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/team" className="hover:text-foreground">Team</Link></li>
-            <li><Link href="/fahrzeuge" className="hover:text-foreground">Fahrzeuge</Link></li>
-            <li><Link href="/sponsoren" className="hover:text-foreground">Sponsoren</Link></li>
-            <li><Link href="/news" className="hover:text-foreground">News</Link></li>
-            <li><Link href="/kontakt" className="hover:text-foreground">Kontakt</Link></li>
+            <li><Link href="/team" className="transition-colors hover:text-accent">Team</Link></li>
+            <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent">Fahrzeuge</Link></li>
+            <li><Link href="/sponsoren" className="transition-colors hover:text-accent">Sponsoren</Link></li>
+            <li><Link href="/news" className="transition-colors hover:text-accent">News</Link></li>
+            <li><Link href="/kontakt" className="transition-colors hover:text-accent">Kontakt</Link></li>
           </ul>
         </div>
 
