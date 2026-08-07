@@ -7,17 +7,18 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const NAV_LINKS = [
-  { href: "/formula-student", label: "Formula Student" },
   { href: "/team", label: "Team" },
   { href: "/fahrzeuge", label: "Fahrzeuge" },
-  { href: "/erfolge", label: "Erfolge" },
   { href: "/sponsoren", label: "Sponsoren" },
 ];
 
 const MORE_LINKS = [
+  { href: "/formula-student", label: "Formula Student" },
   { href: "/news", label: "News" },
   { href: "/blog", label: "Blog" },
   { href: "/galerie", label: "Galerie" },
+  { href: "/erfolge", label: "Erfolge" },
+  { href: "/kontakt", label: "Kontakt" },
 ];
 
 export default function Header() {
@@ -147,22 +148,6 @@ export default function Header() {
           </div>
 
           <Link
-            href="/kontakt"
-            className={`relative py-1 text-sm font-medium transition-colors ${
-              pathname === "/kontakt" ? "text-foreground" : "text-muted hover:text-foreground"
-            }`}
-          >
-            Kontakt
-            {pathname === "/kontakt" && (
-              <motion.span
-                layoutId="nav-underline"
-                className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-accent"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-          </Link>
-
-          <Link
             href="/mitmachen"
             className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
           >
@@ -204,7 +189,7 @@ export default function Header() {
             className="overflow-hidden border-t border-border bg-background md:hidden"
           >
             <div className="container-page flex flex-col gap-1 py-3">
-              {[...NAV_LINKS, ...MORE_LINKS, { href: "/kontakt", label: "Kontakt" }].map(
+              {[...NAV_LINKS, ...MORE_LINKS].map(
                 (link, i) => (
                   <motion.div
                     key={link.href}
