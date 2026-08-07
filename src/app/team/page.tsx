@@ -71,11 +71,20 @@ export default function TeamPage() {
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-muted">
-                              {member.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-muted">
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                className="h-9 w-9 opacity-50"
+                              >
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+                              </svg>
+                              <span className="text-xs font-medium uppercase tracking-wide opacity-70">
+                                Bild folgt
+                              </span>
                             </div>
                           )}
                         </div>

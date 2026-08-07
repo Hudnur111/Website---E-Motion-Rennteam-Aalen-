@@ -1,5 +1,5 @@
 ---
-name: Anna Schmidt
+name: Max Mustermann
 role: Leitung Elektrotechnik
 department: Elektrotechnik / High-Voltage
 order: 20

@@ -1,5 +1,5 @@
 ---
-name: Sophie Becker
+name: Max Mustermann
 role: Leitung Software
 department: Software / Autonomous
 order: 50

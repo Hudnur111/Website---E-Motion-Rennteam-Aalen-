@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getPage, getVehicles, getNews, getSponsors } from "@/lib/content";
 import HeroBackground from "@/components/motion/HeroBackground";
 import HeroContent from "@/components/motion/HeroContent";
+import HeroCarDrive from "@/components/motion/HeroCarDrive";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
@@ -31,6 +32,7 @@ export default function Home() {
             title={page?.heroTitle ?? "E-Motion Rennteam Aalen"}
             subtitle={page?.heroSubtitle ?? "Elektrisch. Ambitioniert. Aalen."}
           />
+          <HeroCarDrive />
         </div>
 
         {vehicle?.coverImage && (

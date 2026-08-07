@@ -1,5 +1,5 @@
 ---
-name: Julia Fischer
+name: Max Mustermann
 role: Leitung Marketing & Finanzen
 department: Marketing & Finanzen
 order: 60

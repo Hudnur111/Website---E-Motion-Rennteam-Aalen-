@@ -1,5 +1,5 @@
 ---
-name: Jonas Richter
+name: Max Mustermann
 role: Composites & Fertigung
 department: Fahrzeugtechnik
 order: 11

@@ -1,5 +1,5 @@
 ---
-name: Nina Krüger
+name: Max Mustermann
 role: Leitung Fahrwerk
 department: Fahrwerk
 order: 40

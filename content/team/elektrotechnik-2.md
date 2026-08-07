@@ -1,5 +1,5 @@
 ---
-name: Felix Braun
+name: Max Mustermann
 role: Batteriesystem
 department: Elektrotechnik / High-Voltage
 order: 21

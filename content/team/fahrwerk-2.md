@@ -1,5 +1,5 @@
 ---
-name: David Neumann
+name: Max Mustermann
 role: Fahrdynamik
 department: Fahrwerk
 order: 41

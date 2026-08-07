@@ -1,5 +1,5 @@
 ---
-name: Erik Schulz
+name: Max Mustermann
 role: Sponsoring & Partner
 department: Marketing & Finanzen
 order: 61

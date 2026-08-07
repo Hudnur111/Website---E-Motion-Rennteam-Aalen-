@@ -1,5 +1,5 @@
 ---
-name: Lukas Weber
+name: Max Mustermann
 role: Leitung Fahrzeugtechnik
 department: Fahrzeugtechnik
 order: 10

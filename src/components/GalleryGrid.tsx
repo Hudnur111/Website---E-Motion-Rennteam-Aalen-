@@ -50,11 +50,6 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-background/80 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <span className="text-sm font-semibold text-foreground">{img.title}</span>
               </div>
-              {img.category && (
-                <span className="absolute right-3 top-3 rounded-full bg-background/70 px-3 py-1 text-xs font-semibold text-accent backdrop-blur">
-                  {img.category}
-                </span>
-              )}
             </button>
           </StaggerItem>
         ))}

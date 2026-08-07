@@ -1,5 +1,5 @@
 ---
-name: Tim Wagner
+name: Max Mustermann
 role: Strömungssimulation
 department: Aerodynamik
 order: 31

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import HeaderPulseLine from "@/components/HeaderPulseLine";
 
 const NAV_LINKS = [
   { href: "/team", label: "Team" },
@@ -62,6 +63,7 @@ export default function Header() {
           : "border-transparent bg-transparent"
       }`}
     >
+      <div className="relative">
       <div className="container-page flex h-16 items-center justify-between">
         <Link href="/" className="group relative flex items-center">
           <Image
@@ -177,6 +179,8 @@ export default function Header() {
             />
           </div>
         </button>
+      </div>
+      <HeaderPulseLine />
       </div>
 
       <AnimatePresence>

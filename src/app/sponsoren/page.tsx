@@ -50,7 +50,9 @@ export default function SponsorsPage() {
                         className="max-h-16 w-auto object-contain"
                       />
                     ) : (
-                      <span className="text-xl font-bold">{sponsor.name}</span>
+                      <span className="text-2xl font-bold uppercase tracking-tight text-foreground">
+                        {sponsor.name}
+                      </span>
                     )}
                     {sponsor.body && (
                       <p className="mt-3 text-sm text-muted">{sponsor.body}</p>
