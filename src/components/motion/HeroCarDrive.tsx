@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function HeroCarDrive() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 -bottom-4 z-10 overflow-hidden sm:-bottom-6">
+    <div className="pointer-events-none absolute inset-x-0 top-6 z-10 overflow-hidden sm:top-10">
       <motion.div
         initial={{ x: "-40vw", opacity: 0 }}
         animate={{ x: "140vw", opacity: [0, 1, 1, 0] }}
