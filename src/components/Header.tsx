@@ -28,6 +28,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const moreRef = useRef<HTMLDivElement>(null);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -36,10 +37,13 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
+  // Close menus when navigating to a new route. Adjusting state during
+  // render (rather than in an effect) avoids an extra cascading render.
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setOpen(false);
     setMoreOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
