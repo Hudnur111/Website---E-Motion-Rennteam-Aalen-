@@ -2,8 +2,9 @@
 
 Eine kleine, eigene Redaktions-App, mit der ihr Texte und Bilder der
 Website bearbeiten könnt – **ohne Programmierkenntnisse**. Beim Speichern
-wird die Änderung automatisch auf GitHub veröffentlicht, auf einen
-eigenen Branch namens `cms-content` (getrennt von `main`).
+wird die Änderung automatisch direkt auf `main` committet – Netlify baut
+die Website danach automatisch neu, die Änderung ist innerhalb weniger
+Minuten live.
 
 ## Einmalige Einrichtung
 
@@ -58,12 +59,16 @@ speichern kann. Der Schlüssel bleibt nur auf deinem Rechner gespeichert
 
 ## Änderungen live schalten
 
-Die App speichert alles auf dem Branch `cms-content` – bewusst getrennt
-von der eigentlichen Live-Website (`main`), damit nichts kaputt gehen
-kann. Um Änderungen auf die echte Website zu übernehmen, muss jemand mit
-Zugriff auf das Repository den Branch `cms-content` einmal nach `main`
-mergen (z. B. über einen Pull Request auf GitHub, oder Claude Code
-darum bitten).
+Jede Speicherung committet direkt auf `main`. Netlify (oder dein
+Hosting) baut die Website bei jedem Push auf `main` automatisch neu –
+in der Regel ist die Änderung nach 1–2 Minuten live, ohne dass jemand
+etwas manuell mergen muss.
+
+Falls ihr lieber erst gegenprüfen wollt, bevor etwas live geht: Im
+Einrichtungs-Assistenten unter „Erweiterte Einstellungen" könnt ihr
+einen anderen Branch-Namen eintragen (z. B. `entwurf`). Dann landen
+Änderungen dort und müssen manuell per Pull Request nach `main`
+gemerged werden.
 
 ## Für Entwickler
 

@@ -30,7 +30,7 @@ function loadStoreFromEnv() {
     token: GITHUB_TOKEN,
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
-    branch: GITHUB_BRANCH || "cms-content",
+    branch: GITHUB_BRANCH || "main",
     baseBranch: GITHUB_BASE_BRANCH || "main",
   });
 }
@@ -60,7 +60,7 @@ app.get("/api/status", (req, res) => {
     configured: Boolean(store),
     owner: process.env.GITHUB_OWNER || "Hudnur111",
     repo: process.env.GITHUB_REPO || "Website---E-Motion-Rennteam-Aalen-",
-    branch: process.env.GITHUB_BRANCH || "cms-content",
+    branch: process.env.GITHUB_BRANCH || "main",
   });
 });
 
@@ -74,17 +74,18 @@ app.post("/api/setup", async (req, res) => {
     token,
     owner,
     repo,
-    branch: branch || "cms-content",
+    branch: branch || "main",
     baseBranch: baseBranch || "main",
   });
 
   try {
     const info = await candidate.verifyAccess();
+    await candidate.ensureBranch();
     saveEnvFile({
       GITHUB_TOKEN: token,
       GITHUB_OWNER: owner,
       GITHUB_REPO: repo,
-      GITHUB_BRANCH: branch || "cms-content",
+      GITHUB_BRANCH: branch || "main",
       GITHUB_BASE_BRANCH: baseBranch || info.defaultBranch || "main",
     });
     dotenv.config({ path: ENV_PATH, override: true });
