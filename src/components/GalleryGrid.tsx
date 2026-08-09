@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
@@ -29,6 +29,27 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
     if (activeIndex === null) return;
     setActiveIndex((activeIndex - 1 + images.length) % images.length);
   }
+
+  // Keyboard support for the lightbox: Escape closes it, arrow keys step
+  // through images. Also lock body scroll while it's open.
+  useEffect(() => {
+    if (activeIndex === null) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex, images.length]);
 
   return (
     <>
@@ -63,6 +84,9 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 p-4 backdrop-blur-sm"
             onClick={close}
+            role="dialog"
+            aria-modal="true"
+            aria-label={active.title}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
