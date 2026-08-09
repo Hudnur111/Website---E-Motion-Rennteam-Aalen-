@@ -1,16 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { marked } from "marked";
 import { getBlogPosts, getBlogPostBySlug } from "@/lib/content";
+import { renderMarkdown } from "@/lib/markdown";
 import Reveal from "@/components/motion/Reveal";
 
 export function generateStaticParams() {
   return getBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getBlogPostBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = getBlogPostBySlug(slug);
   return { title: post ? `${post.title} | Blog | E-Motion Rennteam Aalen` : "Blog" };
 }
 
@@ -23,7 +28,7 @@ export default async function BlogDetailPage({
   const post = getBlogPostBySlug(slug);
   if (!post) notFound();
 
-  const html = await marked.parse(post.body || "");
+  const html = await renderMarkdown(post.body);
 
   return (
     <article className="container-page max-w-3xl py-20">
