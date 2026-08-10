@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,7 @@ const SITE_DESCRIPTION =
   "E-Motion Rennteam Aalen – das Formula-Student-Electric-Team der Hochschule Aalen. Team, Fahrzeuge, Sponsoren und News.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "E-Motion Rennteam Aalen | Formula Student Electric",
     template: "%s | E-Motion Rennteam Aalen",
