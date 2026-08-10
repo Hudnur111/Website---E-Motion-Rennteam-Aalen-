@@ -29,17 +29,23 @@ export default function Header() {
   const pathname = usePathname();
   const moreRef = useRef<HTMLDivElement>(null);
 
+  // Reset the open menus whenever the route changes. Adjusting state during
+  // render (instead of in an effect) avoids the extra "flash" render that a
+  // setState-in-effect would cause – see the React docs pattern for
+  // "Adjusting state when a prop changes".
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+    setMoreOpen(false);
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-    setMoreOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
