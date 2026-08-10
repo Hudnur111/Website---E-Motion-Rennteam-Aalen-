@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,9 +10,28 @@ export function generateStaticParams() {
   return getBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getBlogPostBySlug(params.slug);
-  return { title: post ? `${post.title} | Blog | E-Motion Rennteam Aalen` : "Blog" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getBlogPostBySlug(slug);
+  if (!post) return { title: "Blog" };
+
+  return {
+    title: `${post.title} | Blog`,
+    description: post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+      authors: post.author ? [post.author] : undefined,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+  };
 }
 
 export default async function BlogDetailPage({
