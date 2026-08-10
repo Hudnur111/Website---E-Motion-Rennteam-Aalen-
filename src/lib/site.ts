@@ -1,6 +1,7 @@
-// Set NEXT_PUBLIC_SITE_URL in production so canonical URLs, the sitemap,
-// and robots.txt point at the real domain instead of this placeholder.
-const DEFAULT_SITE_URL = "https://example.com";
+// Matches the domain used throughout the site's own contact/impressum
+// content (e.g. vorstand@emotion-rennteam.de). Override with
+// NEXT_PUBLIC_SITE_URL if the deployed domain ever differs.
+const DEFAULT_SITE_URL = "https://www.emotion-rennteam.de";
 
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL
