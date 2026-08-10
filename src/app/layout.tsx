@@ -67,6 +67,10 @@ const organizationJsonLd = {
     "@type": "CollegeOrUniversity",
     name: "Hochschule Aalen",
   },
+  memberOf: {
+    "@type": "Organization",
+    name: "Formula Student Germany",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

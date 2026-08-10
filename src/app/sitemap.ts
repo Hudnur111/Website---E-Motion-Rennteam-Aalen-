@@ -2,20 +2,24 @@ import type { MetadataRoute } from "next";
 import { getBlogPosts, getNews } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
 
-const STATIC_ROUTES = [
-  { path: "", priority: 1, changeFrequency: "weekly" as const },
-  { path: "/team", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/fahrzeuge", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/sponsoren", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/formula-student", priority: 0.6, changeFrequency: "yearly" as const },
-  { path: "/news", priority: 0.8, changeFrequency: "weekly" as const },
-  { path: "/blog", priority: 0.7, changeFrequency: "weekly" as const },
-  { path: "/galerie", priority: 0.5, changeFrequency: "monthly" as const },
-  { path: "/erfolge", priority: 0.6, changeFrequency: "monthly" as const },
-  { path: "/mitmachen", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" as const },
-  { path: "/impressum", priority: 0.2, changeFrequency: "yearly" as const },
-  { path: "/datenschutz", priority: 0.2, changeFrequency: "yearly" as const },
+const STATIC_ROUTES: {
+  path: string;
+  priority: number;
+  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+}[] = [
+  { path: "", priority: 1, changeFrequency: "weekly" },
+  { path: "/team", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/fahrzeuge", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/sponsoren", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/formula-student", priority: 0.6, changeFrequency: "yearly" },
+  { path: "/news", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/galerie", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/erfolge", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/mitmachen", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" },
+  { path: "/impressum", priority: 0.2, changeFrequency: "yearly" },
+  { path: "/datenschutz", priority: 0.2, changeFrequency: "yearly" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

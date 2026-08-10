@@ -38,9 +38,10 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
     setActiveIndex((activeIndex - 1 + images.length) % images.length);
   }
 
-  // Keyboard support for the lightbox: Escape closes it, arrow keys navigate.
+  // Keyboard support for the lightbox: Escape closes it, arrow keys step
+  // through images. Also lock body scroll while it's open.
   useEffect(() => {
-    if (active === null) return;
+    if (activeIndex === null) return;
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") close();
@@ -49,9 +50,14 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
     }
 
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, activeIndex]);
+  }, [activeIndex, images.length]);
 
   // Move focus into the dialog when it opens so keyboard/screen-reader users
   // land somewhere sensible instead of staying on the (now hidden) trigger.
