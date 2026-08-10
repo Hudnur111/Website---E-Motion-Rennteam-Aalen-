@@ -29,9 +29,10 @@ export default function Header() {
   const pathname = usePathname();
   const moreRef = useRef<HTMLDivElement>(null);
 
-  // Close the open menus on navigation. Derived during render (rather than
-  // in an effect) to avoid the extra open->closed render pass a post-commit
-  // effect would trigger — see https://react.dev/learn/you-might-not-need-an-effect
+  // Reset the open menus whenever the route changes. Adjusting state during
+  // render (instead of in an effect) avoids the extra "flash" render that a
+  // setState-in-effect would cause – see the React docs pattern for
+  // "Adjusting state when a prop changes".
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
@@ -61,7 +62,14 @@ export default function Header() {
   );
 
   return (
-    <header
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[100] focus-visible:rounded-md focus-visible:bg-accent focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-semibold focus-visible:text-accent-foreground"
+      >
+        Zum Inhalt springen
+      </a>
+      <header
       className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
         scrolled
           ? "border-border bg-background/85 backdrop-blur-md"
@@ -82,7 +90,7 @@ export default function Header() {
           <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
@@ -191,6 +199,7 @@ export default function Header() {
       <AnimatePresence>
         {open && (
           <motion.nav
+            aria-label="Mobile Navigation"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -232,6 +241,7 @@ export default function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
-    </header>
+      </header>
+    </>
   );
 }

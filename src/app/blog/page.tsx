@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getBlogPosts } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
-export const metadata = { title: "Blog | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Blog",
+  description:
+    "Einblicke hinter die Kulissen des E-Motion Rennteams Aalen: Werkstattberichte, Baufortschritt und persönliche Erfahrungen aus dem Formula-Student-Alltag.",
+  alternates: { canonical: "/blog" },
+};
 
 export default function BlogPage() {
   const posts = getBlogPosts();

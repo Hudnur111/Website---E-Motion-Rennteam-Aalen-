@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 
-export const metadata = { title: "Sponsoren | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Sponsoren",
+  description:
+    "Unsere Sponsoren und Partner: Unternehmen, die das E-Motion Rennteam Aalen unterstützen. Werde jetzt Sponsor.",
+  alternates: { canonical: "/sponsoren" },
+};
 
 const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Partner"];
 

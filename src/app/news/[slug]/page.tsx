@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,9 +10,27 @@ export function generateStaticParams() {
   return getNews().map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getNewsBySlug(params.slug);
-  return { title: post ? `${post.title} | E-Motion Rennteam Aalen` : "News" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getNewsBySlug(slug);
+  if (!post) return { title: "News" };
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: `/news/${post.slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+  };
 }
 
 export default async function NewsDetailPage({

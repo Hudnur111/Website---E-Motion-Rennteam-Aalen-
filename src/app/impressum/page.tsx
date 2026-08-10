@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
 
-export const metadata = { title: "Impressum | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Impressum",
+  description: "Impressum und Anbieterkennzeichnung des E-Motion Rennteams Aalen gemäß § 5 TMG.",
+  alternates: { canonical: "/impressum" },
+};
 
 export default function ImpressumPage() {
   return (

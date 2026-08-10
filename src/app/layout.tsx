@@ -4,7 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
-import { SITE_URL } from "@/lib/site";
+import MotionProvider from "@/components/MotionProvider";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,9 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_DESCRIPTION =
-  "E-Motion Rennteam Aalen – das Formula-Student-Electric-Team der Hochschule Aalen. Team, Fahrzeuge, Sponsoren und News.";
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -26,10 +24,14 @@ export const metadata: Metadata = {
     template: "%s | E-Motion Rennteam Aalen",
   },
   description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "E-Motion Rennteam Aalen | Formula Student Electric",
     description: SITE_DESCRIPTION,
-    siteName: "E-Motion Rennteam Aalen",
+    siteName: SITE_NAME,
+    url: SITE_URL,
     locale: "de_DE",
     type: "website",
     images: ["/uploads/ert-14-26-studio.jpg"],
@@ -42,6 +44,31 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SportsTeam",
+  name: SITE_NAME,
+  alternateName: "E-Motion Rennteam",
+  url: SITE_URL,
+  logo: `${SITE_URL}/uploads/logo.png`,
+  image: `${SITE_URL}/uploads/ert-14-26-studio.jpg`,
+  description: SITE_DESCRIPTION,
+  sport: "Motorsport",
+  email: "vorstand@emotion-rennteam.de",
+  telephone: "+49-7361-5762191",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Beethovenstraße 1",
+    postalCode: "73430",
+    addressLocality: "Aalen",
+    addressCountry: "DE",
+  },
+  parentOrganization: {
+    "@type": "CollegeOrUniversity",
+    name: "Hochschule Aalen",
+  },
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -49,11 +76,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Header />
-        <main className="flex-1">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <Footer />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <MotionProvider>
+          <Header />
+          <main id="main-content" className="flex-1">
+            <PageTransition>{children}</PageTransition>
+          </main>
+          <Footer />
+        </MotionProvider>
       </body>
     </html>
   );

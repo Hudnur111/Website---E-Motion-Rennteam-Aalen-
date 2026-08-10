@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getTeam } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
-export const metadata = { title: "Team | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Team",
+  description:
+    "Das Team hinter dem E-Motion Rennteam Aalen: Studierende aus allen Fachbereichen, die gemeinsam einen Formula-Student-Electric-Rennwagen entwickeln.",
+  alternates: { canonical: "/team" },
+};
 
 const TEAM_DESCRIPTIONS: Record<string, string> = {
   Teamleitung:

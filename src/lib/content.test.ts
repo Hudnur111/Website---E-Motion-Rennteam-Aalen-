@@ -70,6 +70,13 @@ describe("getNews / getNewsBySlug", () => {
     expect(getNewsBySlug(first.slug)).toEqual(first);
     expect(getNewsBySlug("does-not-exist")).toBeUndefined();
   });
+
+  it("derives the slug from the markdown filename, not the raw file extension", () => {
+    for (const post of getNews()) {
+      expect(post.slug).not.toMatch(/\.md$/);
+      expect(post.slug.length).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("getBlogPosts / getBlogPostBySlug", () => {

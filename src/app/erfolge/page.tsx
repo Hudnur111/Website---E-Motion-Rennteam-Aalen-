@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 
-export const metadata = { title: "Erfolge | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Erfolge",
+  description:
+    "Die Erfolge des E-Motion Rennteams Aalen bei Formula-Student-Wettbewerben: Platzierungen, Events und Meilensteine im Überblick.",
+  alternates: { canonical: "/erfolge" },
+};
 
 export default function ResultsPage() {
   const results = getResults();
