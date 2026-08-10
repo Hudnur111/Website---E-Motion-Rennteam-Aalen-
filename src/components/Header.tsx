@@ -29,17 +29,22 @@ export default function Header() {
   const pathname = usePathname();
   const moreRef = useRef<HTMLDivElement>(null);
 
+  // Close the open menus on navigation. Derived during render (rather than
+  // in an effect) to avoid the extra open->closed render pass a post-commit
+  // effect would trigger — see https://react.dev/learn/you-might-not-need-an-effect
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+    setMoreOpen(false);
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-    setMoreOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
