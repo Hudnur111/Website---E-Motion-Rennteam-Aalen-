@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getNews } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
-export const metadata = { title: "News | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "News",
+  description:
+    "Aktuelle News des E-Motion Rennteams Aalen: Berichte von Rennen, Events und dem Fahrzeugbau der aktuellen Saison.",
+  alternates: { canonical: "/news" },
+};
 
 export default function NewsPage() {
   const news = getNews();

@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { getPage } from "@/lib/content";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/motion/Reveal";
 
-export const metadata = { title: "Kontakt | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Kontakt",
+  description:
+    "Kontaktiere das E-Motion Rennteam Aalen: Fragen, Kooperationen oder Sponsoring-Anfragen an die Hochschule Aalen.",
+  alternates: { canonical: "/kontakt" },
+};
 
 export default function ContactPage() {
   const page = getPage("contact");

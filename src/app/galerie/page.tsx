@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { getGallery } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import GalleryGrid from "@/components/GalleryGrid";
 
-export const metadata = { title: "Galerie | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Galerie",
+  description:
+    "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Events und Wettbewerben.",
+  alternates: { canonical: "/galerie" },
+};
 
 export default function GalleryPage() {
   const images = getGallery();

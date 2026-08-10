@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ScrollScale from "@/components/motion/ScrollScale";
 
-export const metadata = { title: "Fahrzeuge | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Fahrzeuge",
+  description:
+    "Die Rennwagen des E-Motion Rennteams Aalen: technische Daten, Baujahre und Entwicklung unserer Formula-Student-Electric-Boliden.",
+  alternates: { canonical: "/fahrzeuge" },
+};
 
 export default function VehiclesPage() {
   const vehicles = getVehicles();

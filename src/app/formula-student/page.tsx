@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
 import DisciplinesChart from "@/components/DisciplinesChart";
 
-export const metadata = { title: "Was ist Formula Student? | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Was ist Formula Student?",
+  description:
+    "Formula Student erklärt: der internationale Konstruktionswettbewerb, bei dem Studierendenteams eigene Rennwagen entwickeln, bauen und gegeneinander antreten lassen.",
+  alternates: { canonical: "/formula-student" },
+};
 
 export default function FormulaStudentPage() {
   return (

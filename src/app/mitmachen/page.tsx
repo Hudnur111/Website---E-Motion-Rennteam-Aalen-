@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { getPositions } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
 
-export const metadata = { title: "Mitmachen | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Mitmachen",
+  description:
+    "Werde Teil des E-Motion Rennteams Aalen: offene Positionen in allen Fachbereichen für Studierende der Hochschule Aalen.",
+  alternates: { canonical: "/mitmachen" },
+};
 
 export default function JoinPage() {
   const positions = getPositions();

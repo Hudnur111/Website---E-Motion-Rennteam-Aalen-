@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
 
-export const metadata = { title: "Datenschutzerklärung | E-Motion Rennteam Aalen" };
+export const metadata: Metadata = {
+  title: "Datenschutzerklärung",
+  description:
+    "Datenschutzerklärung des E-Motion Rennteams Aalen: Informationen zur Verarbeitung personenbezogener Daten auf dieser Website.",
+  alternates: { canonical: "/datenschutz" },
+};
 
 export default function DatenschutzPage() {
   return (
