@@ -18,7 +18,7 @@ export default function NewsPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">News &amp; Blog</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">News &amp; Blog</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Aktuelles vom Team</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Wettbewerbsberichte, Baufortschritt und Neuigkeiten rund um das E-Motion Rennteam Aalen.
@@ -55,7 +55,7 @@ export default function NewsPage() {
                     year: "numeric",
                   })}
                 </time>
-                <h2 className="mt-2 text-lg font-semibold group-hover:text-accent">
+                <h2 className="mt-2 text-lg font-semibold group-hover:text-accent-text">
                   {post.title}
                 </h2>
                 <p className="mt-2 text-sm text-muted">{post.excerpt}</p>

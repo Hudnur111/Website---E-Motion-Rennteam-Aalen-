@@ -17,7 +17,7 @@ export default function JoinPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Mitmachen</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mitmachen</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Werde Teil des Teams</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Egal ob Fahrzeugtechnik, Elektrotechnik, Software oder Marketing – bei uns lernst du,
@@ -35,7 +35,7 @@ export default function JoinPage() {
             <div className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/50">
               <div className="flex flex-wrap items-center gap-2">
                 {position.department && (
-                  <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
+                  <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-text">
                     {position.department}
                   </span>
                 )}
@@ -49,7 +49,7 @@ export default function JoinPage() {
               <p className="mt-2 flex-1 text-sm text-muted">{position.body}</p>
               <a
                 href="#bewerbung"
-                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent transition-all hover:gap-2 hover:underline"
+                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
               >
                 Jetzt bewerben <span aria-hidden>&rarr;</span>
               </a>

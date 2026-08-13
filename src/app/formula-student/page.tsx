@@ -13,7 +13,7 @@ export default function FormulaStudentPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
           Formula Student
         </p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Was ist die Formula Student?</h1>

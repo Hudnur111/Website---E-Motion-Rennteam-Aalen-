@@ -15,7 +15,7 @@ export default function ResultsPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Erfolge</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Erfolge</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Unsere Meilensteine</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
@@ -43,13 +43,13 @@ export default function ResultsPage() {
                 }`}
               >
                 <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/50">
-                  <span className="text-sm font-semibold uppercase tracking-widest text-accent">
+                  <span className="text-sm font-semibold uppercase tracking-widest text-accent-text">
                     {result.year}
                   </span>
                   <h2 className="mt-1 text-xl font-bold">{result.title}</h2>
                   <p className="mt-1 text-sm text-muted">{result.event}</p>
                   {result.placement && (
-                    <span className="mt-3 inline-block rounded-full bg-accent-2/15 px-3 py-1 text-xs font-semibold text-accent-2">
+                    <span className="mt-3 inline-block rounded-full bg-accent-2/15 px-3 py-1 text-xs font-semibold text-accent-2-text">
                       {result.placement}
                     </span>
                   )}

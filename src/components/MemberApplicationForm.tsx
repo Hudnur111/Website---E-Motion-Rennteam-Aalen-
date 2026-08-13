@@ -141,7 +141,7 @@ export default function MemberApplicationForm() {
             <label htmlFor="member-consent" className="text-xs text-muted">
               Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Bewerbung gespeichert
               werden. Weitere Infos in der{" "}
-              <Link href="/datenschutz" className="text-accent hover:underline">
+              <Link href="/datenschutz" className="text-accent-text underline">
                 Datenschutzerklärung
               </Link>
               . *

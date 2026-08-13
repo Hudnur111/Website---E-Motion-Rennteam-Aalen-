@@ -56,7 +56,7 @@ export default function ContactForm() {
           <HoneypotField />
           <div>
             <label htmlFor="name" className="text-sm font-medium">
-              Name <span className="text-accent">*</span>
+              Name <span className="text-accent-text">*</span>
             </label>
             <input
               id="name"
@@ -75,7 +75,7 @@ export default function ContactForm() {
           </div>
           <div>
             <label htmlFor="email" className="text-sm font-medium">
-              E-Mail <span className="text-accent">*</span>
+              E-Mail <span className="text-accent-text">*</span>
             </label>
             <input
               id="email"
@@ -109,7 +109,7 @@ export default function ContactForm() {
           </div>
           <div>
             <label htmlFor="message" className="text-sm font-medium">
-              Nachricht <span className="text-accent">*</span>
+              Nachricht <span className="text-accent-text">*</span>
             </label>
             <textarea
               id="message"
@@ -139,7 +139,7 @@ export default function ContactForm() {
             <label htmlFor="consent" className="text-xs text-muted">
               Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden.
               Weitere Infos in der{" "}
-              <Link href="/datenschutz" className="text-accent hover:underline">
+              <Link href="/datenschutz" className="text-accent-text underline">
                 Datenschutzerklärung
               </Link>
               . *

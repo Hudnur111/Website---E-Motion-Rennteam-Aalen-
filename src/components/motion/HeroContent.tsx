@@ -35,7 +35,7 @@ export default function HeroContent({
     >
       <motion.p
         variants={item}
-        className="mb-5 text-sm font-semibold uppercase tracking-widest text-accent"
+        className="mb-5 text-sm font-semibold uppercase tracking-widest text-accent-text"
       >
         {eyebrow}
       </motion.p>

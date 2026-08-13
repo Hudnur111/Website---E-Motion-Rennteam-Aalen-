@@ -35,7 +35,7 @@ export default function TeamPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Team</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Die Köpfe hinter dem ERT-14/26</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Über 60 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
@@ -58,7 +58,7 @@ export default function TeamPage() {
                       </p>
                     )}
                   </div>
-                  <span className="whitespace-nowrap rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
+                  <span className="whitespace-nowrap rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-text">
                     {members.length} {members.length === 1 ? "Mitglied" : "Mitglieder"}
                   </span>
                 </div>
@@ -88,14 +88,14 @@ export default function TeamPage() {
                                 <circle cx="12" cy="8" r="4" />
                                 <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
                               </svg>
-                              <span className="text-xs font-medium uppercase tracking-wide opacity-70">
+                              <span className="text-xs font-medium uppercase tracking-wide">
                                 Bild folgt
                               </span>
                             </div>
                           )}
                         </div>
                         <h3 className="mt-4 font-semibold">{member.name}</h3>
-                        <p className="text-sm text-accent">{member.role}</p>
+                        <p className="text-sm text-accent-text">{member.role}</p>
                         {member.body && (
                           <p className="mt-2 text-sm text-muted">{member.body}</p>
                         )}

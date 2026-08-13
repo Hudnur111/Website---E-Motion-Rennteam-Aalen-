@@ -48,7 +48,7 @@ export default async function BlogDetailPage({
   return (
     <article className="container-page max-w-3xl py-20">
       <Reveal>
-        <Link href="/blog" className="text-sm font-semibold text-accent-2 hover:underline">
+        <Link href="/blog" className="text-sm font-semibold text-accent-2-text hover:underline">
           &larr; Zurück zum Blog
         </Link>
 
@@ -86,7 +86,7 @@ export default async function BlogDetailPage({
 
       <Reveal delay={0.15}>
         <div
-          className="prose prose-invert mt-8 max-w-none prose-headings:text-foreground prose-p:text-muted prose-a:text-accent-2"
+          className="prose prose-invert mt-8 max-w-none prose-headings:text-foreground prose-p:text-muted prose-a:text-accent-2-text"
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </Reveal>

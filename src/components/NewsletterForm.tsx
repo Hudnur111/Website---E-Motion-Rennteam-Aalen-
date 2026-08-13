@@ -22,7 +22,7 @@ export default function NewsletterForm() {
           key="sent"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-accent-2"
+          className="text-sm text-accent-2-text"
           role="status"
         >
           Danke für deine Anmeldung!

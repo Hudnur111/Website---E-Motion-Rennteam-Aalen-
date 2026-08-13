@@ -18,7 +18,7 @@ export default function BlogPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Blog</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Direkt aus der Werkstatt</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Persönliche Einblicke, Baufortschritte und Geschichten aus dem Teamalltag –
@@ -64,7 +64,7 @@ export default function BlogPage() {
                     </>
                   )}
                 </div>
-                <h2 className="mt-2 text-lg font-semibold group-hover:text-accent-2">
+                <h2 className="mt-2 text-lg font-semibold group-hover:text-accent-2-text">
                   {post.title}
                 </h2>
                 <p className="mt-2 text-sm text-muted">{post.excerpt}</p>

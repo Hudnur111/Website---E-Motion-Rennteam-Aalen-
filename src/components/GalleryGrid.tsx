@@ -75,9 +75,11 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
               onClick={(e) => open(i, e.currentTarget)}
               className="group relative block aspect-[4/3] w-full overflow-hidden rounded-xl border border-border bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
+              {/* alt="" - the caption span below already gives this button an accessible
+                  name via img.title; a non-empty alt here would announce it twice. */}
               <Image
                 src={img.image}
-                alt={img.title}
+                alt=""
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"

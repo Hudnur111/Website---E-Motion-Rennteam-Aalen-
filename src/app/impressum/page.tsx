@@ -11,7 +11,7 @@ export default function ImpressumPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Rechtliches</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Rechtliches</p>
         <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Impressum</h1>
       </Reveal>
 
@@ -42,7 +42,7 @@ export default function ImpressumPage() {
             E-Mail:{" "}
             <a
               href="mailto:denny.svalia@emotion-rennteam.de"
-              className="text-accent hover:underline"
+              className="text-accent-text underline"
             >
               denny.svalia@emotion-rennteam.de
             </a>
@@ -55,7 +55,7 @@ export default function ImpressumPage() {
             Telefon: 07361 5762191
             <br />
             E-Mail:{" "}
-            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent hover:underline">
+            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent-text underline">
               vorstand@emotion-rennteam.de
             </a>
           </p>
@@ -90,7 +90,7 @@ export default function ImpressumPage() {
               href="https://ec.europa.eu/consumers/odr/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent hover:underline"
+              className="text-accent-text underline"
             >
               ec.europa.eu/consumers/odr
             </a>{" "}

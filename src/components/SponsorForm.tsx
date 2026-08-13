@@ -150,7 +150,7 @@ export default function SponsorForm() {
             <label htmlFor="sponsor-consent" className="text-xs text-muted">
               Wir stimmen zu, dass unsere Angaben zur Bearbeitung der Anfrage gespeichert werden.
               Weitere Infos in der{" "}
-              <Link href="/datenschutz" className="text-accent hover:underline">
+              <Link href="/datenschutz" className="text-accent-text underline">
                 Datenschutzerklärung
               </Link>
               . *
