@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:a11y": "node scripts/a11y-check.mjs",
     "tina:dev": "tinacms dev -c \"next dev\"",
     "tina:build": "tinacms build && next build"
   },
@@ -24,6 +25,7 @@
     "tinacms": "^3.11.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/jest-dom": "^7.0.1",
