@@ -6,6 +6,7 @@
     activeCollection: null,
     entries: [],
     editing: null, // { slug, data, body, isNew }
+    initialSnapshot: null,
   };
 
   const el = (id) => document.getElementById(id);
@@ -43,12 +44,32 @@
       el("setup-screen").classList.add("hidden");
       el("app").classList.remove("hidden");
       el("branch-badge").textContent = `Branch: ${status.branch}`;
+
+      const liveLink = el("live-site-link");
+      if (status.liveSiteUrl) {
+        liveLink.href = status.liveSiteUrl;
+        liveLink.classList.remove("hidden");
+      } else {
+        liveLink.classList.add("hidden");
+      }
+
       await loadCollections();
     } else {
       el("setup-screen").classList.remove("hidden");
       el("app").classList.add("hidden");
     }
   }
+
+  el("disconnect-btn").addEventListener("click", async () => {
+    if (!confirm("Verbindung zu GitHub wirklich trennen? Du musst dich danach neu einrichten.")) return;
+    try {
+      await api("/api/disconnect", { method: "POST" });
+      toast("Verbindung getrennt.", "success");
+      await checkStatus();
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  });
 
   el("setup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -106,19 +127,35 @@
     state.activeCollection = state.collections.find((c) => c.name === name);
     renderNav();
     el("main-title").textContent = state.activeCollection.label;
+    const searchInput = el("entry-search");
+    searchInput.value = "";
+    searchInput.classList.add("hidden");
     el("entry-list").innerHTML = '<p class="muted">Lade …</p>';
     try {
       state.entries = await api(`/api/content/${name}`);
+      if (state.entries.length > 6) searchInput.classList.remove("hidden");
       renderEntryList();
     } catch (err) {
-      el("entry-list").innerHTML = "";
+      el("entry-list").innerHTML =
+        '<div class="empty-state">Laden fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.</div>';
       toast(err.message, "error");
     }
   }
 
+  el("entry-search").addEventListener("input", () => renderEntryList());
+
   function titleFieldName() {
     const f = state.activeCollection.fields.find((f) => f.isTitle);
     return f ? f.name : "title";
+  }
+
+  function getFilteredEntries() {
+    const query = el("entry-search").value.trim().toLowerCase();
+    if (!query) return state.entries;
+    const titleField = titleFieldName();
+    return state.entries.filter((entry) =>
+      String(entry.data[titleField] || entry.slug).toLowerCase().includes(query)
+    );
   }
 
   function renderEntryList() {
@@ -128,10 +165,15 @@
       list.innerHTML = '<div class="empty-state">Noch keine Einträge. Klicke oben rechts auf „Neuer Eintrag".</div>';
       return;
     }
+    const filtered = getFilteredEntries();
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">Keine Einträge gefunden.</div>';
+      return;
+    }
     const titleField = titleFieldName();
     const imageField = state.activeCollection.fields.find((f) => f.type === "image");
 
-    state.entries.forEach((entry) => {
+    filtered.forEach((entry) => {
       const card = document.createElement("div");
       card.className = "entry-card";
 
@@ -174,18 +216,35 @@
     el("editor-status").textContent = "";
     el("editor-status").className = "editor-status";
     renderFields();
+    state.initialSnapshot = JSON.stringify(collectFormData());
     el("editor-overlay").classList.remove("hidden");
   }
 
-  function closeEditor() {
-    el("editor-overlay").classList.add("hidden");
-    state.editing = null;
+  function hasUnsavedChanges() {
+    if (!state.editing) return false;
+    return JSON.stringify(collectFormData()) !== state.initialSnapshot;
   }
 
-  el("editor-close").addEventListener("click", closeEditor);
-  el("editor-cancel").addEventListener("click", closeEditor);
+  function closeEditor(force) {
+    if (!force && hasUnsavedChanges()) {
+      if (!confirm("Du hast ungespeicherte Änderungen. Wirklich schließen und verwerfen?")) return;
+    }
+    el("editor-overlay").classList.add("hidden");
+    state.editing = null;
+    state.initialSnapshot = null;
+  }
+
+  el("editor-close").addEventListener("click", () => closeEditor(false));
+  el("editor-cancel").addEventListener("click", () => closeEditor(false));
   el("editor-overlay").addEventListener("click", (e) => {
-    if (e.target === el("editor-overlay")) closeEditor();
+    if (e.target === el("editor-overlay")) closeEditor(false);
+  });
+
+  window.addEventListener("beforeunload", (e) => {
+    if (hasUnsavedChanges()) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
   });
 
   function renderFields() {
@@ -225,7 +284,7 @@
       case "number":
         return renderInputField(field, value, "number");
       case "datetime":
-        return renderInputField(field, value, "text", "z. B. 2026-05-01T09:00:00.000Z");
+        return renderDatetimeField(field, value);
       case "list":
         return renderListField(field, value);
       case "markdown":
@@ -241,6 +300,31 @@
     input.id = `f_${field.name}`;
     input.value = value ?? "";
     if (placeholder) input.placeholder = placeholder;
+    if (field.required) input.required = true;
+    return fieldWrapper(field.label + (field.required ? " *" : ""), input);
+  }
+
+  function isoToLocalInput(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function localInputToIso(localValue) {
+    if (!localValue) return undefined;
+    const d = new Date(localValue);
+    if (Number.isNaN(d.getTime())) return undefined;
+    return d.toISOString();
+  }
+
+  function renderDatetimeField(field, value) {
+    const input = document.createElement("input");
+    input.type = "datetime-local";
+    input.id = `f_${field.name}`;
+    input.dataset.datetime = "true";
+    input.value = isoToLocalInput(value);
     if (field.required) input.required = true;
     return fieldWrapper(field.label + (field.required ? " *" : ""), input);
   }
@@ -437,6 +521,8 @@
       if (field.isBody) return;
       if (field.type === "boolean") {
         data[field.name] = el(`f_${field.name}`)?.checked || false;
+      } else if (field.type === "datetime") {
+        data[field.name] = localInputToIso(el(`f_${field.name}`)?.value);
       } else if (field.type === "number") {
         const raw = el(`f_${field.name}`)?.value;
         data[field.name] = raw === "" || raw === undefined ? undefined : Number(raw);
@@ -496,7 +582,7 @@
       statusEl.className = "editor-status success";
       toast("Gespeichert und auf GitHub veröffentlicht.", "success");
       await selectCollection(state.activeCollection.name);
-      setTimeout(closeEditor, 500);
+      setTimeout(() => closeEditor(true), 500);
     } catch (err) {
       statusEl.textContent = err.message;
       statusEl.className = "editor-status error";
@@ -512,12 +598,15 @@
     try {
       await api(`/api/content/${state.activeCollection.name}/${state.editing.slug}`, { method: "DELETE" });
       toast("Eintrag gelöscht.", "success");
-      closeEditor();
+      closeEditor(true);
       await selectCollection(state.activeCollection.name);
     } catch (err) {
       toast(err.message, "error");
     }
   });
 
-  checkStatus().catch((err) => toast(err.message, "error"));
+  checkStatus().catch((err) => {
+    toast("Server nicht erreichbar: " + err.message, "error");
+    el("setup-screen").classList.remove("hidden");
+  });
 })();

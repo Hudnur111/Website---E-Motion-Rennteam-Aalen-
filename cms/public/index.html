@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>E-Motion CMS</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,7 +13,10 @@
   <!-- Ersteinrichtung -->
   <div id="setup-screen" class="setup-screen hidden">
     <div class="setup-card">
-      <div class="setup-logo">E-MOTION CMS</div>
+      <div class="setup-logo">
+        <img src="favicon.svg" alt="" width="28" height="28" />
+        E-MOTION CMS
+      </div>
       <h1>Willkommen! Kurze Einrichtung nötig.</h1>
       <p class="muted">
         Diese App bearbeitet die Inhalte der Website direkt auf GitHub. Dafür brauchst du
@@ -71,9 +75,24 @@
   <!-- Hauptanwendung -->
   <div id="app" class="app hidden">
     <aside class="sidebar">
-      <div class="sidebar-brand">E-MOTION CMS</div>
+      <div class="sidebar-brand">
+        <img src="favicon.svg" alt="" width="22" height="22" />
+        E-MOTION CMS
+      </div>
       <nav id="collection-nav" class="collection-nav"></nav>
       <div class="sidebar-footer">
+        <a
+          id="live-site-link"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          class="sidebar-link hidden"
+        >
+          Live-Website ansehen ↗
+        </a>
+        <button type="button" id="disconnect-btn" class="sidebar-link sidebar-link-danger">
+          Verbindung trennen
+        </button>
         <span id="branch-badge" class="branch-badge"></span>
       </div>
     </aside>
@@ -83,6 +102,12 @@
         <h1 id="main-title">—</h1>
         <button id="add-entry-btn" class="btn btn-primary">+ Neuer Eintrag</button>
       </header>
+      <input
+        type="search"
+        id="entry-search"
+        class="entry-search hidden"
+        placeholder="Einträge durchsuchen …"
+      />
       <div id="entry-list" class="entry-list"></div>
     </main>
 

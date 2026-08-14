@@ -2,7 +2,10 @@ const { Octokit } = require("@octokit/rest");
 
 class GitHubStore {
   constructor({ token, owner, repo, branch, baseBranch }) {
-    this.octokit = new Octokit({ auth: token });
+    // GITHUB_API_URL erlaubt den Betrieb gegen GitHub Enterprise Server
+    // (oder einen Test-Mock) statt gegen die öffentliche GitHub-API.
+    const baseUrl = process.env.GITHUB_API_URL;
+    this.octokit = new Octokit(baseUrl ? { auth: token, baseUrl } : { auth: token });
     this.owner = owner;
     this.repo = repo;
     this.branch = branch;

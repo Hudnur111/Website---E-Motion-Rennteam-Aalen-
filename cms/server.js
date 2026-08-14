@@ -61,7 +61,14 @@ app.get("/api/status", (req, res) => {
     owner: process.env.GITHUB_OWNER || "Hudnur111",
     repo: process.env.GITHUB_REPO || "Website---E-Motion-Rennteam-Aalen-",
     branch: process.env.GITHUB_BRANCH || "main",
+    liveSiteUrl: process.env.LIVE_SITE_URL || null,
   });
+});
+
+app.post("/api/disconnect", (req, res) => {
+  if (fs.existsSync(ENV_PATH)) fs.unlinkSync(ENV_PATH);
+  store = null;
+  res.json({ ok: true });
 });
 
 app.post("/api/setup", async (req, res) => {
