@@ -19,7 +19,7 @@ export default function VehiclesPage() {
     <div className="py-20">
       <div className="container-page">
         <Reveal className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent">Fahrzeuge</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
           <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
             Unsere Boliden
           </h1>
@@ -36,7 +36,7 @@ export default function VehiclesPage() {
             <div className="container-page">
               <Reveal className="text-center">
                 <div className="flex items-center justify-center gap-3">
-                  <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+                  <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
                     {vehicle.year}
                   </p>
                   {vehicle.current && (

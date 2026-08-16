@@ -16,7 +16,7 @@ export default function GalleryPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Galerie</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Galerie</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Impressionen</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Eindrücke von Wettbewerben, aus der Werkstatt und von Events – das E-Motion

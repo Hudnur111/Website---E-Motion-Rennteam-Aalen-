@@ -16,7 +16,7 @@ export default function ContactPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Kontakt</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Kontakt</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
           {page?.heroTitle ?? "Kontaktiere uns"}
         </h1>
@@ -47,7 +47,7 @@ export default function ContactPage() {
           <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
             <h2 className="font-semibold">E-Mail</h2>
             <p className="mt-2 text-sm text-muted">
-              <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent hover:underline">
+              <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent-text underline">
                 vorstand@emotion-rennteam.de
               </a>
             </p>
@@ -55,7 +55,7 @@ export default function ContactPage() {
           <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
             <h2 className="font-semibold">Telefon</h2>
             <p className="mt-2 text-sm text-muted">
-              <a href="tel:+4973615762191" className="text-accent hover:underline">
+              <a href="tel:+4973615762191" className="text-accent-text underline">
                 07361 5762191
               </a>
             </p>

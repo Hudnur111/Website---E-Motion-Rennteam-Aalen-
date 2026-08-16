@@ -12,7 +12,7 @@ export default function DatenschutzPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent">Rechtliches</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Rechtliches</p>
         <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Datenschutzerklärung</h1>
       </Reveal>
 
@@ -25,7 +25,7 @@ export default function DatenschutzPage() {
             E-Motion Rennteam Aalen e.V., Beethovenstraße 1, 73430 Aalen
             <br />
             E-Mail:{" "}
-            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent hover:underline">
+            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent-text underline">
               vorstand@emotion-rennteam.de
             </a>
             , Telefon: 07361 5762191

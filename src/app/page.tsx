@@ -69,7 +69,7 @@ export default function Home() {
       {vehicle && (
         <section className="container-page py-28 text-center">
           <Reveal>
-            <p className="text-sm font-semibold uppercase tracking-widest text-accent">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               {vehicle.year} · Aktuelles Fahrzeug
             </p>
             <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
@@ -90,7 +90,7 @@ export default function Home() {
           <Reveal delay={0.1} className="mt-10">
             <Link
               href="/fahrzeuge"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
             >
               Alle technischen Daten ansehen <span aria-hidden>&rarr;</span>
             </Link>
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="container-page">
             <Reveal className="flex items-end justify-between">
               <h2 className="text-2xl font-bold sm:text-3xl">Aktuelle News</h2>
-              <Link href="/news" className="text-sm font-semibold text-accent hover:underline">
+              <Link href="/news" className="text-sm font-semibold text-accent-text hover:underline">
                 Alle News &rarr;
               </Link>
             </Reveal>
@@ -121,7 +121,7 @@ export default function Home() {
                         year: "numeric",
                       })}
                     </time>
-                    <h3 className="mt-2 text-lg font-semibold group-hover:text-accent">
+                    <h3 className="mt-2 text-lg font-semibold group-hover:text-accent-text">
                       {post.title}
                     </h3>
                     <p className="mt-2 text-sm text-muted">{post.excerpt}</p>
@@ -150,7 +150,7 @@ export default function Home() {
             ))}
           </StaggerGroup>
           <Reveal className="mt-8 text-center" delay={0.1}>
-            <Link href="/sponsoren" className="text-sm font-semibold text-accent hover:underline">
+            <Link href="/sponsoren" className="text-sm font-semibold text-accent-text hover:underline">
               Alle Sponsoren ansehen &rarr;
             </Link>
           </Reveal>
