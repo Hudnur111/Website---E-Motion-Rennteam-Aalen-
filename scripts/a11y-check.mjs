@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
@@ -48,8 +49,18 @@ function startServer() {
   });
 }
 
+// In sandboxed CI-like environments without network access for
+// `npx playwright install`, a Chromium build is preinstalled outside
+// Playwright's own version-pinned cache directory. Point at it explicitly
+// when present; otherwise fall back to Playwright's normal resolution
+// (e.g. a real CI runner with `playwright install` already run).
+const preinstalledChromium = process.env.PLAYWRIGHT_CHROMIUM_PATH ?? "/opt/pw-browsers/chromium";
+const launchOptions = existsSync(preinstalledChromium)
+  ? { executablePath: preinstalledChromium, args: ["--no-sandbox"] }
+  : {};
+
 const server = await startServer();
-const browser = await chromium.launch();
+const browser = await chromium.launch(launchOptions);
 const context = await browser.newContext();
 let hasViolations = false;
 
