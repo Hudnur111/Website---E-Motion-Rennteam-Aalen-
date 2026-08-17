@@ -12,11 +12,31 @@ type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
 
+/**
+ * Upper bound on how many distinct keys (route + IP) we track at once.
+ * Expired buckets are never actively evicted on a timer — Vercel/Node
+ * serverless functions don't get to run background work between
+ * invocations — so without a cap, a long-lived process fielding traffic
+ * from many distinct IPs (or a flood of spoofed `x-forwarded-for` values)
+ * would grow this map forever. Once the map hits the cap we sweep expired
+ * entries before inserting a new one, keeping steady-state memory bounded.
+ */
+const MAX_TRACKED_BUCKETS = 5000;
+
+function sweepExpiredBuckets(now: number): void {
+  for (const [key, bucket] of buckets) {
+    if (bucket.resetAt <= now) buckets.delete(key);
+  }
+}
+
 export function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now();
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {
+    if (buckets.size >= MAX_TRACKED_BUCKETS) {
+      sweepExpiredBuckets(now);
+    }
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return true;
   }
@@ -27,6 +47,11 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
 
   bucket.count += 1;
   return true;
+}
+
+/** Test-only escape hatch to observe the internal map size. */
+export function _getTrackedBucketCountForTesting(): number {
+  return buckets.size;
 }
 
 /** Best-effort client IP extraction behind typical reverse proxies. */
