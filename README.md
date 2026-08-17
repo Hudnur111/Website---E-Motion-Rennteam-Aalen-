@@ -66,3 +66,13 @@ src/app/        # Next.js App Router Seiten
 src/components/ # Wiederverwendbare UI-Komponenten
 tina/config.ts  # TinaCMS Schema-Definition
 ```
+
+### 🧪 Qualitätssicherung
+
+| Befehl | Zweck |
+| :--- | :--- |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | TypeScript-Typprüfung |
+| `npm test` | Vitest (Unit-/Komponententests) |
+| `npm run test:a11y` | axe-core-Scan gegen den Produktions-Build (`npm run build` vorher ausführen) |
+| `npm run analyze` | Bundle-Analyse via Next.js' eingebautem `--experimental-analyze` (Turbopack-basiert; das ältere `@next/bundle-analyzer`-Paket funktioniert hier **nicht**, da es auf Webpack-Hooks aufbaut und dieses Projekt mit Turbopack baut). Ergebnis liegt danach in `.next/diagnostics/analyze/index.html`. |
