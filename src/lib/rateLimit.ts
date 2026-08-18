@@ -36,6 +36,19 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   if (!bucket || bucket.resetAt <= now) {
     if (buckets.size >= MAX_TRACKED_BUCKETS) {
       sweepExpiredBuckets(now);
+      // A sustained flood of distinct keys inside a single window (e.g.
+      // spoofed `x-forwarded-for` values arriving faster than any of
+      // them expire) leaves nothing for the sweep above to reclaim — all
+      // buckets are still legitimately "active". Without a fallback the
+      // map would keep growing past MAX_TRACKED_BUCKETS for as long as
+      // the flood lasts, silently defeating the cap. Evict the oldest
+      // entry (first in Map insertion order) so the cap is a true bound
+      // even under that load, not just when traffic happens to be idle
+      // enough for buckets to expire on their own.
+      if (buckets.size >= MAX_TRACKED_BUCKETS) {
+        const oldestKey = buckets.keys().next().value;
+        if (oldestKey !== undefined) buckets.delete(oldestKey);
+      }
     }
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return true;

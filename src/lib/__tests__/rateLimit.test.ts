@@ -62,4 +62,26 @@ describe("checkRateLimit", () => {
     expect(_getTrackedBucketCountForTesting()).toBeLessThan(bucketsToFill);
     vi.useRealTimers();
   });
+
+  it("still enforces the cap when a flood of distinct keys never expires", () => {
+    // A sweep only reclaims *expired* buckets. If an attacker (or a genuine
+    // traffic spike) sends more distinct keys than the cap within a single
+    // window — so nothing has expired yet when the cap is hit — the sweep
+    // above finds nothing to remove. Without a fallback eviction, the map
+    // would keep growing past MAX_TRACKED_BUCKETS for as long as the flood
+    // lasts. Confirm the cap holds even in that case.
+    vi.useFakeTimers();
+    const overflowPrefix = `sustained-${Math.random()}-`;
+    const maxTrackedBuckets = 5_000; // matches MAX_TRACKED_BUCKETS in rateLimit.ts
+    const floodSize = maxTrackedBuckets + 500;
+
+    for (let i = 0; i < floodSize; i += 1) {
+      // A long window (10 minutes) so none of these buckets expire during
+      // this test — mirrors the real form routes' rate-limit windows.
+      checkRateLimit(`${overflowPrefix}${i}`, 1, 10 * 60_000);
+    }
+
+    expect(_getTrackedBucketCountForTesting()).toBeLessThanOrEqual(maxTrackedBuckets);
+    vi.useRealTimers();
+  });
 });
