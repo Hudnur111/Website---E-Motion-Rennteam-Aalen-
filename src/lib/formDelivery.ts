@@ -6,6 +6,9 @@
  * are never silently dropped — operators just need to set the env var to
  * start receiving them for real.
  */
+/** Max time to wait for the webhook before giving up and logging a failure. */
+const WEBHOOK_TIMEOUT_MS = 8000;
+
 export type FormSubmission = {
   form: "contact" | "newsletter" | "mitmachen" | "sponsoring";
   submittedAt: string;
@@ -36,6 +39,12 @@ export async function deliverFormSubmission(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(submission),
+      // Every route handler `await`s this call before responding, so a
+      // slow or unresponsive webhook endpoint would otherwise hold the
+      // visitor's form submission open indefinitely (fetch has no default
+      // timeout). Bound it so a misbehaving webhook degrades to a logged
+      // failure instead of hanging the request.
+      signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
     });
     if (!response.ok) {
       console.error(`[form:${form}] webhook delivery failed with status ${response.status}`);
