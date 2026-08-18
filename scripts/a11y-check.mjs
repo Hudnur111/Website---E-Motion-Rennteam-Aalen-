@@ -28,10 +28,28 @@ const pages = [
   "/datenschutz",
 ];
 
+/** Kills the server's whole process group, not just the `npx` wrapper. */
+function stopServer(server) {
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    // Not POSIX, already exited, or never got a pid — fall back to the
+    // single-process kill so at least the wrapper itself is stopped.
+    server.kill();
+  }
+}
+
 function startServer() {
   return new Promise((resolve, reject) => {
+    // `detached: true` puts this child in its own process group (POSIX).
+    // `npx` itself forks the actual `next start`/`next-server` process, so
+    // without this, killing just the `npx` process (see stopServer above)
+    // leaves that grandchild running and bound to PORT forever — this
+    // script's own process then never exits either, since its stdio pipes
+    // stay open to that orphaned process.
     const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
       stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
     });
     let ready = false;
     const onData = (data) => {
@@ -42,9 +60,15 @@ function startServer() {
     };
     server.stdout.on("data", onData);
     server.stderr.on("data", onData);
-    server.on("error", reject);
+    server.on("error", (err) => {
+      stopServer(server);
+      reject(err);
+    });
     setTimeout(() => {
-      if (!ready) reject(new Error("Timed out waiting for `next start` to become ready"));
+      if (!ready) {
+        stopServer(server);
+        reject(new Error("Timed out waiting for `next start` to become ready"));
+      }
     }, 30_000);
   });
 }
@@ -86,7 +110,7 @@ try {
   }
 } finally {
   await browser.close();
-  server.kill();
+  stopServer(server);
 }
 
 if (hasViolations) {
