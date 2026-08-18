@@ -16,17 +16,26 @@ import {
 // These tests read the real markdown content under content/, exercising the
 // same fs + gray-matter code path the site uses at build time.
 
+function isSortedDescending(values: number[]): boolean {
+  return values.every((value, i) => i === 0 || values[i - 1] >= value);
+}
+
+function hasUniqueSlugs(items: { slug: string }[]): boolean {
+  return new Set(items.map((item) => item.slug)).size === items.length;
+}
+
 describe("getTeam", () => {
-  it("returns team members sorted by their order field", () => {
+  it("sorts members by their order field, undefined order last", () => {
     const team = getTeam();
     expect(team.length).toBeGreaterThan(0);
     const orders = team.map((member) => member.order ?? 99);
-    const sorted = [...orders].sort((a, b) => a - b);
-    expect(orders).toEqual(sorted);
+    expect(isSortedDescending(orders.map((o) => -o))).toBe(true);
   });
 
-  it("gives every member a slug and name", () => {
-    for (const member of getTeam()) {
+  it("gives every member a unique slug and a name", () => {
+    const team = getTeam();
+    expect(hasUniqueSlugs(team)).toBe(true);
+    for (const member of team) {
       expect(member.slug).toBeTruthy();
       expect(member.name).toBeTruthy();
     }
@@ -34,90 +43,95 @@ describe("getTeam", () => {
 });
 
 describe("getVehicles", () => {
-  it("returns vehicles sorted newest year first", () => {
+  it("sorts vehicles newest year first", () => {
     const vehicles = getVehicles();
     expect(vehicles.length).toBeGreaterThan(0);
-    for (let i = 1; i < vehicles.length; i += 1) {
-      expect(vehicles[i - 1].year).toBeGreaterThanOrEqual(vehicles[i].year);
-    }
+    expect(isSortedDescending(vehicles.map((v) => v.year))).toBe(true);
   });
 });
 
 describe("getSponsors", () => {
-  it("orders sponsors Platin > Gold > Silber > Partner", () => {
-    const tierRank: Record<string, number> = { Platin: 0, Gold: 1, Silber: 2, Partner: 3 };
-    const sponsors = getSponsors();
-    const ranks = sponsors.map((s) => tierRank[s.tier]);
-    const sorted = [...ranks].sort((a, b) => a - b);
-    expect(ranks).toEqual(sorted);
+  const TIER_ORDER = ["Platin", "Gold", "Silber", "Partner"];
+
+  it("only uses the documented tier values", () => {
+    for (const sponsor of getSponsors()) {
+      expect(TIER_ORDER).toContain(sponsor.tier);
+    }
+  });
+
+  it("groups sponsors by tier in Platin > Gold > Silber > Partner order", () => {
+    const tierIndices = getSponsors().map((s) => TIER_ORDER.indexOf(s.tier));
+    expect(isSortedDescending(tierIndices.map((i) => -i))).toBe(true);
   });
 });
 
-describe("news", () => {
-  it("returns news sorted newest first", () => {
+describe("getNews / getNewsBySlug", () => {
+  it("sorts posts newest first", () => {
     const news = getNews();
     expect(news.length).toBeGreaterThan(0);
-    for (let i = 1; i < news.length; i += 1) {
-      expect(new Date(news[i - 1].date).getTime()).toBeGreaterThanOrEqual(
-        new Date(news[i].date).getTime()
-      );
-    }
+    const timestamps = news.map((post) => new Date(post.date).getTime());
+    expect(isSortedDescending(timestamps)).toBe(true);
   });
 
-  it("getNewsBySlug finds an existing post by slug", () => {
+  it("looks posts up by slug and returns undefined for unknown slugs", () => {
     const [first] = getNews();
-    expect(getNewsBySlug(first.slug)?.slug).toBe(first.slug);
+    expect(getNewsBySlug(first.slug)).toEqual(first);
+    expect(getNewsBySlug("does-not-exist")).toBeUndefined();
   });
 
-  it("getNewsBySlug returns undefined for an unknown slug", () => {
-    expect(getNewsBySlug("this-slug-does-not-exist")).toBeUndefined();
+  it("derives the slug from the markdown filename, not the raw file extension", () => {
+    for (const post of getNews()) {
+      expect(post.slug).not.toMatch(/\.md$/);
+      expect(post.slug.length).toBeGreaterThan(0);
+    }
   });
 });
 
-describe("blog", () => {
-  it("returns blog posts sorted newest first", () => {
+describe("getBlogPosts / getBlogPostBySlug", () => {
+  it("sorts posts newest first", () => {
     const posts = getBlogPosts();
     expect(posts.length).toBeGreaterThan(0);
-    for (let i = 1; i < posts.length; i += 1) {
-      expect(new Date(posts[i - 1].date).getTime()).toBeGreaterThanOrEqual(
-        new Date(posts[i].date).getTime()
-      );
-    }
+    const timestamps = posts.map((post) => new Date(post.date).getTime());
+    expect(isSortedDescending(timestamps)).toBe(true);
   });
 
-  it("getBlogPostBySlug returns undefined for an unknown slug", () => {
-    expect(getBlogPostBySlug("this-slug-does-not-exist")).toBeUndefined();
+  it("looks posts up by slug and returns undefined for unknown slugs", () => {
+    const [first] = getBlogPosts();
+    expect(getBlogPostBySlug(first.slug)).toEqual(first);
+    expect(getBlogPostBySlug("does-not-exist")).toBeUndefined();
   });
 });
 
 describe("getPage", () => {
-  it("returns undefined for a page slug that doesn't exist", () => {
-    expect(getPage("this-page-does-not-exist")).toBeUndefined();
+  it("returns known pages and undefined for unknown slugs", () => {
+    expect(getPage("home")).toBeDefined();
+    expect(getPage("does-not-exist")).toBeUndefined();
+  });
+});
+
+describe("getResults", () => {
+  it("sorts results newest year first", () => {
+    const results = getResults();
+    expect(results.length).toBeGreaterThan(0);
+    expect(isSortedDescending(results.map((r) => r.year))).toBe(true);
   });
 });
 
 describe("getGallery", () => {
-  it("returns an array of images with a slug and image path each", () => {
-    const gallery = getGallery();
-    expect(Array.isArray(gallery)).toBe(true);
-    for (const image of gallery) {
+  it("has unique slugs across curated and auto-discovered images", () => {
+    expect(hasUniqueSlugs(getGallery())).toBe(true);
+  });
+
+  it("gives every image a slug and an image path", () => {
+    for (const image of getGallery()) {
       expect(image.slug).toBeTruthy();
       expect(image.image).toBeTruthy();
     }
   });
 });
 
-describe("getResults", () => {
-  it("returns results sorted newest year first", () => {
-    const results = getResults();
-    for (let i = 1; i < results.length; i += 1) {
-      expect(results[i - 1].year).toBeGreaterThanOrEqual(results[i].year);
-    }
-  });
-});
-
 describe("getPositions", () => {
-  it("returns an array (possibly empty) of open positions", () => {
+  it("returns an array of open positions", () => {
     expect(Array.isArray(getPositions())).toBe(true);
   });
 });
