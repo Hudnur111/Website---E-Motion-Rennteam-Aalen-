@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useFormSubmit } from "@/lib/useFormSubmit";
+import HoneypotField from "@/components/HoneypotField";
 
 const SUBJECTS = [
   "Allgemeine Anfrage",
@@ -13,12 +14,14 @@ const SUBJECTS = [
 ];
 
 export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("sending");
-    window.setTimeout(() => setStatus("sent"), 600);
+    const formData = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
+    payload.consent = formData.get("consent") === "on" ? "true" : "";
+    await submit(payload);
   }
 
   return (
@@ -30,6 +33,7 @@ export default function ContactForm() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="rounded-xl border border-accent/40 bg-surface p-6 text-sm text-muted"
+          role="status"
         >
           Danke für deine Nachricht! Wir melden uns so schnell wie möglich bei dir.
         </motion.div>
@@ -41,30 +45,52 @@ export default function ContactForm() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3 }}
           onSubmit={handleSubmit}
+          noValidate
           className="space-y-4"
         >
+          {errorMessage && (
+            <p role="alert" className="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-500">
+              {errorMessage}
+            </p>
+          )}
+          <HoneypotField />
           <div>
             <label htmlFor="name" className="text-sm font-medium">
-              Name <span className="text-accent">*</span>
+              Name <span className="text-accent-text">*</span>
             </label>
             <input
               id="name"
               name="name"
               required
+              maxLength={120}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "name-error" : undefined}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
+            {errors.name && (
+              <p id="name-error" className="mt-1 text-xs text-red-500">
+                {errors.name}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="email" className="text-sm font-medium">
-              E-Mail <span className="text-accent">*</span>
+              E-Mail <span className="text-accent-text">*</span>
             </label>
             <input
               id="email"
               name="email"
               type="email"
               required
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "email-error" : undefined}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
+            {errors.email && (
+              <p id="email-error" className="mt-1 text-xs text-red-500">
+                {errors.email}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="subject" className="text-sm font-medium">Betreff</label>
@@ -83,15 +109,23 @@ export default function ContactForm() {
           </div>
           <div>
             <label htmlFor="message" className="text-sm font-medium">
-              Nachricht <span className="text-accent">*</span>
+              Nachricht <span className="text-accent-text">*</span>
             </label>
             <textarea
               id="message"
               name="message"
               rows={5}
               required
+              maxLength={4000}
+              aria-invalid={Boolean(errors.message)}
+              aria-describedby={errors.message ? "message-error" : undefined}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
+            {errors.message && (
+              <p id="message-error" className="mt-1 text-xs text-red-500">
+                {errors.message}
+              </p>
+            )}
           </div>
           <div className="flex items-start gap-2.5">
             <input
@@ -99,12 +133,13 @@ export default function ContactForm() {
               name="consent"
               type="checkbox"
               required
+              aria-invalid={Boolean(errors.consent)}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
             />
             <label htmlFor="consent" className="text-xs text-muted">
               Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden.
               Weitere Infos in der{" "}
-              <Link href="/datenschutz" className="text-accent hover:underline">
+              <Link href="/datenschutz" className="text-accent-text underline">
                 Datenschutzerklärung
               </Link>
               . *

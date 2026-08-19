@@ -26,22 +26,22 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold text-foreground">Navigation</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/formula-student" className="transition-colors hover:text-accent">Formula Student</Link></li>
-            <li><Link href="/team" className="transition-colors hover:text-accent">Team</Link></li>
-            <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent">Fahrzeuge</Link></li>
-            <li><Link href="/erfolge" className="transition-colors hover:text-accent">Erfolge</Link></li>
-            <li><Link href="/sponsoren" className="transition-colors hover:text-accent">Sponsoren</Link></li>
-            <li><Link href="/mitmachen" className="transition-colors hover:text-accent">Mitmachen</Link></li>
+            <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
+            <li><Link href="/team" className="transition-colors hover:text-accent-text">Team</Link></li>
+            <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent-text">Fahrzeuge</Link></li>
+            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Erfolge</Link></li>
+            <li><Link href="/sponsoren" className="transition-colors hover:text-accent-text">Sponsoren</Link></li>
+            <li><Link href="/mitmachen" className="transition-colors hover:text-accent-text">Mitmachen</Link></li>
           </ul>
         </div>
 
         <div>
           <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/news" className="transition-colors hover:text-accent">News</Link></li>
-            <li><Link href="/blog" className="transition-colors hover:text-accent">Blog</Link></li>
-            <li><Link href="/galerie" className="transition-colors hover:text-accent">Galerie</Link></li>
-            <li><Link href="/kontakt" className="transition-colors hover:text-accent">Kontakt</Link></li>
+            <li><Link href="/news" className="transition-colors hover:text-accent-text">News</Link></li>
+            <li><Link href="/blog" className="transition-colors hover:text-accent-text">Blog</Link></li>
+            <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
+            <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
           <div className="mt-4 space-y-1 text-sm text-muted">
             <p>Hochschule Aalen</p>

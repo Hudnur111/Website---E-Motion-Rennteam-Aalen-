@@ -9,6 +9,14 @@
   --muted: #9aa0b4;
   --accent: #4a63f7;
   --accent-2: #8b5cf6;
+  /* Lightened variants of --accent/--accent-2 for use as *text* color. The base
+     accent colors are only ~3.4-4.2:1 against our dark backgrounds - enough for
+     borders/icons/large headings (3:1) but below the 4.5:1 WCAG AA threshold for
+     normal-size text, including on the semi-transparent accent/15 badge fills
+     used across the site. Verified against every background these run against
+     (background/surface/surface-2 and the accent/15 + accent-2/15 badge fills). */
+  --accent-text: #8092f9;
+  --accent-2-text: #a27df8;
   --accent-foreground: #ffffff;
   --border: #232635;
 }
@@ -21,6 +29,8 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
+  --color-accent-text: var(--accent-text);
+  --color-accent-2-text: var(--accent-2-text);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
@@ -40,6 +50,25 @@ body {
 ::selection {
   background: var(--accent);
   color: var(--accent-foreground);
+}
+
+/* Consistent, visible keyboard-focus indicator across the site (WCAG 2.4.7).
+   Only shows for keyboard/programmatic focus, not for mouse clicks. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 ::-webkit-scrollbar {

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageTransition from "@/components/PageTransition";
+import MotionProvider from "@/components/MotionProvider";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { getOrganizationJsonLdScript } from "@/lib/structuredData";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,19 +15,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_DESCRIPTION =
-  "E-Motion Rennteam Aalen – das Formula-Student-Electric-Team der Hochschule Aalen. Team, Fahrzeuge, Sponsoren und News.";
-
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "E-Motion Rennteam Aalen | Formula Student Electric",
     template: "%s | E-Motion Rennteam Aalen",
   },
   description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "E-Motion Rennteam Aalen | Formula Student Electric",
     description: SITE_DESCRIPTION,
-    siteName: "E-Motion Rennteam Aalen",
+    siteName: SITE_NAME,
+    url: SITE_URL,
     locale: "de_DE",
     type: "website",
     images: ["/uploads/ert-14-26-studio.jpg"],
@@ -47,11 +49,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Header />
-        <main className="flex-1">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <Footer />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: getOrganizationJsonLdScript() }}
+        />
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );
