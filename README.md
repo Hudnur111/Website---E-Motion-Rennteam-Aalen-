@@ -56,7 +56,20 @@ im eigenen Next.js-Code: eigener Login, eigenes Design, eigene Anbindung an GitH
 - Jede Speicherung wird – sofern konfiguriert – automatisch als **Commit direkt ins GitHub-Repository** geschrieben
   (über die GitHub Contents API), inklusive Bild-Uploads nach `public/uploads/`.
 
-**Einrichtung (lokal & Produktion):**
+**Einrichtung unter Windows (für Redakteure ohne Entwicklungsumgebung):**
+
+Im Hauptverzeichnis liegen zwei Doppelklick-Programme:
+
+- **`CMS-Start.bat`** – beim ersten Start fragt ein Assistent Benutzername, Passwort und optional den
+  GitHub-Token ab, richtet alles automatisch ein und startet danach den Server; der Browser öffnet sich von
+  selbst unter `http://localhost:3000/admin/login`. Bei jedem weiteren Start wird direkt der Server gestartet.
+- **`CMS-Zugangsdaten-aendern.bat`** – startet den Einrichtungsassistenten erneut, z. B. um das Passwort zu
+  ändern oder den GitHub-Token nachträglich einzutragen.
+
+Voraussetzung ist eine installierte [Node.js](https://nodejs.org/) LTS-Version; alles Weitere (Abhängigkeiten,
+Zugangsdaten) übernehmen die beiden Skripte.
+
+**Einrichtung manuell (lokal & Produktion):**
 
 1. `.env.local.example` nach `.env.local` kopieren.
 2. Login-Zugangsdaten setzen:
