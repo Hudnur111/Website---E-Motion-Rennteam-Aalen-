@@ -75,7 +75,8 @@ Write-Host "--- GitHub-Anbindung (optional, aber empfohlen) ---"
 Write-Host "Damit Speicherungen automatisch als Commit ins GitHub-Repository geschrieben werden."
 Write-Host "Ohne Token werden Aenderungen NUR lokal auf diesem PC gespeichert."
 Write-Host "Token erstellen: https://github.com/settings/tokens (fine-grained, 'Contents: Read and write')"
-$githubToken = Read-PasswordPlain "GitHub Personal Access Token (leer lassen zum Ueberspringen)"
+Write-Host "(Der Token wird beim Einfuegen sichtbar - das ist normal, damit Copy-Paste zuverlaessig funktioniert.)"
+$githubToken = Read-Host "GitHub Personal Access Token (leer lassen zum Ueberspringen)"
 $githubToken = $githubToken.Trim()
 
 $githubOwner = "Hudnur111"
