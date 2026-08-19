@@ -12,11 +12,16 @@ export default function ImageUploadField({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  // Kept separate so a hard failure (nothing uploaded, red) never looks the
+  // same as a soft warning (upload succeeded, e.g. "not committed to
+  // GitHub", amber) — they used to share one field and one color.
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
 
   async function handleFile(file: File) {
     setUploading(true);
     setError("");
+    setWarning("");
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -27,9 +32,9 @@ export default function ImageUploadField({
         return;
       }
       onChange(data.publicPath);
-      if (data.warning) setError(data.warning);
+      if (data.warning) setWarning(data.warning);
     } catch {
-      setError("Upload fehlgeschlagen.");
+      setError("Verbindung zum Server fehlgeschlagen.");
     } finally {
       setUploading(false);
     }
@@ -76,7 +81,8 @@ export default function ImageUploadField({
           )}
         </div>
       </div>
-      {error && <p className="mt-2 text-xs text-amber-400">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-xs text-red-400">{error}</p>}
+      {warning && <p className="mt-2 text-xs text-amber-400">{warning}</p>}
     </div>
   );
 }

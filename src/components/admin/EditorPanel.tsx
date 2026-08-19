@@ -25,6 +25,7 @@ export default function EditorPanel({ title, onClose, children }: Props) {
   return (
     <AnimatePresence>
       <motion.div
+        key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -33,6 +34,7 @@ export default function EditorPanel({ title, onClose, children }: Props) {
         aria-hidden
       />
       <motion.div
+        key="panel"
         role="dialog"
         aria-modal="true"
         aria-label={title}
