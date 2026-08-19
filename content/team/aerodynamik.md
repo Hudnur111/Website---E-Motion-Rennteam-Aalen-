@@ -1,5 +1,5 @@
 ---
-name: Max Mustermann
+name: Dani Baum
 role: Leitung Aerodynamik
 department: Aerodynamik
 order: 30
