@@ -38,6 +38,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     suffix += 1;
   }
 
-  const result = await saveItem(collectionName, slug, body.data ?? {}, body.body ?? "", user.username);
-  return NextResponse.json({ slug, ...result });
+  try {
+    const result = await saveItem(collectionName, slug, body.data ?? {}, body.body ?? "", user.username);
+    return NextResponse.json({ slug, ...result });
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Speichern fehlgeschlagen." }, { status: 502 });
+  }
 }

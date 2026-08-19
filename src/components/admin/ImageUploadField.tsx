@@ -68,6 +68,7 @@ export default function ImageUploadField({
           {value && (
             <input
               type="text"
+              aria-label="Bildpfad"
               value={value}
               onChange={(e) => onChange(e.target.value)}
               className="mt-2 w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-muted outline-none focus:border-accent"

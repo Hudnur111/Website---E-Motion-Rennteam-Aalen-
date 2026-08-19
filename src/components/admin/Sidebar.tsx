@@ -17,7 +17,7 @@ export default function Sidebar() {
       >
         Übersicht
       </Link>
-      <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted/70">Inhalte</p>
+      <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Inhalte</p>
       {collections.map((c) => {
         const href = `/admin/${c.name}`;
         const active = pathname === href || pathname.startsWith(`${href}/`);

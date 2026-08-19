@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
-  const result = await saveUploadedImage(file.name, bytes, user.username);
-  return NextResponse.json(result);
+  try {
+    const result = await saveUploadedImage(file.name, bytes, user.username);
+    return NextResponse.json(result);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Upload fehlgeschlagen." }, { status: 502 });
+  }
 }

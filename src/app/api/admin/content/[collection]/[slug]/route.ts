@@ -34,8 +34,12 @@ export async function PUT(
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
 
-  const result = await saveItem(collectionName, slug, body.data ?? {}, body.body ?? "", user.username);
-  return NextResponse.json(result);
+  try {
+    const result = await saveItem(collectionName, slug, body.data ?? {}, body.body ?? "", user.username);
+    return NextResponse.json(result);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Speichern fehlgeschlagen." }, { status: 502 });
+  }
 }
 
 export async function DELETE(
@@ -49,6 +53,10 @@ export async function DELETE(
   const user = await getSessionUser(request);
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
-  const result = await deleteItem(collectionName, slug, user.username);
-  return NextResponse.json(result);
+  try {
+    const result = await deleteItem(collectionName, slug, user.username);
+    return NextResponse.json(result);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Löschen fehlgeschlagen." }, { status: 502 });
+  }
 }

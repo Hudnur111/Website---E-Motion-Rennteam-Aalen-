@@ -119,7 +119,7 @@ function LoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{
@@ -139,6 +139,6 @@ export default function AdminLoginPage() {
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>
-    </div>
+    </main>
   );
 }

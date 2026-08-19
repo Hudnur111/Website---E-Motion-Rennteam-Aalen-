@@ -28,6 +28,18 @@ function bodyField(collection: CollectionDef): FieldDef | undefined {
   return collection.fields.find((f) => f.type === "richText");
 }
 
+// Existing content stores full ISO timestamps (e.g. "2025-08-10T09:00:00.000Z");
+// <input type="datetime-local"> needs "YYYY-MM-DDTHH:mm" in the browser's local
+// time. Converting through Date preserves the time-of-day on edit instead of
+// silently truncating it to midnight, which a plain <input type="date"> would.
+function toDatetimeLocalValue(value: FieldValue): string {
+  if (typeof value !== "string" || !value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export default function ContentForm({ collectionName, collection, mode, initialSlug, initialData, initialBody }: Props) {
   const router = useRouter();
   const [slug, setSlug] = useState(initialSlug ?? "");
@@ -42,8 +54,20 @@ export default function ContentForm({ collectionName, collection, mode, initialS
     setData((prev) => ({ ...prev, [name]: value }));
   }
 
+  function findMissingRequiredImageField(): FieldDef | undefined {
+    // Native HTML `required` validation only covers <input>/<select>/
+    // <textarea>; the image field is a custom upload widget with no such
+    // element when empty, so the browser would happily submit it blank.
+    return fieldsWithoutBody(collection).find((f) => f.type === "image" && f.required && !data[f.name]);
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const missingImage = findMissingRequiredImageField();
+    if (missingImage) {
+      setResult({ ok: false, message: `${missingImage.label} ist erforderlich – bitte ein Bild hochladen.` });
+      return;
+    }
     setSaving(true);
     setResult(null);
     try {
@@ -210,11 +234,11 @@ function FieldEditor({ field, value, onChange }: { field: FieldDef; value: Field
         <TextField field={field}>
           <input
             id={field.name}
-            type="date"
+            type="datetime-local"
             required={field.required}
-            value={typeof value === "string" ? value.slice(0, 10) : ""}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full max-w-[12rem] rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
+            value={toDatetimeLocalValue(value)}
+            onChange={(e) => onChange(e.target.value ? new Date(e.target.value).toISOString() : undefined)}
+            className="w-full max-w-[16rem] rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
           />
         </TextField>
       );
