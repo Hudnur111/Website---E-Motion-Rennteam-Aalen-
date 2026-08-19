@@ -56,6 +56,7 @@ export default function ImageUploadField({
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
             className="hidden"
+            tabIndex={-1}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) void handleFile(file);

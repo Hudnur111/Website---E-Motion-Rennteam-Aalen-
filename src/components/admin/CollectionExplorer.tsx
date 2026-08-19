@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CollectionDef } from "@/lib/cms/collections";
 import ContentForm from "@/components/admin/ContentForm";
 import EditorPanel from "@/components/admin/EditorPanel";
@@ -30,6 +30,21 @@ export default function CollectionExplorer({
   const [panelDirty, setPanelDirty] = useState(false);
 
   const titleField = collection.fields.find((f) => f.isTitle);
+
+  // The in-panel confirm() below only covers navigation this component can
+  // intercept (Escape, the × button, a backdrop click). It can't run for a
+  // browser back button, tab close, or manual refresh — those unmount the
+  // page before any JS handler gets a chance to ask, silently discarding
+  // whatever the editor typed. beforeunload is the one hook the platform
+  // gives us for that case; only registered while there's something to lose.
+  useEffect(() => {
+    if (!panelDirty) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [panelDirty]);
 
   // Re-fetches the list after a save/create/delete inside the panel so it
   // reflects the change without a full page reload. Never called from an

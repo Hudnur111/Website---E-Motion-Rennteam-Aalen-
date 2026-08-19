@@ -86,3 +86,49 @@ describe("ContentForm dirty tracking", () => {
     expect(onDirtyChange).not.toHaveBeenCalledWith(true);
   });
 });
+
+// Regression coverage for a double-submit bug found in hands-on testing:
+// the submit button's `disabled` attribute only takes effect on React's
+// next render, so two click events dispatched in the same tick (a fast
+// real double-click included) both ran handleSubmit and fired two POST
+// requests, creating duplicate content.
+describe("ContentForm submit guard", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("only sends one request when the submit button is clicked twice synchronously", async () => {
+    let resolveFetch: (value: unknown) => void = () => {};
+    const fetchMock = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ContentForm
+        collectionName="sponsor"
+        collection={sponsorCollection}
+        mode="create"
+        onSaved={() => {}}
+      />
+    );
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/^Name/), "Bosch");
+    await user.selectOptions(screen.getByLabelText(/Sponsoring-Stufe/), "Gold");
+
+    const submitButton = screen.getByRole("button", { name: /Speichern/ });
+    // Two click events in the same tick, bypassing React's re-render (and
+    // therefore the `disabled` attribute) between them — this is what a
+    // genuine fast double-click does, and what caused the duplicate POST.
+    submitButton.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    submitButton.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    resolveFetch({ ok: true, json: async () => ({ slug: "bosch", committedToGithub: false }) });
+  });
+});
