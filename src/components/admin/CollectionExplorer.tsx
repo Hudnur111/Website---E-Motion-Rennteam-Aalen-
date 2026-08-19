@@ -27,6 +27,7 @@ export default function CollectionExplorer({
   const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
   const [panel, setPanel] = useState<PanelState>(null);
+  const [panelDirty, setPanelDirty] = useState(false);
 
   const titleField = collection.fields.find((f) => f.isTitle);
 
@@ -67,6 +68,15 @@ export default function CollectionExplorer({
 
   function closePanel() {
     setPanel(null);
+    setPanelDirty(false);
+  }
+
+  // Used for every user-initiated close (backdrop click, Escape, the × button)
+  // so an editor can't lose in-progress work with one stray click. Saves and
+  // deletes call closePanel() directly since the change is already persisted.
+  function requestClosePanel() {
+    if (panelDirty && !window.confirm("Ungespeicherte Änderungen verwerfen?")) return;
+    closePanel();
   }
 
   return (
@@ -114,13 +124,13 @@ export default function CollectionExplorer({
             key={item.slug}
             type="button"
             onClick={() => setPanel({ mode: "edit", slug: item.slug })}
-            className="flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
+            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
           >
-            <span>
-              <span className="block font-medium text-foreground">{itemTitle(item)}</span>
-              <span className="block text-xs text-muted">{item.slug}</span>
+            <span className="min-w-0">
+              <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
+              <span className="block break-words text-xs text-muted">{item.slug}</span>
             </span>
-            <span className="text-xs text-accent-text">Bearbeiten →</span>
+            <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
           </button>
         ))}
       </div>
@@ -128,13 +138,14 @@ export default function CollectionExplorer({
       {panel && (
         <EditorPanel
           title={panel.mode === "create" ? `Neuer Eintrag: ${collection.label}` : `${collection.label} bearbeiten`}
-          onClose={closePanel}
+          onClose={requestClosePanel}
         >
           {panel.mode === "create" ? (
             <ContentForm
               collectionName={collectionName}
               collection={collection}
               mode="create"
+              onDirtyChange={setPanelDirty}
               onSaved={() => {
                 closePanel();
                 refresh();
@@ -152,6 +163,7 @@ export default function CollectionExplorer({
                   initialSlug={item.slug}
                   initialData={item.data}
                   initialBody={item.body}
+                  onDirtyChange={setPanelDirty}
                   onSaved={() => {
                     closePanel();
                     refresh();

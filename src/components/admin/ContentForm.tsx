@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CollectionDef, FieldDef } from "@/lib/cms/collections";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextField from "@/components/admin/RichTextField";
@@ -21,6 +21,7 @@ interface Props {
   initialBody?: string;
   onSaved: (result: SaveResult) => void;
   onDeleted?: () => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 type FieldValue = string | number | boolean | { label: string; value: string }[] | undefined;
@@ -58,6 +59,7 @@ export default function ContentForm({
   initialBody,
   onSaved,
   onDeleted,
+  onDirtyChange,
 }: Props) {
   const [slug, setSlug] = useState(initialSlug ?? "");
   const [data, setData] = useState<Record<string, FieldValue>>(() => (initialData as Record<string, FieldValue>) ?? {});
@@ -67,6 +69,17 @@ export default function ContentForm({
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const bField = bodyField(collection);
+
+  // Lets the parent (EditorPanel via CollectionExplorer) confirm before
+  // discarding an editor's in-progress work when they close the panel
+  // without saving — compares against a snapshot taken once on mount, not
+  // on every initial* prop change, so it stays stable across re-renders.
+  const initialSnapshot = useRef(JSON.stringify({ slug: initialSlug ?? "", data: initialData ?? {}, body: initialBody ?? "" }));
+  useEffect(() => {
+    const dirty = JSON.stringify({ slug, data, body }) !== initialSnapshot.current;
+    onDirtyChange?.(dirty);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, data, body]);
 
   function setField(name: string, value: FieldValue) {
     setData((prev) => ({ ...prev, [name]: value }));
