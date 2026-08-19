@@ -63,13 +63,13 @@ if not exist ".env.local" (
 )
 
 echo Der Server wird gestartet. Dieses Fenster waehrend der Nutzung bitte geoeffnet lassen.
-echo Der Browser oeffnet sich automatisch in wenigen Sekunden unter:
-echo   http://localhost:3000/admin/login
+echo Das CMS oeffnet sich automatisch in einem eigenen App-Fenster, sobald der
+echo Server bereit ist.
 echo.
 echo Zum Beenden: dieses Fenster schliessen oder STRG+C druecken.
 echo.
 
-start "" /min powershell -NoProfile -Command "Start-Sleep -Seconds 5; Start-Process 'http://localhost:3000/admin/login'"
+start "" /min powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-open-app.ps1"
 
 call npm run dev
 
