@@ -19,14 +19,23 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "node_modules" (
-    echo Erstinstallation: Abhaengigkeiten werden installiert.
+if not exist "node_modules\.bin\next.cmd" (
+    echo Erstinstallation ^(oder unvollstaendige Installation erkannt^):
+    echo Abhaengigkeiten werden installiert.
     echo Das kann beim ersten Mal ein paar Minuten dauern, bitte warten...
     echo.
     call npm install
     if errorlevel 1 (
         echo.
         echo [FEHLER] "npm install" ist fehlgeschlagen. Siehe Meldung oben.
+        pause
+        exit /b 1
+    )
+    if not exist "node_modules\.bin\next.cmd" (
+        echo.
+        echo [FEHLER] "next" wurde auch nach "npm install" nicht gefunden.
+        echo Bitte loesche den Ordner "node_modules" manuell und starte dieses
+        echo Fenster erneut.
         pause
         exit /b 1
     )
