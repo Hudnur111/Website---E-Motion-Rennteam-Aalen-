@@ -1,9 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { CollectionDef, FieldDef } from "@/lib/cms/collections";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import RichTextField from "@/components/admin/RichTextField";
+
+interface SaveResult {
+  slug: string;
+  committedToGithub: boolean;
+  commitUrl: string | null;
+  warning?: string;
+}
 
 interface Props {
   collectionName: string;
@@ -12,6 +19,8 @@ interface Props {
   initialSlug?: string;
   initialData?: Record<string, unknown>;
   initialBody?: string;
+  onSaved: (result: SaveResult) => void;
+  onDeleted?: () => void;
 }
 
 type FieldValue = string | number | boolean | { label: string; value: string }[] | undefined;
@@ -40,12 +49,21 @@ function toDatetimeLocalValue(value: FieldValue): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export default function ContentForm({ collectionName, collection, mode, initialSlug, initialData, initialBody }: Props) {
-  const router = useRouter();
+export default function ContentForm({
+  collectionName,
+  collection,
+  mode,
+  initialSlug,
+  initialData,
+  initialBody,
+  onSaved,
+  onDeleted,
+}: Props) {
   const [slug, setSlug] = useState(initialSlug ?? "");
   const [data, setData] = useState<Record<string, FieldValue>>(() => (initialData as Record<string, FieldValue>) ?? {});
   const [body, setBody] = useState(initialBody ?? "");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const bField = bodyField(collection);
@@ -90,14 +108,35 @@ export default function ContentForm({ collectionName, collection, mode, initialS
           ? "Gespeichert und als Commit auf GitHub gesichert."
           : responseData.warning || "Gespeichert.",
       });
-      if (mode === "create") {
-        router.push(`/admin/${collectionName}/${responseData.slug}`);
-      }
-      router.refresh();
+      onSaved({
+        slug: mode === "create" ? responseData.slug : (initialSlug ?? slug),
+        committedToGithub: responseData.committedToGithub,
+        commitUrl: responseData.commitUrl ?? null,
+        warning: responseData.warning,
+      });
     } catch {
       setResult({ ok: false, message: "Verbindung zum Server fehlgeschlagen." });
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!initialSlug) return;
+    if (!confirm(`Diesen Eintrag wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/content/${collectionName}/${initialSlug}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setResult({ ok: false, message: data.error || "Löschen fehlgeschlagen." });
+        return;
+      }
+      onDeleted?.();
+    } catch {
+      setResult({ ok: false, message: "Verbindung zum Server fehlgeschlagen." });
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -128,14 +167,7 @@ export default function ContentForm({ collectionName, collection, mode, initialS
           <label htmlFor="body" className="mb-1.5 block text-sm font-medium text-foreground">
             {bField.label}
           </label>
-          <textarea
-            id="body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={12}
-            className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-accent"
-            placeholder="Markdown-Text…"
-          />
+          <RichTextField id="body" value={body} onChange={setBody} rows={12} />
         </div>
       )}
 
@@ -150,14 +182,24 @@ export default function ContentForm({ collectionName, collection, mode, initialS
         </p>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || deleting}
           className="rounded-lg bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         >
           {saving ? "Speichert…" : "Speichern"}
         </button>
+        {mode === "edit" && onDeleted && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={saving || deleting}
+            className="rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {deleting ? "Löscht…" : "Löschen"}
+          </button>
+        )}
       </div>
     </form>
   );
@@ -188,19 +230,6 @@ function FieldEditor({ field, value, onChange }: { field: FieldDef; value: Field
             onChange={(e) => onChange(e.target.value)}
             rows={3}
             className="w-full rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
-          />
-        </TextField>
-      );
-    case "richText":
-      return (
-        <TextField field={field}>
-          <textarea
-            id={field.name}
-            value={(value as string) ?? ""}
-            onChange={(e) => onChange(e.target.value)}
-            rows={8}
-            className="w-full rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
-            placeholder="Markdown-Text…"
           />
         </TextField>
       );
