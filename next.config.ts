@@ -8,9 +8,15 @@ import type { NextConfig } from "next";
 // is almost entirely statically generated, so that trade isn't worth it for
 // a defense-in-depth header — this follows Next's documented "Without
 // Nonces" baseline CSP instead: https://nextjs.org/docs/app/guides/content-security-policy
+
+// Next.js/Turbopack's dev server (React Fast Refresh, stack-trace
+// symbolication) relies on eval(), so the dev-only CSP needs 'unsafe-eval'.
+// Production never uses eval() (see Next's CSP docs) and stays without it.
+const isDev = process.env.NODE_ENV !== "production";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   // React/framer-motion set inline `style` attributes at render time, so
   // style-src needs 'unsafe-inline' too. CSS injection is a much
   // lower-severity risk than script injection.
