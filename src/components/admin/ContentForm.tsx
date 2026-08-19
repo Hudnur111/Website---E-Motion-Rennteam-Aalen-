@@ -67,6 +67,13 @@ export default function ContentForm({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  // The `saving` state disables the submit button, but that disabling only
+  // takes effect on React's next render — two clicks dispatched in the same
+  // event-loop tick (a fast real double-click, or any script that fires two
+  // click events back to back) both run handleSubmit before that render
+  // happens, which used to fire two POST requests and create two entries.
+  // A plain ref is set synchronously, so the second call sees it immediately.
+  const submittingRef = useRef(false);
 
   const bField = bodyField(collection);
 
@@ -94,11 +101,13 @@ export default function ContentForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submittingRef.current) return;
     const missingImage = findMissingRequiredImageField();
     if (missingImage) {
       setResult({ ok: false, message: `${missingImage.label} ist erforderlich – bitte ein Bild hochladen.` });
       return;
     }
+    submittingRef.current = true;
     setSaving(true);
     setResult(null);
     try {
@@ -130,6 +139,7 @@ export default function ContentForm({
     } catch {
       setResult({ ok: false, message: "Verbindung zum Server fehlgeschlagen." });
     } finally {
+      submittingRef.current = false;
       setSaving(false);
     }
   }
