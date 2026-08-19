@@ -18,6 +18,19 @@ export interface SaveResult {
   warning?: string;
 }
 
+// Slugs end up in filesystem paths (path.join(ROOT, collection.path, `${slug}.md`))
+// and as-is in GitHub Contents API paths. slugify() only ever produces safe
+// values, but getItem/saveItem/deleteItem also accept a slug straight from
+// the URL's dynamic route segment (editing/deleting an existing item) —
+// without this check, a crafted slug like "../../../etc/passwd" or one
+// containing an encoded slash could read, overwrite, or delete files outside
+// the intended content directory, including in the GitHub repo itself.
+const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function isValidSlug(slug: string): boolean {
+  return VALID_SLUG.test(slug);
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
@@ -54,6 +67,7 @@ export async function listItems(collectionName: string): Promise<ContentItem[]> 
 export async function getItem(collectionName: string, slug: string): Promise<ContentItem | null> {
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
+  if (!isValidSlug(slug)) return null;
   const filePath = path.join(/* turbopackIgnore: true */ ROOT, collection.path, `${slug}.md`);
   try {
     const raw = await fs.readFile(filePath, "utf-8");
@@ -77,6 +91,7 @@ export async function saveItem(
 ): Promise<SaveResult> {
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
+  if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
   const content = serialize(data, body);
 
@@ -112,6 +127,7 @@ export async function saveItem(
 export async function deleteItem(collectionName: string, slug: string, authorName: string): Promise<SaveResult> {
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
+  if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
 
   try {
