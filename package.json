@@ -11,19 +11,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "node scripts/a11y-check.mjs",
-    "tina:dev": "tinacms dev -c \"next dev\"",
-    "tina:build": "tinacms build && next build"
+    "cms:hash-password": "node scripts/cms-hash-password.mjs"
   },
   "dependencies": {
-    "@tinacms/cli": "^2.6.0",
     "framer-motion": "^13.0.0",
     "gray-matter": "^4.0.3",
     "marked": "^18.0.9",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sanitize-html": "^2.17.6",
-    "tinacms": "^3.12.0"
+    "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
