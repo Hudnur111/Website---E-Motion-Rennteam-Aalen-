@@ -3,7 +3,10 @@ import { getCollection } from "@/lib/cms/collections";
 import { getItem, listItems, saveItem, slugify } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ collection: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ collection: string }> }) {
+  const user = await getSessionUser(request);
+  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+
   const { collection: collectionName } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });

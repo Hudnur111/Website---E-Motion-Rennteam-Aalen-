@@ -4,9 +4,12 @@ import { getItem, saveItem, deleteItem, isValidSlug } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ collection: string; slug: string }> }
 ) {
+  const user = await getSessionUser(request);
+  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+
   const { collection: collectionName, slug } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
