@@ -2,7 +2,6 @@
 setlocal
 title E-Motion Rennteam Aalen - CMS starten
 cd /d "%~dp0"
-chcp 65001 >nul
 
 echo ============================================
 echo   E-Motion Rennteam Aalen - Redaktions-CMS
@@ -19,26 +18,60 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "node_modules\.bin\next.cmd" (
-    echo Erstinstallation ^(oder unvollstaendige Installation erkannt^):
-    echo Abhaengigkeiten werden installiert.
-    echo Das kann beim ersten Mal ein paar Minuten dauern, bitte warten...
+where npm >nul 2>nul
+if errorlevel 1 (
+    echo [FEHLER] npm wurde nicht gefunden, obwohl Node.js vorhanden ist.
+    echo Bitte installiere Node.js von https://nodejs.org/ neu ^(LTS-Version^)
+    echo und starte dieses Fenster danach neu.
     echo.
-    call npm install
-    if errorlevel 1 (
-        echo.
-        echo [FEHLER] "npm install" ist fehlgeschlagen. Siehe Meldung oben.
-        pause
-        exit /b 1
+    pause
+    exit /b 1
+)
+
+if not exist "package.json" (
+    echo [FEHLER] Diese Datei liegt nicht im Projektordner.
+    echo CMS-Start.bat muss im selben Ordner liegen wie "package.json".
+    echo.
+    pause
+    exit /b 1
+)
+
+REM Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
+REM node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.
+if not exist "node_modules\.bin\next.cmd" (
+    echo Abhaengigkeiten werden installiert.
+    echo.
+    echo   WICHTIG: Das dauert beim ersten Mal 2 bis 10 Minuten.
+    echo   Waehrenddessen passiert oft minutenlang scheinbar nichts -
+    echo   das ist normal. Bitte dieses Fenster NICHT schliessen.
+    echo.
+
+    if exist "package-lock.json" (
+        call npm ci --no-audit --no-fund
+        if errorlevel 1 (
+            echo.
+            echo Hinweis: "npm ci" war nicht moeglich, versuche "npm install"...
+            echo.
+            call npm install --no-audit --no-fund
+        )
+    ) else (
+        call npm install --no-audit --no-fund
     )
+
     if not exist "node_modules\.bin\next.cmd" (
         echo.
-        echo [FEHLER] "next" wurde auch nach "npm install" nicht gefunden.
-        echo Bitte loesche den Ordner "node_modules" manuell und starte dieses
-        echo Fenster erneut.
+        echo [FEHLER] Die Installation ist unvollstaendig geblieben.
+        echo.
+        echo Bitte so vorgehen:
+        echo   1. Ordner "node_modules" in diesem Verzeichnis loeschen
+        echo   2. Internetverbindung pruefen
+        echo   3. Diese Datei erneut starten
+        echo.
         pause
         exit /b 1
     )
+    echo.
+    echo Installation abgeschlossen.
     echo.
 )
 
@@ -47,12 +80,6 @@ if not exist ".env.local" (
     echo Der Einrichtungsassistent startet jetzt...
     echo.
     powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-setup.ps1"
-    if errorlevel 1 (
-        echo.
-        echo [FEHLER] Die Einrichtung wurde abgebrochen oder ist fehlgeschlagen.
-        pause
-        exit /b 1
-    )
     if not exist ".env.local" (
         echo.
         echo Einrichtung wurde abgebrochen. Der Server wird nicht gestartet.
@@ -62,16 +89,29 @@ if not exist ".env.local" (
     echo.
 )
 
-echo Der Server wird gestartet. Dieses Fenster waehrend der Nutzung bitte geoeffnet lassen.
-echo Das CMS oeffnet sich automatisch in einem eigenen App-Fenster, sobald der
-echo Server bereit ist.
+REM Laeuft schon ein CMS auf Port 3000? Dann wuerde Next.js auf einen anderen
+REM Port ausweichen und das App-Fenster ins Leere zeigen.
+netstat -ano | findstr /C:":3000 " | findstr "LISTENING" >nul 2>nul
+if not errorlevel 1 (
+    echo [HINWEIS] Auf Port 3000 laeuft bereits ein Programm.
+    echo Vermutlich ist das CMS schon in einem anderen Fenster gestartet.
+    echo.
+    echo Bitte das andere CMS-Fenster schliessen und es erneut versuchen.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo Der Server wird gestartet. Dieses Fenster waehrend der Nutzung bitte
+echo geoeffnet lassen.
 echo.
+echo Das CMS oeffnet sich gleich automatisch in einem eigenen Fenster.
 echo Zum Beenden: dieses Fenster schliessen oder STRG+C druecken.
 echo.
 
 start "" /min powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-open-app.ps1"
 
-call npm run dev
+call npm run dev -- -p 3000
 
 echo.
 echo Der Server wurde beendet.
