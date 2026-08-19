@@ -62,7 +62,12 @@ if ([string]::IsNullOrWhiteSpace($hash)) {
 $hash = $hash.Trim()
 
 $bytes = New-Object byte[] 32
-[System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+try {
+    $rng.GetBytes($bytes)
+} finally {
+    $rng.Dispose()
+}
 $sessionSecret = ($bytes | ForEach-Object { $_.ToString("x2") }) -join ""
 
 Write-Host ""
