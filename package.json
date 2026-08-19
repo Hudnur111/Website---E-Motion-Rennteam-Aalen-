@@ -10,8 +10,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "node scripts/a11y-check.mjs",
-    "cms:hash-password": "node scripts/cms-hash-password.mjs"
+    "test:a11y": "node scripts/a11y-check.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.0.0",
