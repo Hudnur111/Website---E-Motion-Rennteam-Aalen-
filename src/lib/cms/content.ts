@@ -148,12 +148,36 @@ export async function deleteItem(collectionName: string, slug: string, authorNam
   return { committedToGithub: true, commitUrl: null };
 }
 
+// The extension written to disk must come from this fixed, server-controlled
+// mapping — never from the client-supplied filename. `file.type` on the
+// upload route is only checked against an allowlist of MIME *values*; an
+// attacker can freely set the multipart Content-Type of a form field to
+// whatever they like while keeping any filename (e.g. send bytes for
+// "evil.html" with a forged `Content-Type: image/png`). If the extension
+// were taken from that filename, the allowlist would do nothing to stop an
+// arbitrary extension (including .html/.js) from landing in the
+// publicly-served public/uploads/ directory. SVG is intentionally not in
+// this map — see ALLOWED_TYPES in the upload route for why.
+const MIME_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+};
+
+export function extensionForMimeType(mimeType: string): string | null {
+  return MIME_EXTENSIONS[mimeType] ?? null;
+}
+
 export async function saveUploadedImage(
   fileName: string,
+  mimeType: string,
   bytes: Uint8Array,
   authorName: string
 ): Promise<{ publicPath: string } & SaveResult> {
-  const safeName = `${Date.now()}-${slugify(fileName.replace(/\.[^/.]+$/, ""))}${path.extname(fileName)}`;
+  const extension = extensionForMimeType(mimeType);
+  if (!extension) throw new Error(`Nicht unterstützter Dateityp: "${mimeType}"`);
+  const safeName = `${Date.now()}-${slugify(fileName.replace(/\.[^/.]+$/, ""))}${extension}`;
   const relPath = `public/uploads/${safeName}`;
   const publicPath = `/uploads/${safeName}`;
 

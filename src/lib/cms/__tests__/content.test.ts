@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { isValidSlug, slugify } from "@/lib/cms/content";
+import { describe, expect, it, vi } from "vitest";
+import { extensionForMimeType, isValidSlug, saveUploadedImage, slugify } from "@/lib/cms/content";
+
+vi.mock("node:fs", () => {
+  const promises = {
+    mkdir: vi.fn().mockResolvedValue(undefined),
+    writeFile: vi.fn().mockResolvedValue(undefined),
+  };
+  return { promises, default: { promises } };
+});
 
 describe("slugify", () => {
   it("lowercases and dashes separators", () => {
@@ -28,6 +36,42 @@ describe("slugify", () => {
     for (const input of inputs) {
       expect(isValidSlug(slugify(input))).toBe(true);
     }
+  });
+});
+
+describe("extensionForMimeType", () => {
+  it("maps allowed image MIME types to their fixed extension", () => {
+    expect(extensionForMimeType("image/jpeg")).toBe(".jpg");
+    expect(extensionForMimeType("image/png")).toBe(".png");
+    expect(extensionForMimeType("image/webp")).toBe(".webp");
+    expect(extensionForMimeType("image/gif")).toBe(".gif");
+  });
+
+  it("rejects SVG and any other MIME type", () => {
+    expect(extensionForMimeType("image/svg+xml")).toBeNull();
+    expect(extensionForMimeType("text/html")).toBeNull();
+    expect(extensionForMimeType("application/javascript")).toBeNull();
+    expect(extensionForMimeType("")).toBeNull();
+  });
+});
+
+describe("saveUploadedImage", () => {
+  it("derives the written extension from the MIME type, never from the client-supplied filename", async () => {
+    // Regression test: a malicious multipart request can set an arbitrary
+    // Content-Type on the file field independent of the filename. Before the
+    // fix, the extension was taken from `fileName` (path.extname), so a file
+    // named "evil.html" declared as image/png would still be written to
+    // public/uploads/ with a .html extension and be served as a live HTML
+    // document from the site's own origin.
+    const result = await saveUploadedImage("evil.html", "image/png", new Uint8Array([1, 2, 3]), "tester");
+    expect(result.publicPath).toMatch(/\.png$/);
+    expect(result.publicPath).not.toMatch(/\.html$/);
+  });
+
+  it("rejects a MIME type outside the allowlist (e.g. SVG) instead of writing a file", async () => {
+    await expect(
+      saveUploadedImage("evil.svg", "image/svg+xml", new Uint8Array([1, 2, 3]), "tester")
+    ).rejects.toThrow();
   });
 });
 
