@@ -39,6 +39,27 @@ if not exist "package.json" (
 REM Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 REM node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.
 if not exist "node_modules\.bin\next.cmd" (
+    REM Reste eines abgebrochenen Laufs automatisch entfernen, sonst bleibt
+    REM die Installation erneut unvollstaendig.
+    if exist "node_modules" (
+        echo Eine unvollstaendige Installation wurde gefunden und wird
+        echo aufgeraeumt. Das dauert einen Moment...
+        rmdir /s /q "node_modules"
+        if exist "node_modules" (
+            echo.
+            echo [FEHLER] Der Ordner "node_modules" liess sich nicht loeschen.
+            echo Vermutlich laeuft das CMS noch in einem anderen Fenster.
+            echo.
+            echo Bitte alle anderen CMS-Fenster schliessen und diese Datei
+            echo erneut starten.
+            echo.
+            pause
+            exit /b 1
+        )
+        echo Aufgeraeumt.
+        echo.
+    )
+
     echo Abhaengigkeiten werden installiert.
     echo.
     echo   WICHTIG: Das dauert beim ersten Mal 2 bis 10 Minuten.
@@ -62,10 +83,9 @@ if not exist "node_modules\.bin\next.cmd" (
         echo.
         echo [FEHLER] Die Installation ist unvollstaendig geblieben.
         echo.
-        echo Bitte so vorgehen:
-        echo   1. Ordner "node_modules" in diesem Verzeichnis loeschen
-        echo   2. Internetverbindung pruefen
-        echo   3. Diese Datei erneut starten
+        echo Das deutet fast immer auf die Internetverbindung hin.
+        echo Bitte Verbindung pruefen und diese Datei erneut starten -
+        echo aufgeraeumt wird dann automatisch.
         echo.
         pause
         exit /b 1
