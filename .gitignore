@@ -46,3 +46,6 @@ next-env.d.ts
 /public/admin
 AGENTS.md
 CLAUDE.md
+
+# claude code
+/.claude/
