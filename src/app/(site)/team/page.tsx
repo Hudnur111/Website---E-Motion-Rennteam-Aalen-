@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getTeam } from "@/lib/content";
+import { getTeam, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/team" },
 };
 
-const TEAM_DESCRIPTIONS: Record<string, string> = {
+const DEFAULT_DESCRIPTIONS: Record<string, string> = {
   Teamleitung:
     "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachbereiche.",
   Fahrzeugtechnik:
@@ -30,16 +30,26 @@ const TEAM_DESCRIPTIONS: Record<string, string> = {
 
 export default function TeamPage() {
   const team = getTeam();
+  const page = getPage("team");
   const departments = Array.from(new Set(team.map((m) => m.department)));
+
+  const descriptions: Record<string, string> = { ...DEFAULT_DESCRIPTIONS };
+  if (page?.departmentDescriptions?.length) {
+    for (const d of page.departmentDescriptions) {
+      descriptions[d.label] = d.value;
+    }
+  }
 
   return (
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Die Köpfe hinter dem ERT-14/26</h1>
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
+          {page?.heroTitle ?? "Die Köpfe hinter dem ERT-14/26"}
+        </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Über 60 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
-          gemeinsam unseren elektrischen Rennwagen – organisiert in sieben Fachteams.
+          {page?.heroSubtitle ??
+            "Über 60 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen gemeinsam unseren elektrischen Rennwagen – organisiert in sieben Fachteams."}
         </p>
       </Reveal>
 
@@ -52,9 +62,9 @@ export default function TeamPage() {
                 <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
                   <div>
                     <h2 className="text-xl font-bold">{department}</h2>
-                    {TEAM_DESCRIPTIONS[department] && (
+                    {descriptions[department] && (
                       <p className="mt-1.5 max-w-xl text-sm text-muted">
-                        {TEAM_DESCRIPTIONS[department]}
+                        {descriptions[department]}
                       </p>
                     )}
                   </div>
