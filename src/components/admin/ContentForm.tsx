@@ -12,6 +12,12 @@ interface SaveResult {
   warning?: string;
 }
 
+interface DeleteResult {
+  committedToGithub: boolean;
+  commitUrl: string | null;
+  warning?: string;
+}
+
 interface Props {
   collectionName: string;
   collection: CollectionDef;
@@ -20,7 +26,7 @@ interface Props {
   initialData?: Record<string, unknown>;
   initialBody?: string;
   onSaved: (result: SaveResult) => void;
-  onDeleted?: () => void;
+  onDeleted?: (result: DeleteResult) => void;
   onDirtyChange?: (dirty: boolean) => void;
 }
 
@@ -150,12 +156,12 @@ export default function ContentForm({
     setDeleting(true);
     try {
       const res = await fetch(`/api/admin/content/${collectionName}/${initialSlug}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         setResult({ ok: false, message: data.error || "Löschen fehlgeschlagen." });
         return;
       }
-      onDeleted?.();
+      onDeleted?.(data);
     } catch {
       setResult({ ok: false, message: "Verbindung zum Server fehlgeschlagen." });
     } finally {
