@@ -96,6 +96,13 @@ export default function ContentForm({
 
   function setField(name: string, value: FieldValue) {
     setData((prev) => ({ ...prev, [name]: value }));
+    // Also reported synchronously here, not just from the effect below: that
+    // effect only runs after the next commit, which is one or two render
+    // cycles behind a change dispatched programmatically (or by a very fast
+    // typist) immediately followed by Escape/backdrop-click - close enough
+    // together that the parent's dirty flag hadn't been raised yet, so the
+    // unsaved-changes confirmation was silently skipped.
+    onDirtyChange?.(true);
   }
 
   function findMissingRequiredImageField(): FieldDef | undefined {
@@ -180,7 +187,10 @@ export default function ContentForm({
             id="slug"
             type="text"
             value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            onChange={(e) => {
+              setSlug(e.target.value);
+              onDirtyChange?.(true);
+            }}
             className="w-full max-w-sm rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
             placeholder="mein-eintrag"
           />
@@ -196,7 +206,15 @@ export default function ContentForm({
           <label htmlFor="body" className="mb-1.5 block text-sm font-medium text-foreground">
             {bField.label}
           </label>
-          <RichTextField id="body" value={body} onChange={setBody} rows={12} />
+          <RichTextField
+            id="body"
+            value={body}
+            onChange={(v) => {
+              setBody(v);
+              onDirtyChange?.(true);
+            }}
+            rows={12}
+          />
         </div>
       )}
 
