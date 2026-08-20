@@ -83,6 +83,12 @@ geändert, werden die Abhängigkeiten dabei automatisch neu installiert. Die Pr�
 blockiert den Start nie: Ohne Internetverbindung, ohne lokal installiertes Git oder bei lokalen Änderungen an
 versionierten Dateien läuft die vorhandene Version einfach unverändert weiter.
 
+Bei diesem Update-Check wird außerdem `content/` mit dem in `GITHUB_BRANCH` konfigurierten Branch (Standard:
+`main`) abgeglichen – dort landen die Speicherungen des CMS, unabhängig davon, von welchem Branch aus diese
+CMS-Installation selbst läuft. Ohne diesen Abgleich würde die lokale Ansicht der Inhalte mit der Zeit veralten,
+sobald von einem anderen Gerät aus gespeichert wird. Der Abgleich passiert rein lokal (nie ein Push) und wird –
+genau wie der Code-Update-Check – übersprungen, sobald es eine noch ungesicherte lokale Bearbeitung gibt.
+
 **Einrichtung manuell (lokal & Produktion):**
 
 1. `.env.local.example` nach `.env.local` kopieren.
