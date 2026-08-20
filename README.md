@@ -56,18 +56,24 @@ im eigenen Next.js-Code: eigener Login, eigenes Design, eigene Anbindung an GitH
 - Jede Speicherung wird – sofern konfiguriert – automatisch als **Commit direkt ins GitHub-Repository** geschrieben
   (über die GitHub Contents API), inklusive Bild-Uploads nach `public/uploads/`.
 
-**Einrichtung unter Windows (für Redakteure ohne Entwicklungsumgebung):**
+**Einrichtung unter Windows/macOS (für Redakteure ohne Entwicklungsumgebung):**
 
-Im Hauptverzeichnis liegen zwei Doppelklick-Programme:
+Im Hauptverzeichnis liegen jeweils zwei Doppelklick-Programme – `.bat` für Windows, `.command` für macOS:
 
-- **`CMS-Start.bat`** – beim ersten Start fragt ein Assistent Benutzername, Passwort und optional den
-  GitHub-Token ab, richtet alles automatisch ein und startet danach den Server; der Browser öffnet sich von
-  selbst unter `http://localhost:3000/admin/login`. Bei jedem weiteren Start wird direkt der Server gestartet.
-- **`CMS-Zugangsdaten-aendern.bat`** – startet den Einrichtungsassistenten erneut, z. B. um das Passwort zu
-  ändern oder den GitHub-Token nachträglich einzutragen.
+- **`CMS-Start.bat`** / **`CMS-Start.command`** – beim allerersten Start fragt ein Assistent einmalig
+  Benutzername, Passwort und optional den GitHub-Token ab, richtet alles automatisch ein und startet danach
+  den Server; der Browser öffnet sich von selbst unter `http://localhost:3000/admin/login`, mit bereits
+  ausgefülltem Benutzernamen – es muss nur noch das Passwort eingegeben werden. Bei jedem weiteren
+  Doppelklick wird ganz ohne Eingaben direkt der Server gestartet.
+- **`CMS-Zugangsdaten-aendern.bat`** / **`CMS-Zugangsdaten-aendern.command`** – startet den
+  Einrichtungsassistenten erneut, z. B. um das Passwort zu ändern oder den GitHub-Token nachträglich
+  einzutragen.
 
 Voraussetzung ist eine installierte [Node.js](https://nodejs.org/) LTS-Version; alles Weitere (Abhängigkeiten,
-Zugangsdaten) übernehmen die beiden Skripte.
+Zugangsdaten) übernehmen die Skripte. Der GitHub-Token wird ausschließlich lokal in der (nicht versionierten)
+`.env.local` gespeichert – er landet nie im Git-Repository und wird deshalb bewusst nicht in `CMS-Start.bat`/
+`.command` fest hinterlegt. Einmal über den Assistenten eingetragen, muss er danach nicht mehr eingegeben
+werden.
 
 **Einrichtung manuell (lokal & Produktion):**
 
