@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { collections } from "@/lib/cms/collections";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isAdmin: boolean;
+}
+
+export default function Sidebar({ isAdmin }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -33,6 +37,20 @@ export default function Sidebar() {
           </Link>
         );
       })}
+
+      {isAdmin && (
+        <>
+          <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Verwaltung</p>
+          <Link
+            href="/admin/benutzer"
+            className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              pathname === "/admin/benutzer" ? "bg-accent/15 text-accent-text" : "text-muted hover:bg-surface-2 hover:text-foreground"
+            }`}
+          >
+            Benutzerverwaltung
+          </Link>
+        </>
+      )}
     </nav>
   );
 }

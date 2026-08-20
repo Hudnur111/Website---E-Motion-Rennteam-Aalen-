@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/cms/auth";
 import { verifyPassword } from "@/lib/cms/password";
+import { findUser } from "@/lib/cms/users";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
@@ -23,23 +24,33 @@ export async function POST(request: NextRequest) {
   const adminUser = process.env.CMS_ADMIN_USER;
   const adminHash = process.env.CMS_ADMIN_PASSWORD_HASH;
 
-  if (!adminUser || !adminHash) {
+  if ((!adminUser || !adminHash) && typeof username === "string" && !findUser(username)) {
     return NextResponse.json(
       { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_ADMIN_USER/CMS_ADMIN_PASSWORD_HASH fehlen)." },
       { status: 500 }
     );
   }
 
-  if (
-    typeof username !== "string" ||
-    typeof password !== "string" ||
-    username !== adminUser ||
-    !verifyPassword(password, adminHash)
-  ) {
+  let mustChangePassword = false;
+  let authenticated = false;
+
+  if (typeof username === "string" && typeof password === "string") {
+    if (adminUser && adminHash && username === adminUser && verifyPassword(password, adminHash)) {
+      authenticated = true;
+    } else {
+      const user = findUser(username);
+      if (user && verifyPassword(password, user.passwordHash)) {
+        authenticated = true;
+        mustChangePassword = user.mustChangePassword;
+      }
+    }
+  }
+
+  if (!authenticated) {
     return NextResponse.json({ error: "Benutzername oder Passwort ist falsch." }, { status: 401 });
   }
 
-  const token = await createSessionToken(username);
+  const token = await createSessionToken(username as string, mustChangePassword);
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,

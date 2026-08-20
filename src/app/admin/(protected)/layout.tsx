@@ -10,6 +10,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
   if (!session) redirect("/admin/login");
+  if (session.mustChangePassword) redirect("/admin/passwort-aendern");
+
+  const isAdmin = session.username === process.env.CMS_ADMIN_USER;
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 sm:px-6">
         <aside className="hidden w-56 shrink-0 md:block">
           <div className="sticky top-20">
-            <Sidebar />
+            <Sidebar isAdmin={isAdmin} />
           </div>
         </aside>
         <main className="min-w-0 flex-1 pb-16">{children}</main>

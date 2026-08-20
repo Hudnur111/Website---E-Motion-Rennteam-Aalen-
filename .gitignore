@@ -41,6 +41,9 @@ yarn-error.log*
 next-env.d.ts
 .env.local
 
+# CMS: lokal angelegte Zusatz-Benutzer (Passwort-Hashes, nie versionieren)
+/.cms-users.json
+
 # tinacms
 /tina/__generated__
 /public/admin

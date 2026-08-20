@@ -36,6 +36,13 @@ if not exist "package.json" (
     exit /b 1
 )
 
+REM Automatisches Update von GitHub, sofern moeglich. Blockiert den Start
+REM nie - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen),
+REM laeuft es einfach mit der vorhandenen Version weiter.
+if exist ".git" (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-update.ps1"
+)
+
 REM Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 REM node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.
 if not exist "node_modules\.bin\next.cmd" (

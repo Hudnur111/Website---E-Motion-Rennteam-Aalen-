@@ -75,6 +75,14 @@ Zugangsdaten) übernehmen die Skripte. Der GitHub-Token wird ausschließlich lok
 `.command` fest hinterlegt. Einmal über den Assistenten eingetragen, muss er danach nicht mehr eingegeben
 werden.
 
+**Automatische Updates:** `CMS-Start.bat`/`.command` prüfen bei jedem Start automatisch, ob es im
+GitHub-Repository eine neuere Version gibt (`scripts/cms-update.ps1` bzw. `scripts/cms-update.sh`), und
+übernehmen sie per Fast-Forward, bevor der Server startet – neue Funktionen landen dadurch von selbst auf
+jedem Gerät, ohne dass jemand manuell etwas herunterladen muss. Haben sich `package.json`/`package-lock.json`
+geändert, werden die Abhängigkeiten dabei automatisch neu installiert. Die Prüfung ist rein informativ und
+blockiert den Start nie: Ohne Internetverbindung, ohne lokal installiertes Git oder bei lokalen Änderungen an
+versionierten Dateien läuft die vorhandene Version einfach unverändert weiter.
+
 **Einrichtung manuell (lokal & Produktion):**
 
 1. `.env.local.example` nach `.env.local` kopieren.
@@ -90,6 +98,15 @@ werden.
 
 Ohne gesetzte GitHub-Variablen funktioniert das CMS weiterhin (Änderungen werden lokal auf der Festplatte
 gespeichert), zeigt im Dashboard aber deutlich an, dass nichts auf GitHub gesichert wurde.
+
+**Mehrere Benutzer:** Der über `.env.local`/den Einrichtungsassistenten konfigurierte Zugang
+(`CMS_ADMIN_USER`) ist der Hauptadministrator und hat volle Berechtigung, u. a. für die Benutzerverwaltung
+unter `/admin/benutzer`. Dort kann er weitere Redaktions-Zugänge anlegen (Benutzername + temporäres
+Passwort), damit z. B. Teamkolleg:innen sich von ihrem eigenen Gerät aus einloggen können. Beim ersten Login
+mit dem temporären Passwort wird die Person automatisch aufgefordert, ein eigenes, nur ihr bekanntes Passwort
+zu vergeben, bevor sie das CMS weiter nutzen kann. Diese Zusatz-Zugänge werden – wie `.env.local` – nur lokal
+in einer nicht versionierten Datei (`.cms-users.json`) gespeichert und bleiben auch von automatischen Updates
+unberührt.
 
 ### 📁 Projektstruktur
 

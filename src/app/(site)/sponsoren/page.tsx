@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getSponsors, type Sponsor } from "@/lib/content";
+import { getSponsors, getPage, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
@@ -16,15 +16,18 @@ const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Partner"];
 
 export default function SponsorsPage() {
   const sponsors = getSponsors();
+  const page = getPage("sponsors");
 
   return (
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Sponsoren</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Unsere Partner</h1>
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
+          {page?.heroTitle ?? "Unsere Partner"}
+        </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht
-          möglich. Vielen Dank an alle Partner!
+          {page?.heroSubtitle ??
+            "Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht möglich. Vielen Dank an alle Partner!"}
         </p>
       </Reveal>
 
