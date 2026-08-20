@@ -66,6 +66,12 @@ export type Page = {
   title: string;
   heroTitle?: string;
   heroSubtitle?: string;
+  stats?: { label: string; value: string }[];
+  departmentDescriptions?: { label: string; value: string }[];
+  address?: string;
+  email?: string;
+  phone?: string;
+  socialMedia?: string;
   body: string;
   slug: string;
 };

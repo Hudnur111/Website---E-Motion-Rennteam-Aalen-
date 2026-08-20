@@ -119,6 +119,28 @@ export const collections: CollectionDef[] = [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "heroTitle", label: "Hero-Titel", type: "string" },
       { name: "heroSubtitle", label: "Hero-Untertitel", type: "text" },
+      {
+        name: "stats",
+        label: "Kennzahlen (nur Startseite)",
+        type: "objectList",
+        fields: [
+          { name: "label", label: "Bezeichnung", type: "string" },
+          { name: "value", label: "Wert", type: "string" },
+        ],
+      },
+      {
+        name: "departmentDescriptions",
+        label: "Abteilungsbeschreibungen (nur Team)",
+        type: "objectList",
+        fields: [
+          { name: "label", label: "Abteilung", type: "string" },
+          { name: "value", label: "Beschreibung", type: "string" },
+        ],
+      },
+      { name: "address", label: "Adresse (nur Kontakt)", type: "text" },
+      { name: "email", label: "E-Mail (nur Kontakt)", type: "string" },
+      { name: "phone", label: "Telefon (nur Kontakt)", type: "string" },
+      { name: "socialMedia", label: "Social Media (nur Kontakt)", type: "string" },
       { name: "body", label: "Inhalt", type: "richText" },
     ],
   },
