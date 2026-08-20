@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getVehicles } from "@/lib/content";
+import { getVehicles, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ScrollScale from "@/components/motion/ScrollScale";
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 export default function VehiclesPage() {
   const vehicles = getVehicles();
+  const page = getPage("vehicles");
 
   return (
     <div className="py-20">
@@ -21,11 +22,11 @@ export default function VehiclesPage() {
         <Reveal className="text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
           <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
-            Unsere Boliden
+            {page?.heroTitle ?? "Unsere Boliden"}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
-            Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
-            der Simulation bis zur Rennstrecke.
+            {page?.heroSubtitle ??
+              "Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von der Simulation bis zur Rennstrecke."}
           </p>
         </Reveal>
       </div>

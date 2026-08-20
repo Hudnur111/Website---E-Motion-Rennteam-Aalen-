@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { getNews } from "@/lib/content";
+import { getNews, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -14,14 +14,18 @@ export const metadata: Metadata = {
 
 export default function NewsPage() {
   const news = getNews();
+  const page = getPage("news");
 
   return (
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">News &amp; Blog</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Aktuelles vom Team</h1>
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
+          {page?.heroTitle ?? "Aktuelles vom Team"}
+        </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Wettbewerbsberichte, Baufortschritt und Neuigkeiten rund um das E-Motion Rennteam Aalen.
+          {page?.heroSubtitle ??
+            "Wettbewerbsberichte, Baufortschritt und Neuigkeiten rund um das E-Motion Rennteam Aalen."}
         </p>
       </Reveal>
 

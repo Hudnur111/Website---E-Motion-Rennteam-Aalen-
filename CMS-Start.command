@@ -35,6 +35,13 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Automatisches Update von GitHub, sofern moeglich. Blockiert den Start nie
+# - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen), laeuft
+# es einfach mit der vorhandenen Version weiter.
+if [ -d ".git" ]; then
+    bash "scripts/cms-update.sh"
+fi
+
 # Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 # node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.
 if [ ! -f "node_modules/.bin/next" ]; then

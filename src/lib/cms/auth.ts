@@ -8,6 +8,8 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8; // 8h
 interface SessionPayload {
   u: string;
   exp: number;
+  /** Muss vor weiterer Nutzung erst ein eigenes Passwort vergeben. */
+  p?: boolean;
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {
@@ -44,10 +46,11 @@ function getSecret(): string {
   return secret;
 }
 
-export async function createSessionToken(username: string): Promise<string> {
+export async function createSessionToken(username: string, mustChangePassword = false): Promise<string> {
   const payload: SessionPayload = {
     u: username,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    ...(mustChangePassword ? { p: true } : {}),
   };
   const payloadBytes = new TextEncoder().encode(JSON.stringify(payload));
   const payloadB64 = base64UrlEncode(payloadBytes);
@@ -57,7 +60,9 @@ export async function createSessionToken(username: string): Promise<string> {
   return `${payloadB64}.${sigB64}`;
 }
 
-export async function verifySessionToken(token: string | undefined | null): Promise<{ username: string } | null> {
+export async function verifySessionToken(
+  token: string | undefined | null
+): Promise<{ username: string; mustChangePassword: boolean } | null> {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 2) return null;
@@ -83,7 +88,7 @@ export async function verifySessionToken(token: string | undefined | null): Prom
     const payload: SessionPayload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64)));
     if (typeof payload.exp !== "number" || payload.exp < Math.floor(Date.now() / 1000)) return null;
     if (typeof payload.u !== "string" || !payload.u) return null;
-    return { username: payload.u };
+    return { username: payload.u, mustChangePassword: payload.p === true };
   } catch {
     return null;
   }
@@ -92,7 +97,9 @@ export async function verifySessionToken(token: string | undefined | null): Prom
 export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;
 
 /** Reads and verifies the session cookie from an incoming request. */
-export async function getSessionUser(request: Request): Promise<{ username: string } | null> {
+export async function getSessionUser(
+  request: Request
+): Promise<{ username: string; mustChangePassword: boolean } | null> {
   const cookieHeader = request.headers.get("cookie") || "";
   const match = cookieHeader
     .split(";")
