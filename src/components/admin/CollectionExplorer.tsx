@@ -11,7 +11,25 @@ interface Item {
   body: string;
 }
 
+interface WriteResult {
+  committedToGithub: boolean;
+  warning?: string;
+}
+
 type PanelState = { mode: "create" } | { mode: "edit"; slug: string } | null;
+
+// The panel closes as soon as a save/delete succeeds (see closePanel() in
+// onSaved/onDeleted below), which unmounts ContentForm's own success/warning
+// message in the same tick it appears — a real editor could never actually
+// read it, most importantly the warning that a change was only saved
+// locally and NOT committed to GitHub. Recording it here, outside the
+// panel, keeps it on screen after the panel is gone.
+function noticeForWriteResult(result: WriteResult, verb: "gespeichert" | "gelöscht"): { kind: "ok" | "warning"; message: string } {
+  if (result.committedToGithub) {
+    return { kind: "ok", message: `Erfolgreich ${verb} und als Commit auf GitHub gesichert.` };
+  }
+  return { kind: "warning", message: result.warning || `Erfolgreich ${verb}.` };
+}
 
 export default function CollectionExplorer({
   collectionName,
@@ -28,6 +46,7 @@ export default function CollectionExplorer({
   const [search, setSearch] = useState("");
   const [panel, setPanel] = useState<PanelState>(null);
   const [panelDirty, setPanelDirty] = useState(false);
+  const [notice, setNotice] = useState<{ kind: "ok" | "warning"; message: string } | null>(null);
 
   const titleField = collection.fields.find((f) => f.isTitle);
 
@@ -103,12 +122,28 @@ export default function CollectionExplorer({
         </div>
         <button
           type="button"
-          onClick={() => setPanel({ mode: "create" })}
+          onClick={() => {
+            setNotice(null);
+            setPanel({ mode: "create" });
+          }}
           className="rounded-lg bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-transform hover:scale-105"
         >
           + Neuer Eintrag
         </button>
       </div>
+
+      {notice && (
+        <p
+          role="status"
+          className={`mb-4 rounded-lg border px-3.5 py-2.5 text-sm ${
+            notice.kind === "ok"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+          }`}
+        >
+          {notice.message}
+        </p>
+      )}
 
       {items.length >= 6 && (
         <input
@@ -138,7 +173,10 @@ export default function CollectionExplorer({
           <button
             key={item.slug}
             type="button"
-            onClick={() => setPanel({ mode: "edit", slug: item.slug })}
+            onClick={() => {
+              setNotice(null);
+              setPanel({ mode: "edit", slug: item.slug });
+            }}
             className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
           >
             <span className="min-w-0">
@@ -161,7 +199,8 @@ export default function CollectionExplorer({
               collection={collection}
               mode="create"
               onDirtyChange={setPanelDirty}
-              onSaved={() => {
+              onSaved={(result) => {
+                setNotice(noticeForWriteResult(result, "gespeichert"));
                 closePanel();
                 refresh();
               }}
@@ -179,11 +218,13 @@ export default function CollectionExplorer({
                   initialData={item.data}
                   initialBody={item.body}
                   onDirtyChange={setPanelDirty}
-                  onSaved={() => {
+                  onSaved={(result) => {
+                    setNotice(noticeForWriteResult(result, "gespeichert"));
                     closePanel();
                     refresh();
                   }}
-                  onDeleted={() => {
+                  onDeleted={(result) => {
+                    setNotice(noticeForWriteResult(result, "gelöscht"));
                     closePanel();
                     refresh();
                   }}
