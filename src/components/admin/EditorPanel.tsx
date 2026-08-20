@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface Props {
@@ -18,6 +18,15 @@ const FOCUSABLE_SELECTOR =
 export default function EditorPanel({ title, onClose, children }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Kept in sync on every render (not via an effect) so the keydown listener
+  // below - subscribed once - always calls the *current* onClose. Without
+  // this, closing over the initial onClose (or re-subscribing only when the
+  // effect's dependency changes) could still call a close handler that
+  // captured a stale "not dirty" state from just before an edit landed.
+  const onCloseRef = useRef(onClose);
+  useLayoutEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   // Moves focus into the panel on open and restores it to whatever
   // triggered the panel (e.g. the list-item or "Neuer Eintrag" button) once
@@ -33,7 +42,7 @@ export default function EditorPanel({ title, onClose, children }: Props) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       // Trap Tab/Shift+Tab inside the panel so a keyboard user can't tab
@@ -64,7 +73,9 @@ export default function EditorPanel({ title, onClose, children }: Props) {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
     };
-  }, [onClose]);
+    // Subscribes once per mount; onCloseRef (kept current via the layout
+    // effect above) is what keeps this listener from calling a stale onClose.
+  }, []);
 
   return (
     <AnimatePresence>
