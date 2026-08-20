@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "node scripts/a11y-check.mjs",
+    "test:cms-agent": "node scripts/cms-test-agent.mjs",
     "cms:hash-password": "node scripts/cms-hash-password.mjs"
   },
   "dependencies": {
