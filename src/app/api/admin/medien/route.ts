@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/cms/auth";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { commitBinaryFile, deleteFile as githubDeleteFile, getGithubConfig } from "@/lib/cms/github";
+import { deleteFile as githubDeleteFile, getGithubConfig } from "@/lib/cms/github";
 
 const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
 const IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|webp|gif)$/i;
