@@ -5,6 +5,18 @@ import type { CollectionDef, FieldDef } from "@/lib/cms/collections";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextField from "@/components/admin/RichTextField";
 
+function clientSlugify(input: string): string {
+  return (
+    input
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "eintrag"
+  );
+}
+
 interface SaveResult {
   slug: string;
   committedToGithub: boolean;
@@ -28,6 +40,7 @@ interface Props {
   onSaved: (result: SaveResult) => void;
   onDeleted?: (result: DeleteResult) => void;
   onDirtyChange?: (dirty: boolean) => void;
+  onDuplicate?: (data: Record<string, FieldValue>, body: string) => void;
 }
 
 type FieldValue = string | number | boolean | { label: string; value: string }[] | undefined;
@@ -66,8 +79,10 @@ export default function ContentForm({
   onSaved,
   onDeleted,
   onDirtyChange,
+  onDuplicate,
 }: Props) {
   const [slug, setSlug] = useState(initialSlug ?? "");
+  const [slugManual, setSlugManual] = useState(false);
   const [data, setData] = useState<Record<string, FieldValue>>(() => (initialData as Record<string, FieldValue>) ?? {});
   const [body, setBody] = useState(initialBody ?? "");
   const [saving, setSaving] = useState(false);
@@ -80,8 +95,10 @@ export default function ContentForm({
   // happens, which used to fire two POST requests and create two entries.
   // A plain ref is set synchronously, so the second call sees it immediately.
   const submittingRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const bField = bodyField(collection);
+  const titleFieldName = collection.fields.find((f) => f.isTitle)?.name;
 
   // Lets the parent (EditorPanel via CollectionExplorer) confirm before
   // discarding an editor's in-progress work when they close the panel
@@ -94,6 +111,18 @@ export default function ContentForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, data, body]);
 
+  // Ctrl+S / Cmd+S saves the form without reaching for the mouse.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        formRef.current?.requestSubmit();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   function setField(name: string, value: FieldValue) {
     setData((prev) => ({ ...prev, [name]: value }));
     // Also reported synchronously here, not just from the effect below: that
@@ -103,6 +132,11 @@ export default function ContentForm({
     // together that the parent's dirty flag hadn't been raised yet, so the
     // unsaved-changes confirmation was silently skipped.
     onDirtyChange?.(true);
+    // In create mode, auto-derive the slug from the title field as the user
+    // types, unless they've already manually overridden it.
+    if (mode === "create" && !slugManual && name === titleFieldName && typeof value === "string") {
+      setSlug(clientSlugify(value));
+    }
   }
 
   function findMissingRequiredImageField(): FieldDef | undefined {
@@ -177,18 +211,38 @@ export default function ContentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       {mode === "create" && (
         <div>
-          <label htmlFor="slug" className="mb-1.5 block text-sm font-medium text-foreground">
-            URL-Slug <span className="text-muted">(optional, wird sonst automatisch erzeugt)</span>
-          </label>
+          <div className="mb-1.5 flex items-center gap-2">
+            <label htmlFor="slug" className="text-sm font-medium text-foreground">
+              URL-Slug
+            </label>
+            {!slugManual ? (
+              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent-text">
+                automatisch
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSlugManual(false);
+                  const titleVal = titleFieldName ? String(data[titleFieldName] ?? "") : "";
+                  setSlug(clientSlugify(titleVal));
+                }}
+                className="text-xs text-accent-text underline underline-offset-2 hover:no-underline"
+              >
+                zurücksetzen
+              </button>
+            )}
+          </div>
           <input
             id="slug"
             type="text"
             value={slug}
             onChange={(e) => {
               setSlug(e.target.value);
+              setSlugManual(true);
               onDirtyChange?.(true);
             }}
             className="w-full max-w-sm rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
@@ -229,24 +283,41 @@ export default function ContentForm({
         </p>
       )}
 
-      <div className="flex items-center justify-between gap-3">
-        <button
-          type="submit"
-          disabled={saving || deleting}
-          className="rounded-lg bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
-        >
-          {saving ? "Speichert…" : "Speichern"}
-        </button>
-        {mode === "edit" && onDeleted && (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
           <button
-            type="button"
-            onClick={handleDelete}
+            type="submit"
             disabled={saving || deleting}
-            className="rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
           >
-            {deleting ? "Löscht…" : "Löschen"}
+            {saving ? "Speichert…" : "Speichern"}
           </button>
-        )}
+          <span className="hidden text-xs text-muted sm:inline" aria-hidden>
+            Strg+S
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {mode === "edit" && onDuplicate && (
+            <button
+              type="button"
+              onClick={() => onDuplicate(data, body)}
+              disabled={saving || deleting}
+              className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Duplizieren
+            </button>
+          )}
+          {mode === "edit" && onDeleted && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={saving || deleting}
+              className="rounded-lg border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {deleting ? "Löscht…" : "Löschen"}
+            </button>
+          )}
+        </div>
       </div>
     </form>
   );

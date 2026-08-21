@@ -16,7 +16,7 @@ interface WriteResult {
   warning?: string;
 }
 
-type PanelState = { mode: "create" } | { mode: "edit"; slug: string } | null;
+type PanelState = { mode: "create"; prefill?: { data: Record<string, unknown>; body: string } } | { mode: "edit"; slug: string } | null;
 
 // The panel closes as soon as a save/delete succeeds (see closePanel() in
 // onSaved/onDeleted below), which unmounts ContentForm's own success/warning
@@ -100,6 +100,22 @@ export default function CollectionExplorer({
     return titleField ? String(item.data[titleField.name] ?? item.slug) : item.slug;
   }
 
+  function itemSubtitle(item: Item): string {
+    // Show the most informative secondary field: date > select > string (non-title), fall back to slug.
+    const dateField = collection.fields.find((f) => f.type === "datetime");
+    if (dateField && item.data[dateField.name]) {
+      const d = new Date(String(item.data[dateField.name]));
+      if (!Number.isNaN(d.getTime())) {
+        return d.toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" });
+      }
+    }
+    const selectField = collection.fields.find((f) => f.type === "select");
+    if (selectField && item.data[selectField.name]) return String(item.data[selectField.name]);
+    const secondaryString = collection.fields.find((f) => f.type === "string" && !f.isTitle);
+    if (secondaryString && item.data[secondaryString.name]) return String(item.data[secondaryString.name]);
+    return item.slug;
+  }
+
   function closePanel() {
     setPanel(null);
     setPanelDirty(false);
@@ -169,28 +185,40 @@ export default function CollectionExplorer({
       )}
 
       <div className="space-y-2">
-        {filteredItems.map((item) => (
-          <button
-            key={item.slug}
-            type="button"
-            onClick={() => {
-              setNotice(null);
-              setPanel({ mode: "edit", slug: item.slug });
-            }}
-            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
-          >
-            <span className="min-w-0">
-              <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
-              <span className="block break-words text-xs text-muted">{item.slug}</span>
-            </span>
-            <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
-          </button>
-        ))}
+        {filteredItems.map((item) => {
+          const subtitle = itemSubtitle(item);
+          const isSlug = subtitle === item.slug;
+          return (
+            <button
+              key={item.slug}
+              type="button"
+              onClick={() => {
+                setNotice(null);
+                setPanel({ mode: "edit", slug: item.slug });
+              }}
+              className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
+            >
+              <span className="min-w-0">
+                <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
+                <span className="block break-words text-xs text-muted">
+                  {isSlug ? item.slug : <>{subtitle} <span className="text-border">·</span> {item.slug}</>}
+                </span>
+              </span>
+              <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
+            </button>
+          );
+        })}
       </div>
 
       {panel && (
         <EditorPanel
-          title={panel.mode === "create" ? `Neuer Eintrag: ${collection.label}` : `${collection.label} bearbeiten`}
+          title={
+            panel.mode === "create"
+              ? panel.prefill
+                ? `Kopie erstellen: ${collection.label}`
+                : `Neuer Eintrag: ${collection.label}`
+              : `${collection.label} bearbeiten`
+          }
           onClose={requestClosePanel}
         >
           {panel.mode === "create" ? (
@@ -198,6 +226,8 @@ export default function CollectionExplorer({
               collectionName={collectionName}
               collection={collection}
               mode="create"
+              initialData={panel.prefill?.data}
+              initialBody={panel.prefill?.body}
               onDirtyChange={setPanelDirty}
               onSaved={(result) => {
                 setNotice(noticeForWriteResult(result, "gespeichert"));
@@ -227,6 +257,10 @@ export default function CollectionExplorer({
                     setNotice(noticeForWriteResult(result, "gelöscht"));
                     closePanel();
                     refresh();
+                  }}
+                  onDuplicate={(dupData, dupBody) => {
+                    setPanel({ mode: "create", prefill: { data: dupData as Record<string, unknown>, body: dupBody } });
+                    setPanelDirty(false);
                   }}
                 />
               );

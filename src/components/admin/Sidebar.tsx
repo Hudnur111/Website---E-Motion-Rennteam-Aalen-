@@ -38,6 +38,16 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
         );
       })}
 
+      <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Medien</p>
+      <Link
+        href="/admin/medien"
+        className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+          pathname === "/admin/medien" ? "bg-accent/15 text-accent-text" : "text-muted hover:bg-surface-2 hover:text-foreground"
+        }`}
+      >
+        Mediathek
+      </Link>
+
       {isAdmin && (
         <>
           <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Verwaltung</p>
