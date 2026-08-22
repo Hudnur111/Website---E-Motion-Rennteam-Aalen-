@@ -16,7 +16,11 @@ interface WriteResult {
   warning?: string;
 }
 
-type PanelState = { mode: "create" } | { mode: "edit"; slug: string } | null;
+type PanelState =
+  | { mode: "create" }
+  | { mode: "create-prefilled"; sourceSlug: string; data: Record<string, unknown>; body: string }
+  | { mode: "edit"; slug: string }
+  | null;
 
 // The panel closes as soon as a save/delete succeeds (see closePanel() in
 // onSaved/onDeleted below), which unmounts ContentForm's own success/warning
@@ -170,30 +174,60 @@ export default function CollectionExplorer({
 
       <div className="space-y-2">
         {filteredItems.map((item) => (
-          <button
+          <div
             key={item.slug}
-            type="button"
-            onClick={() => {
-              setNotice(null);
-              setPanel({ mode: "edit", slug: item.slug });
-            }}
-            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
+            className="flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-surface px-4 py-3 transition-colors hover:border-accent"
           >
-            <span className="min-w-0">
+            <button
+              type="button"
+              onClick={() => {
+                setNotice(null);
+                setPanel({ mode: "edit", slug: item.slug });
+              }}
+              className="min-w-0 flex-1 text-left"
+            >
               <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
               <span className="block break-words text-xs text-muted">{item.slug}</span>
-            </span>
-            <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
-          </button>
+            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                title="Duplizieren"
+                onClick={() => {
+                  setNotice(null);
+                  setPanel({ mode: "create-prefilled", sourceSlug: item.slug, data: item.data, body: item.body });
+                }}
+                className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+              >
+                Kopieren
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNotice(null);
+                  setPanel({ mode: "edit", slug: item.slug });
+                }}
+                className="text-xs text-accent-text"
+              >
+                Bearbeiten →
+              </button>
+            </div>
+          </div>
         ))}
       </div>
 
       {panel && (
         <EditorPanel
-          title={panel.mode === "create" ? `Neuer Eintrag: ${collection.label}` : `${collection.label} bearbeiten`}
+          title={
+            panel.mode === "create"
+              ? `Neuer Eintrag: ${collection.label}`
+              : panel.mode === "create-prefilled"
+              ? `Kopie erstellen: ${collection.label}`
+              : `${collection.label} bearbeiten`
+          }
           onClose={requestClosePanel}
         >
-          {panel.mode === "create" ? (
+          {panel.mode === "create" && (
             <ContentForm
               collectionName={collectionName}
               collection={collection}
@@ -205,7 +239,23 @@ export default function CollectionExplorer({
                 refresh();
               }}
             />
-          ) : (
+          )}
+          {panel.mode === "create-prefilled" && (
+            <ContentForm
+              collectionName={collectionName}
+              collection={collection}
+              mode="create"
+              initialData={panel.data}
+              initialBody={panel.body}
+              onDirtyChange={setPanelDirty}
+              onSaved={(result) => {
+                setNotice(noticeForWriteResult(result, "gespeichert"));
+                closePanel();
+                refresh();
+              }}
+            />
+          )}
+          {panel.mode === "edit" &&
             (() => {
               const item = items.find((i) => i.slug === panel.slug);
               if (!item) return <p className="text-sm text-muted">Eintrag nicht gefunden.</p>;
@@ -230,8 +280,7 @@ export default function CollectionExplorer({
                   }}
                 />
               );
-            })()
-          )}
+            })()}
         </EditorPanel>
       )}
     </div>

@@ -49,6 +49,19 @@ async function readDirSafe(dir: string): Promise<string[]> {
   }
 }
 
+/** Returns the mtime of the most recently modified .md file in the collection, or null if empty. */
+export async function latestMtime(collectionName: string): Promise<Date | null> {
+  const collection = getCollection(collectionName);
+  if (!collection) return null;
+  const dir = path.join(/* turbopackIgnore: true */ ROOT, collection.path);
+  const files = (await readDirSafe(dir)).filter((f) => f.endsWith(".md"));
+  if (files.length === 0) return null;
+  const mtimes = await Promise.all(
+    files.map((f) => fs.stat(path.join(dir, f)).then((s) => s.mtime).catch(() => new Date(0)))
+  );
+  return mtimes.reduce((latest, t) => (t > latest ? t : latest), new Date(0));
+}
+
 export async function listItems(collectionName: string): Promise<ContentItem[]> {
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
