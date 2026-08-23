@@ -24,11 +24,22 @@ export interface FieldDef {
   fields?: FieldDef[];
 }
 
+export interface SortDef {
+  field: string;
+  direction?: "asc" | "desc";
+}
+
 export interface CollectionDef {
   name: string;
   label: string;
   path: string;
   fields: FieldDef[];
+  /** Field to sort the list by in the admin UI. Defaults to slug order. */
+  sortBy?: SortDef;
+  /** Field whose value is shown as a secondary line in the list rows. */
+  subtitleField?: string;
+  /** Returns the public URL for a given slug so editors can open a preview. */
+  previewPath?: (slug: string) => string;
 }
 
 export const collections: CollectionDef[] = [
@@ -36,6 +47,8 @@ export const collections: CollectionDef[] = [
     name: "team",
     label: "Team-Mitglieder",
     path: "content/team",
+    sortBy: { field: "order", direction: "asc" },
+    subtitleField: "role",
     fields: [
       { name: "name", label: "Name", type: "string", isTitle: true, required: true },
       { name: "role", label: "Position/Rolle", type: "string", required: true },
@@ -63,6 +76,8 @@ export const collections: CollectionDef[] = [
     name: "vehicle",
     label: "Fahrzeuge",
     path: "content/vehicles",
+    sortBy: { field: "year", direction: "desc" },
+    subtitleField: "year",
     fields: [
       { name: "name", label: "Fahrzeugname", type: "string", isTitle: true, required: true },
       { name: "year", label: "Baujahr", type: "number", required: true },
@@ -85,6 +100,7 @@ export const collections: CollectionDef[] = [
     name: "sponsor",
     label: "Sponsoren",
     path: "content/sponsors",
+    subtitleField: "tier",
     fields: [
       { name: "name", label: "Name", type: "string", isTitle: true, required: true },
       {
@@ -103,6 +119,9 @@ export const collections: CollectionDef[] = [
     name: "news",
     label: "News & Blog",
     path: "content/news",
+    sortBy: { field: "date", direction: "desc" },
+    subtitleField: "date",
+    previewPath: (slug) => `/news/${slug}`,
     fields: [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "date", label: "Datum", type: "datetime", required: true },
@@ -148,6 +167,9 @@ export const collections: CollectionDef[] = [
     name: "blog",
     label: "Blog",
     path: "content/blog",
+    sortBy: { field: "date", direction: "desc" },
+    subtitleField: "date",
+    previewPath: (slug) => `/blog/${slug}`,
     fields: [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "date", label: "Datum", type: "datetime", required: true },
@@ -161,6 +183,8 @@ export const collections: CollectionDef[] = [
     name: "galleryImage",
     label: "Galerie",
     path: "content/gallery",
+    sortBy: { field: "order", direction: "asc" },
+    subtitleField: "category",
     fields: [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "image", label: "Bild", type: "image", required: true },
@@ -177,6 +201,8 @@ export const collections: CollectionDef[] = [
     name: "result",
     label: "Erfolge",
     path: "content/results",
+    sortBy: { field: "year", direction: "desc" },
+    subtitleField: "event",
     fields: [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "year", label: "Jahr", type: "number", required: true },
@@ -189,6 +215,7 @@ export const collections: CollectionDef[] = [
     name: "position",
     label: "Offene Positionen",
     path: "content/positions",
+    subtitleField: "department",
     fields: [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "department", label: "Abteilung", type: "string" },

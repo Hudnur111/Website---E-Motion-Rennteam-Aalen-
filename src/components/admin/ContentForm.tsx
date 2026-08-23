@@ -30,7 +30,7 @@ interface Props {
   onDirtyChange?: (dirty: boolean) => void;
 }
 
-type FieldValue = string | number | boolean | { label: string; value: string }[] | undefined;
+type FieldValue = string | number | boolean | Record<string, string>[] | undefined;
 
 // Every collection has at most one `richText` field, and — regardless of the
 // `isBody` flag, which is only used for `isBody: true` at the schema level —
@@ -344,7 +344,7 @@ function FieldEditor({ field, value, onChange }: { field: FieldDef; value: Field
         </TextField>
       );
     case "objectList":
-      return <ObjectListField field={field} value={(value as { label: string; value: string }[]) ?? []} onChange={onChange} />;
+      return <ObjectListField field={field} value={(value as Record<string, string>[]) ?? []} onChange={onChange} />;
     default:
       return null;
   }
@@ -368,12 +368,22 @@ function ObjectListField({
   onChange,
 }: {
   field: FieldDef;
-  value: { label: string; value: string }[];
-  onChange: (v: { label: string; value: string }[]) => void;
+  value: Record<string, string>[];
+  onChange: (v: Record<string, string>[]) => void;
 }) {
-  function updateRow(index: number, key: "label" | "value", val: string) {
+  // Fall back to the classic two-column layout when no sub-fields are declared
+  const subFields = field.fields ?? [
+    { name: "label", label: "Bezeichnung", type: "string" as const },
+    { name: "value", label: "Wert", type: "string" as const },
+  ];
+
+  function updateRow(index: number, key: string, val: string) {
     const next = value.map((row, i) => (i === index ? { ...row, [key]: val } : row));
     onChange(next);
+  }
+
+  function newRow(): Record<string, string> {
+    return Object.fromEntries(subFields.map((f) => [f.name, ""]));
   }
 
   return (
@@ -382,20 +392,18 @@ function ObjectListField({
       <div className="space-y-2">
         {value.map((row, i) => (
           <div key={i} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={row.label}
-              onChange={(e) => updateRow(i, "label", e.target.value)}
-              placeholder="Bezeichnung"
-              className="w-1/3 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            />
-            <input
-              type="text"
-              value={row.value}
-              onChange={(e) => updateRow(i, "value", e.target.value)}
-              placeholder="Wert"
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            />
+            {subFields.map((subField, fi) => (
+              <input
+                key={subField.name}
+                type="text"
+                value={row[subField.name] ?? ""}
+                onChange={(e) => updateRow(i, subField.name, e.target.value)}
+                placeholder={subField.label}
+                className={`rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent ${
+                  fi === 0 && subFields.length > 1 ? "w-1/3" : "flex-1"
+                }`}
+              />
+            ))}
             <button
               type="button"
               onClick={() => onChange(value.filter((_, idx) => idx !== i))}
@@ -408,7 +416,7 @@ function ObjectListField({
       </div>
       <button
         type="button"
-        onClick={() => onChange([...value, { label: "", value: "" }])}
+        onClick={() => onChange([...value, newRow()])}
         className="mt-2 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-foreground"
       >
         + Zeile hinzufügen

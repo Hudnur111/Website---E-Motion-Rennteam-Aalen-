@@ -1,15 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { CollectionDef } from "@/lib/cms/collections";
+import type { CollectionDef, SortDef } from "@/lib/cms/collections";
 import ContentForm from "@/components/admin/ContentForm";
 import EditorPanel from "@/components/admin/EditorPanel";
-
-interface Item {
-  slug: string;
-  data: Record<string, unknown>;
-  body: string;
-}
 
 interface WriteResult {
   committedToGithub: boolean;
@@ -29,6 +23,40 @@ function noticeForWriteResult(result: WriteResult, verb: "gespeichert" | "gelös
     return { kind: "ok", message: `Erfolgreich ${verb} und als Commit auf GitHub gesichert.` };
   }
   return { kind: "warning", message: result.warning || `Erfolgreich ${verb}.` };
+}
+
+interface Item {
+  slug: string;
+  data: Record<string, unknown>;
+  body: string;
+}
+
+function applySortDef(items: Item[], sortBy: SortDef): Item[] {
+  const { field, direction = "asc" } = sortBy;
+  return [...items].sort((a, b) => {
+    const av = a.data[field];
+    const bv = b.data[field];
+    if (av == null && bv == null) return 0;
+    if (av == null) return direction === "asc" ? 1 : -1;
+    if (bv == null) return direction === "asc" ? -1 : 1;
+    if (typeof av === "number" && typeof bv === "number") {
+      return direction === "asc" ? av - bv : bv - av;
+    }
+    const cmp = String(av).localeCompare(String(bv));
+    return direction === "asc" ? cmp : -cmp;
+  });
+}
+
+function formatSubtitle(value: unknown): string {
+  if (value == null) return "";
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    try {
+      return new Date(value).toLocaleDateString("de-DE", { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return value;
+    }
+  }
+  return String(value);
 }
 
 export default function CollectionExplorer({
@@ -87,17 +115,27 @@ export default function CollectionExplorer({
     }
   }
 
+  const sortedItems = useMemo(
+    () => (collection.sortBy ? applySortDef(items, collection.sortBy) : items),
+    [items, collection.sortBy]
+  );
+
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return items;
-    return items.filter((item) => {
+    if (!query) return sortedItems;
+    return sortedItems.filter((item) => {
       const title = titleField ? String(item.data[titleField.name] ?? "") : "";
       return title.toLowerCase().includes(query) || item.slug.toLowerCase().includes(query);
     });
-  }, [items, search, titleField]);
+  }, [sortedItems, search, titleField]);
 
   function itemTitle(item: Item): string {
     return titleField ? String(item.data[titleField.name] ?? item.slug) : item.slug;
+  }
+
+  function itemSubtitle(item: Item): string {
+    if (!collection.subtitleField) return "";
+    return formatSubtitle(item.data[collection.subtitleField]);
   }
 
   function closePanel() {
@@ -169,23 +207,46 @@ export default function CollectionExplorer({
       )}
 
       <div className="space-y-2">
-        {filteredItems.map((item) => (
-          <button
-            key={item.slug}
-            type="button"
-            onClick={() => {
-              setNotice(null);
-              setPanel({ mode: "edit", slug: item.slug });
-            }}
-            className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
-          >
-            <span className="min-w-0">
-              <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
-              <span className="block break-words text-xs text-muted">{item.slug}</span>
-            </span>
-            <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
-          </button>
-        ))}
+        {filteredItems.map((item) => {
+          const subtitle = itemSubtitle(item);
+          const previewHref = collection.previewPath?.(item.slug);
+          return (
+            <div key={item.slug} className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setNotice(null);
+                  setPanel({ mode: "edit", slug: item.slug });
+                }}
+                className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
+              >
+                <span className="min-w-0">
+                  <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
+                  <span className="block break-words text-xs text-muted">
+                    {subtitle ? `${subtitle} · ${item.slug}` : item.slug}
+                  </span>
+                </span>
+                <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
+              </button>
+              {previewHref && (
+                <a
+                  href={previewHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Vorschau öffnen"
+                  className="shrink-0 rounded-lg border border-border bg-surface p-2.5 text-muted transition-colors hover:border-accent hover:text-foreground"
+                  aria-label={`Vorschau: ${itemTitle(item)}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {panel && (
