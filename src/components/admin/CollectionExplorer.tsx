@@ -10,7 +10,47 @@ interface WriteResult {
   warning?: string;
 }
 
-type PanelState = { mode: "create" } | { mode: "edit"; slug: string } | null;
+type PanelState =
+  | { mode: "create" }
+  | { mode: "create-from"; sourceSlug: string }
+  | { mode: "edit"; slug: string }
+  | null;
+
+// Maps a collection name + optional slug to the public URL where the content
+// appears on the live site. Returns null when there's no direct preview URL.
+function publicPreviewUrl(collectionName: string, slug: string): string | null {
+  switch (collectionName) {
+    case "news":
+      return `/news/${slug}`;
+    case "blog":
+      return `/blog/${slug}`;
+    case "team":
+      return "/team";
+    case "vehicle":
+      return "/fahrzeuge";
+    case "sponsor":
+      return "/sponsoren";
+    case "galleryImage":
+      return "/galerie";
+    case "result":
+      return "/erfolge";
+    case "position":
+      return "/mitmachen";
+    case "page":
+      // Map page slugs to their routes
+      if (slug === "home") return "/";
+      if (slug === "team") return "/team";
+      if (slug === "sponsors") return "/sponsoren";
+      if (slug === "join") return "/mitmachen";
+      if (slug === "contact") return "/kontakt";
+      if (slug === "formula-student") return "/formula-student";
+      if (slug === "datenschutz") return "/datenschutz";
+      if (slug === "impressum") return "/impressum";
+      return null;
+    default:
+      return null;
+  }
+}
 
 // The panel closes as soon as a save/delete succeeds (see closePanel() in
 // onSaved/onDeleted below), which unmounts ContentForm's own success/warning
@@ -151,6 +191,19 @@ export default function CollectionExplorer({
     closePanel();
   }
 
+  function openDuplicate(item: Item) {
+    setNotice(null);
+    setPanel({ mode: "create-from", sourceSlug: item.slug });
+  }
+
+  // Resolve the item to show in the panel when duplicating or editing.
+  function resolveEditItem(): Item | undefined {
+    if (!panel) return undefined;
+    if (panel.mode === "edit") return items.find((i) => i.slug === panel.slug);
+    if (panel.mode === "create-from") return items.find((i) => i.slug === panel.sourceSlug);
+    return undefined;
+  }
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -209,41 +262,60 @@ export default function CollectionExplorer({
       <div className="space-y-2">
         {filteredItems.map((item) => {
           const subtitle = itemSubtitle(item);
-          const previewHref = collection.previewPath?.(item.slug);
+          const previewUrl = publicPreviewUrl(collectionName, item.slug);
           return (
-            <div key={item.slug} className="flex items-center gap-2">
+            <div
+              key={item.slug}
+              className="flex w-full items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 transition-colors hover:border-accent"
+            >
+              {/* Main edit button — takes up remaining space */}
               <button
                 type="button"
                 onClick={() => {
                   setNotice(null);
                   setPanel({ mode: "edit", slug: item.slug });
                 }}
-                className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-accent"
+                className="min-w-0 flex-1 text-left"
               >
-                <span className="min-w-0">
-                  <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
-                  <span className="block break-words text-xs text-muted">
-                    {subtitle ? `${subtitle} · ${item.slug}` : item.slug}
-                  </span>
+                <span className="block break-words font-medium text-foreground">{itemTitle(item)}</span>
+                <span className="block break-words text-xs text-muted">
+                  {subtitle ? `${subtitle} · ${item.slug}` : item.slug}
                 </span>
-                <span className="shrink-0 text-xs text-accent-text">Bearbeiten →</span>
               </button>
-              {previewHref && (
-                <a
-                  href={previewHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Vorschau öffnen"
-                  className="shrink-0 rounded-lg border border-border bg-surface p-2.5 text-muted transition-colors hover:border-accent hover:text-foreground"
-                  aria-label={`Vorschau: ${itemTitle(item)}`}
+
+              {/* Action buttons */}
+              <div className="flex shrink-0 items-center gap-1.5">
+                {previewUrl && (
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-foreground"
+                    title="Auf der Website ansehen"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Vorschau
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => openDuplicate(item)}
+                  className="rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-foreground"
+                  title="Eintrag duplizieren"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              )}
+                  Duplizieren
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNotice(null);
+                    setPanel({ mode: "edit", slug: item.slug });
+                  }}
+                  className="text-xs text-accent-text"
+                >
+                  Bearbeiten →
+                </button>
+              </div>
             </div>
           );
         })}
@@ -251,7 +323,13 @@ export default function CollectionExplorer({
 
       {panel && (
         <EditorPanel
-          title={panel.mode === "create" ? `Neuer Eintrag: ${collection.label}` : `${collection.label} bearbeiten`}
+          title={
+            panel.mode === "create"
+              ? `Neuer Eintrag: ${collection.label}`
+              : panel.mode === "create-from"
+                ? `Duplizieren: ${collection.label}`
+                : `${collection.label} bearbeiten`
+          }
           onClose={requestClosePanel}
         >
           {panel.mode === "create" ? (
@@ -266,30 +344,65 @@ export default function CollectionExplorer({
                 refresh();
               }}
             />
-          ) : (
+          ) : panel.mode === "create-from" ? (
             (() => {
-              const item = items.find((i) => i.slug === panel.slug);
-              if (!item) return <p className="text-sm text-muted">Eintrag nicht gefunden.</p>;
+              const source = resolveEditItem();
+              if (!source) return <p className="text-sm text-muted">Quelleintrag nicht gefunden.</p>;
               return (
                 <ContentForm
                   collectionName={collectionName}
                   collection={collection}
-                  mode="edit"
-                  initialSlug={item.slug}
-                  initialData={item.data}
-                  initialBody={item.body}
+                  mode="create"
+                  initialData={source.data}
+                  initialBody={source.body}
                   onDirtyChange={setPanelDirty}
                   onSaved={(result) => {
                     setNotice(noticeForWriteResult(result, "gespeichert"));
                     closePanel();
                     refresh();
                   }}
-                  onDeleted={(result) => {
-                    setNotice(noticeForWriteResult(result, "gelöscht"));
-                    closePanel();
-                    refresh();
-                  }}
                 />
+              );
+            })()
+          ) : (
+            (() => {
+              const item = items.find((i) => i.slug === panel.slug);
+              if (!item) return <p className="text-sm text-muted">Eintrag nicht gefunden.</p>;
+              const previewUrl = publicPreviewUrl(collectionName, item.slug);
+              return (
+                <>
+                  {previewUrl && (
+                    <div className="mb-4">
+                      <a
+                        href={previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-foreground"
+                      >
+                        Auf der Website ansehen →
+                      </a>
+                    </div>
+                  )}
+                  <ContentForm
+                    collectionName={collectionName}
+                    collection={collection}
+                    mode="edit"
+                    initialSlug={item.slug}
+                    initialData={item.data}
+                    initialBody={item.body}
+                    onDirtyChange={setPanelDirty}
+                    onSaved={(result) => {
+                      setNotice(noticeForWriteResult(result, "gespeichert"));
+                      closePanel();
+                      refresh();
+                    }}
+                    onDeleted={(result) => {
+                      setNotice(noticeForWriteResult(result, "gelöscht"));
+                      closePanel();
+                      refresh();
+                    }}
+                  />
+                </>
               );
             })()
           )}
