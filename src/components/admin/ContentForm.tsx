@@ -376,12 +376,41 @@ function ObjectListField({
     onChange(next);
   }
 
+  function moveRow(index: number, direction: -1 | 1) {
+    const next = [...value];
+    const target = index + direction;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  }
+
   return (
     <div>
       <p className="mb-1.5 block text-sm font-medium text-foreground">{field.label}</p>
       <div className="space-y-2">
         {value.map((row, i) => (
           <div key={i} className="flex items-center gap-2">
+            {/* Reorder controls */}
+            <div className="flex flex-col gap-0.5">
+              <button
+                type="button"
+                onClick={() => moveRow(i, -1)}
+                disabled={i === 0}
+                aria-label="Zeile nach oben"
+                className="rounded px-1 py-0.5 text-[10px] text-muted transition-colors hover:bg-surface-2 hover:text-foreground disabled:opacity-30"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                onClick={() => moveRow(i, 1)}
+                disabled={i === value.length - 1}
+                aria-label="Zeile nach unten"
+                className="rounded px-1 py-0.5 text-[10px] text-muted transition-colors hover:bg-surface-2 hover:text-foreground disabled:opacity-30"
+              >
+                ▼
+              </button>
+            </div>
             <input
               type="text"
               value={row.label}

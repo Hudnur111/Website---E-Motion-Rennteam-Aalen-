@@ -5,6 +5,7 @@ import Image from "next/image";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import Sidebar from "@/components/admin/Sidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
+import MobileNav from "@/components/admin/MobileNav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -18,12 +19,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-20 border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-2">
-              <Image src="/uploads/logo.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
-            </div>
-            <span className="text-sm font-semibold tracking-tight text-foreground">E-Motion CMS</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <MobileNav isAdmin={isAdmin} />
+            <Link href="/admin" className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-2">
+                <Image src="/uploads/logo.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
+              </div>
+              <span className="text-sm font-semibold tracking-tight text-foreground">E-Motion CMS</span>
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-muted sm:inline">Angemeldet als {session.username}</span>
             <LogoutButton />

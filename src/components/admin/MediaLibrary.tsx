@@ -22,6 +22,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copiedPath, setCopiedPath] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
@@ -41,9 +42,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     return () => clearTimeout(id);
   }, [copiedPath]);
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function uploadFile(file: File) {
     setUploading(true);
     setNotice(null);
     try {
@@ -68,6 +67,31 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOver(false);
+    }
+  }
+
+  async function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
   }
 
   async function handleDelete(filename: string) {
@@ -114,7 +138,21 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     : files;
 
   return (
-    <div>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag-and-drop overlay */}
+      {dragOver && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="rounded-2xl border-2 border-dashed border-accent px-16 py-12 text-center">
+            <p className="text-2xl font-bold text-accent-text">Bild hier ablegen</p>
+            <p className="mt-1 text-sm text-muted">JPG, PNG, WebP oder GIF</p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-foreground">Medienbibliothek</h1>
@@ -138,6 +176,14 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
           </label>
         </div>
       </div>
+
+      {/* Drop zone hint when library is empty */}
+      {files.length === 0 && !dragOver && (
+        <div className="mb-4 rounded-xl border-2 border-dashed border-border p-8 text-center text-sm text-muted transition-colors hover:border-accent">
+          <p className="font-medium text-foreground">Bilder hier ablegen oder oben hochladen</p>
+          <p className="mt-1">JPG, PNG, WebP und GIF werden unterstützt</p>
+        </div>
+      )}
 
       {notice && (
         <p
@@ -165,16 +211,9 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         />
       )}
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 && files.length > 0 && (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted">
-          {files.length === 0 ? (
-            <>
-              <p className="mb-1 font-medium text-foreground">Noch keine Bilder vorhanden.</p>
-              <p>Lade dein erstes Bild über den Button oben hoch.</p>
-            </>
-          ) : (
-            "Keine Dateien gefunden."
-          )}
+          Keine Dateien gefunden.
         </div>
       )}
 

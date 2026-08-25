@@ -84,6 +84,7 @@ export default function CollectionExplorer({
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"slug" | "title" | "date">("slug");
   const [panel, setPanel] = useState<PanelState>(null);
   const [panelDirty, setPanelDirty] = useState(false);
   const [notice, setNotice] = useState<{ kind: "ok" | "warning"; message: string } | null>(null);
@@ -127,14 +128,33 @@ export default function CollectionExplorer({
     }
   }
 
+  const hasDates = collection.fields.some((f) => f.type === "datetime");
+
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return items;
-    return items.filter((item) => {
-      const title = titleField ? String(item.data[titleField.name] ?? "") : "";
-      return title.toLowerCase().includes(query) || item.slug.toLowerCase().includes(query);
+    const filtered = query
+      ? items.filter((item) => {
+          const title = titleField ? String(item.data[titleField.name] ?? "") : "";
+          return title.toLowerCase().includes(query) || item.slug.toLowerCase().includes(query);
+        })
+      : [...items];
+
+    filtered.sort((a, b) => {
+      if (sortBy === "title") {
+        const ta = titleField ? String(a.data[titleField.name] ?? a.slug) : a.slug;
+        const tb = titleField ? String(b.data[titleField.name] ?? b.slug) : b.slug;
+        return ta.localeCompare(tb, "de");
+      }
+      if (sortBy === "date") {
+        const dateField = collection.fields.find((f) => f.type === "datetime");
+        const da = dateField ? new Date(String(a.data[dateField.name] ?? "")).getTime() : 0;
+        const db = dateField ? new Date(String(b.data[dateField.name] ?? "")).getTime() : 0;
+        return db - da;
+      }
+      return a.slug.localeCompare(b.slug);
     });
-  }, [items, search, titleField]);
+    return filtered;
+  }, [items, search, sortBy, titleField, collection.fields]);
 
   function itemTitle(item: Item): string {
     return titleField ? String(item.data[titleField.name] ?? item.slug) : item.slug;
@@ -199,14 +219,31 @@ export default function CollectionExplorer({
       )}
 
       {items.length >= 6 && (
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Einträge durchsuchen…"
-          aria-label="Einträge durchsuchen"
-          className="mb-4 w-full max-w-sm rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
-        />
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Einträge durchsuchen…"
+            aria-label="Einträge durchsuchen"
+            className="w-full max-w-sm rounded-lg border border-border bg-background px-3.5 py-2 text-sm text-foreground outline-none focus:border-accent"
+          />
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-1 text-xs">
+            <span className="px-1.5 text-muted">Sortieren:</span>
+            {(["slug", "title", ...(hasDates ? (["date"] as const) : [])] as Array<"slug" | "title" | "date">).map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setSortBy(key)}
+                className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
+                  sortBy === key ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
+                }`}
+              >
+                {key === "slug" ? "Slug" : key === "title" ? "Titel" : "Datum ↓"}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {loadError && (
