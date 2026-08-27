@@ -56,18 +56,23 @@ im eigenen Next.js-Code: eigener Login, eigenes Design, eigene Anbindung an GitH
 - Jede Speicherung wird – sofern konfiguriert – automatisch als **Commit direkt ins GitHub-Repository** geschrieben
   (über die GitHub Contents API), inklusive Bild-Uploads nach `public/uploads/`.
 
-**Einrichtung unter Windows/macOS (für Redakteure ohne Entwicklungsumgebung):**
+**Einrichtung unter Windows/macOS/Linux (für Redakteure ohne Entwicklungsumgebung):**
 
-Im Hauptverzeichnis liegen jeweils zwei Doppelklick-Programme – `.bat` für Windows, `.command` für macOS:
+Im Hauptverzeichnis liegt je ein Start-Programm pro Plattform – `.bat` für Windows, `.command` für macOS,
+`.sh` für Linux:
 
-- **`CMS-Start.bat`** / **`CMS-Start.command`** – beim allerersten Start fragt ein Assistent einmalig
-  Benutzername, Passwort und optional den GitHub-Token ab, richtet alles automatisch ein und startet danach
-  den Server; der Browser öffnet sich von selbst unter `http://localhost:3000/admin/login`, mit bereits
-  ausgefülltem Benutzernamen – es muss nur noch das Passwort eingegeben werden. Bei jedem weiteren
-  Doppelklick wird ganz ohne Eingaben direkt der Server gestartet.
-- **`CMS-Zugangsdaten-aendern.bat`** / **`CMS-Zugangsdaten-aendern.command`** – startet den
-  Einrichtungsassistenten erneut, z. B. um das Passwort zu ändern oder den GitHub-Token nachträglich
-  einzutragen.
+- **`CMS-Start.bat`** / **`CMS-Start.command`** / **`CMS-Start.sh`** – beim allerersten Start fragt ein
+  Assistent einmalig Benutzername, Passwort und optional den GitHub-Token ab, richtet alles automatisch ein
+  und startet danach den Server. Es öffnet sich sofort ein eigenes App-Fenster mit einer kurzen Ladeanzeige
+  ("Kurzes Update wird geprüft …"), das automatisch zur Login-Seite weiterspringt, sobald der Server bereit
+  ist – mit bereits ausgefülltem Benutzernamen, es muss nur noch das Passwort eingegeben werden. Bei jedem
+  weiteren Doppelklick wird ganz ohne Eingaben direkt der Server gestartet.
+- **`CMS-Zugangsdaten-aendern.bat`** / **`.command`** / **`.sh`** – startet den Einrichtungsassistenten
+  erneut, z. B. um das Passwort zu ändern oder den GitHub-Token nachträglich einzutragen.
+
+Das parallel geöffnete Terminal-/Konsolenfenster bleibt bewusst sichtbar (dort erscheinen Fehlermeldungen,
+falls etwas schiefgeht) – es ist aber nicht mehr das, worauf man während des Starts schaut: Das App-Fenster
+mit der Ladeanzeige übernimmt das, direkt nach dem Doppelklick.
 
 Voraussetzung ist eine installierte [Node.js](https://nodejs.org/) LTS-Version; alles Weitere (Abhängigkeiten,
 Zugangsdaten) übernehmen die Skripte. Der GitHub-Token wird ausschließlich lokal in der (nicht versionierten)
@@ -75,13 +80,15 @@ Zugangsdaten) übernehmen die Skripte. Der GitHub-Token wird ausschließlich lok
 `.command` fest hinterlegt. Einmal über den Assistenten eingetragen, muss er danach nicht mehr eingegeben
 werden.
 
-**Automatische Updates:** `CMS-Start.bat`/`.command` prüfen bei jedem Start automatisch, ob es im
+**Automatische Updates:** `CMS-Start.bat`/`.command`/`.sh` prüfen bei jedem Start automatisch, ob es im
 GitHub-Repository eine neuere Version gibt (`scripts/cms-update.ps1` bzw. `scripts/cms-update.sh`), und
 übernehmen sie per Fast-Forward, bevor der Server startet – neue Funktionen landen dadurch von selbst auf
 jedem Gerät, ohne dass jemand manuell etwas herunterladen muss. Haben sich `package.json`/`package-lock.json`
 geändert, werden die Abhängigkeiten dabei automatisch neu installiert. Die Prüfung ist rein informativ und
 blockiert den Start nie: Ohne Internetverbindung, ohne lokal installiertes Git oder bei lokalen Änderungen an
-versionierten Dateien läuft die vorhandene Version einfach unverändert weiter.
+versionierten Dateien läuft die vorhandene Version einfach unverändert weiter. Das läuft technisch im
+Terminal-Fenster ab, ist für die Person am Rechner aber nur noch die kurze "Kurzes Update wird geprüft …"-
+Anzeige im App-Fenster – das eigentliche Update dauert in aller Regel nur wenige Sekunden.
 
 Bei diesem Update-Check wird außerdem `content/` mit dem in `GITHUB_BRANCH` konfigurierten Branch (Standard:
 `main`) abgeglichen – dort landen die Speicherungen des CMS, unabhängig davon, von welchem Branch aus diese

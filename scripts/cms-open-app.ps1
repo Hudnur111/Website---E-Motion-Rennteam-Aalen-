@@ -1,45 +1,25 @@
 # Oeffnet das CMS als eigenstaendiges App-Fenster (ohne Adressleiste, Tabs und
 # Lesezeichenleiste), damit es sich wie eine richtige Desktop-Anwendung anfuehlt.
 # Wird von CMS-Start.bat im Hintergrund gestartet, waehrend der Server hochfaehrt.
+#
+# Das Fenster oeffnet sofort eine lokale Ladeseite (scripts/cms-loading.html)
+# statt zu warten, bis der Server bereit ist - die Ladeseite selbst wartet
+# (mit sichtbarer Rueckmeldung: "Kurzes Update wird geprueft...") und leitet
+# automatisch weiter, sobald der Server tatsaechlich antwortet. So sieht die
+# Person sofort ein Fenster, statt auf einen leeren Bildschirm zu starren.
 
 $ErrorActionPreference = "SilentlyContinue"
 
-$port = 3000
-$url = "http://localhost:$port/admin/login"
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$loadingFile = Join-Path $scriptDir "cms-loading.html"
 
-# Warten, bis der Server den Port tatsaechlich bedient. Eine reine TCP-Pruefung
-# ist schneller als ein HTTP-Request und umgeht Proxy-Einstellungen, die in
-# Hochschul- und Firmennetzen sonst auch fuer localhost greifen wuerden.
-function Test-Port([int]$portNumber) {
-    $client = New-Object System.Net.Sockets.TcpClient
-    try {
-        $async = $client.BeginConnect("127.0.0.1", $portNumber, $null, $null)
-        if ($async.AsyncWaitHandle.WaitOne(500)) {
-            $client.EndConnect($async)
-            return $client.Connected
-        }
-        return $false
-    } catch {
-        return $false
-    } finally {
-        $client.Close()
-    }
+if (Test-Path $loadingFile) {
+    $loadingUrl = "file:///" + ($loadingFile -replace '\\', '/')
+} else {
+    # Sollte nicht passieren, aber lieber direkt auf die Login-Seite als gar
+    # nichts zu oeffnen.
+    $loadingUrl = "http://localhost:3000/admin/login"
 }
-
-$deadline = (Get-Date).AddSeconds(180)
-while ((Get-Date) -lt $deadline) {
-    if (Test-Port $port) { break }
-    Start-Sleep -Milliseconds 500
-}
-
-if (-not (Test-Port $port)) {
-    # Server kam nicht hoch - das Fehlerbild steht im Hauptfenster.
-    exit 1
-}
-
-# Der Port ist offen, Next.js kompiliert die Seite aber erst beim ersten
-# Aufruf. Kurz warten, damit das Fenster nicht in einen Ladefehler laeuft.
-Start-Sleep -Seconds 2
 
 $candidatePaths = @(
     "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
@@ -60,10 +40,10 @@ foreach ($candidate in $candidatePaths) {
 if ($browserExe) {
     # --app=<url> startet ein eigenes Fenster ohne Browser-Bedienelemente.
     Start-Process -FilePath $browserExe -ArgumentList @(
-        "--app=$url",
+        "--app=$loadingUrl",
         "--window-size=1360,900"
     )
 } else {
     # Weder Edge noch Chrome gefunden: normaler Standardbrowser als Rueckfall.
-    Start-Process $url
+    Start-Process $loadingUrl
 }
