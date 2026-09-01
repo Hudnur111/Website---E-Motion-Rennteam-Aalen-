@@ -77,7 +77,7 @@ export default function Home() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
           </Reveal>
-          <StaggerGroup className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
+          <StaggerGroup className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-4">
             {vehicle.specs?.slice(0, 4).map((spec) => (
               <StaggerItem key={spec.label}>
                 <div className="rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/60">

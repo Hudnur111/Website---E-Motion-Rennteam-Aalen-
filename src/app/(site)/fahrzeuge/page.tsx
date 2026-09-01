@@ -74,7 +74,7 @@ export default function VehiclesPage() {
               )}
 
               {vehicle.specs && vehicle.specs.length > 0 && (
-                <StaggerGroup className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
+                <StaggerGroup className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-4">
                   {vehicle.specs.map((spec) => (
                     <StaggerItem key={spec.label}>
                       <div className="rounded-2xl border border-border bg-background p-5 text-center transition-colors hover:border-accent/60">
