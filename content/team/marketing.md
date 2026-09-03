@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Leitung Marketing & Finanzen
-department: Marketing & Finanzen
+department: Finance
 order: 60
 ---
 

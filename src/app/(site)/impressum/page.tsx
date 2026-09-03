@@ -52,11 +52,11 @@ export default function ImpressumPage() {
         <section>
           <h2 className="text-base font-semibold text-foreground">Kontakt</h2>
           <p className="mt-2">
-            Telefon: 07361 5762191
+            Telefon: +49 7361 5762191
             <br />
             E-Mail:{" "}
-            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent-text underline">
-              vorstand@emotion-rennteam.de
+            <a href="mailto:info@emotion-rennteam.de" className="text-accent-text underline">
+              info@emotion-rennteam.de
             </a>
           </p>
         </section>

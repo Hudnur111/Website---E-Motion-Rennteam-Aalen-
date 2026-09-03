@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Teamleiter
-department: Teamleitung
+department: Project Management
 order: 1
 ---
 

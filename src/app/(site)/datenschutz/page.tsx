@@ -25,10 +25,10 @@ export default function DatenschutzPage() {
             E-Motion Rennteam Aalen e.V., Beethovenstraße 1, 73430 Aalen
             <br />
             E-Mail:{" "}
-            <a href="mailto:vorstand@emotion-rennteam.de" className="text-accent-text underline">
-              vorstand@emotion-rennteam.de
+            <a href="mailto:info@emotion-rennteam.de" className="text-accent-text underline">
+              info@emotion-rennteam.de
             </a>
-            , Telefon: 07361 5762191
+            , Telefon: +49 7361 5762191
           </p>
         </section>
 
@@ -58,17 +58,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-foreground">4. Newsletter</h2>
-          <p className="mt-2">
-            Wenn du dich für unseren Newsletter anmeldest, verwenden wir deine E-Mail-Adresse
-            ausschließlich für den Versand des Newsletters. Eine Abmeldung ist jederzeit über den
-            entsprechenden Link im Newsletter oder per E-Mail an uns möglich. Rechtsgrundlage ist
-            Art. 6 Abs. 1 lit. a DSGVO.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-base font-semibold text-foreground">5. Deine Rechte</h2>
+          <h2 className="text-base font-semibold text-foreground">4. Deine Rechte</h2>
           <p className="mt-2">
             Du hast jederzeit das Recht auf Auskunft über deine bei uns gespeicherten
             personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der
@@ -80,7 +70,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-foreground">6. Hosting</h2>
+          <h2 className="text-base font-semibold text-foreground">5. Hosting</h2>
           <p className="mt-2">
             Diese Website wird bei einem externen Dienstleister gehostet. Die personenbezogenen
             Daten, die auf dieser Website erfasst werden, werden auf den Servern des Hosters
@@ -91,7 +81,7 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-foreground">7. Änderung dieser Datenschutzerklärung</h2>
+          <h2 className="text-base font-semibold text-foreground">6. Änderung dieser Datenschutzerklärung</h2>
           <p className="mt-2">
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, damit sie stets den
             aktuellen rechtlichen Anforderungen entspricht. Für deinen erneuten Besuch gilt dann

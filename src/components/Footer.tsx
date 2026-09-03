@@ -1,13 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import SocialIcons from "@/components/SocialIcons";
-import NewsletterForm from "@/components/NewsletterForm";
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="checkered-divider" />
-      <div className="container-page grid gap-10 py-14 md:grid-cols-4">
+      <div className="container-page grid gap-10 py-14 md:grid-cols-3">
         <div>
           <Image
             src="/uploads/logo.png"
@@ -29,7 +28,7 @@ export default function Footer() {
             <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
             <li><Link href="/team" className="transition-colors hover:text-accent-text">Team</Link></li>
             <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent-text">Fahrzeuge</Link></li>
-            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Erfolge</Link></li>
+            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Timeline</Link></li>
             <li><Link href="/sponsoren" className="transition-colors hover:text-accent-text">Sponsoren</Link></li>
             <li><Link href="/mitmachen" className="transition-colors hover:text-accent-text">Mitmachen</Link></li>
           </ul>
@@ -38,31 +37,18 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/news" className="transition-colors hover:text-accent-text">News</Link></li>
-            <li><Link href="/blog" className="transition-colors hover:text-accent-text">Blog</Link></li>
             <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
             <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
           <div className="mt-4 space-y-1 text-sm text-muted">
             <p>Hochschule Aalen</p>
             <p>Beethovenstraße 1, 73430 Aalen</p>
-            <a href="mailto:vorstand@emotion-rennteam.de" className="block hover:text-foreground">
-              vorstand@emotion-rennteam.de
+            <a href="mailto:info@emotion-rennteam.de" className="block hover:text-foreground">
+              info@emotion-rennteam.de
             </a>
             <a href="tel:+4973615762191" className="block hover:text-foreground">
-              07361 5762191
+              +49 7361 5762191
             </a>
-          </div>
-        </div>
-
-        <div>
-          <div className="text-sm font-semibold text-foreground">Newsletter</div>
-          <p className="mt-3 text-sm text-muted">
-            Kein Update mehr verpassen – Rennergebnisse, Baufortschritt und Events direkt
-            ins Postfach.
-          </p>
-          <div className="mt-4">
-            <NewsletterForm />
           </div>
         </div>
       </div>

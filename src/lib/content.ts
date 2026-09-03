@@ -22,6 +22,29 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
     });
 }
 
+/**
+ * Official list of the team's specialist groups, in display order. Single
+ * source of truth so the Team page, the homepage stat, and the Mitmachen
+ * application form can't drift apart again.
+ */
+export const TEAM_DEPARTMENTS = [
+  "Project Management",
+  "Workshop",
+  "Chassis and Ergonomics",
+  "Electrics",
+  "Powertrain",
+  "Aerodynamics",
+  "Suspension and Steering Systems",
+  "Driverless",
+  "Vehicle Dynamics",
+  "Testing and Data Acquisition",
+  "Media and Marketing",
+  "Business Plan",
+  "Sponsoring",
+  "Eventmanagement",
+  "Finance",
+] as const;
+
 export type TeamMember = {
   name: string;
   role: string;
@@ -84,6 +107,7 @@ export type GalleryImage = {
   title: string;
   image: string;
   category?: string;
+  season?: string;
   order?: number;
   slug: string;
 };

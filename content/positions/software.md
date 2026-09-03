@@ -1,6 +1,6 @@
 ---
 title: "Teammitglied Software / Autonomous"
-department: "Software"
+department: "Driverless"
 commitment: "5–10 Std./Woche"
 ---
 

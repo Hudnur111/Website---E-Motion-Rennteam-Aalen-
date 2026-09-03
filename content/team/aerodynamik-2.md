@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Strömungssimulation
-department: Aerodynamik
+department: Aerodynamics
 order: 31
 ---
 

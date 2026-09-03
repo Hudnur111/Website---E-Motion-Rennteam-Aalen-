@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Leitung Elektrotechnik
-department: Elektrotechnik / High-Voltage
+department: Electrics
 order: 20
 ---
 

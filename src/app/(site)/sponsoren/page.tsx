@@ -60,9 +60,6 @@ export default function SponsorsPage() {
                         {sponsor.name}
                       </span>
                     )}
-                    {sponsor.body && (
-                      <p className="mt-3 text-sm text-muted">{sponsor.body}</p>
-                    )}
                   </a>
                 </StaggerItem>
               ))}

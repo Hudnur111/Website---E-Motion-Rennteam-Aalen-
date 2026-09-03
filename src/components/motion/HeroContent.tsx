@@ -50,10 +50,16 @@ export default function HeroContent({
       </motion.p>
       <motion.div variants={item} className="mt-10 flex flex-wrap justify-center gap-4">
         <Link
-          href="/fahrzeuge"
+          href="/mitmachen"
           className="group relative overflow-hidden rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
         >
-          <span className="relative z-10">Unser Fahrzeug entdecken</span>
+          <span className="relative z-10">Jetzt mitmachen</span>
+        </Link>
+        <Link
+          href="/fahrzeuge"
+          className="rounded-full border border-border px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:bg-surface"
+        >
+          Unser Fahrzeug entdecken
         </Link>
         <Link
           href="/sponsoren#werden"

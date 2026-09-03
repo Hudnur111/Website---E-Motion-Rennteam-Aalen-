@@ -1,5 +1,5 @@
 /**
- * Shared server-side validation for the site's forms (contact, newsletter,
+ * Shared server-side validation for the site's forms (contact,
  * member application, sponsor inquiry). Kept dependency-free and framework
  * agnostic so it can be unit tested in isolation and reused by every
  * API route handler under `src/app/api`.
@@ -97,22 +97,6 @@ export function validateContactForm(body: unknown): ValidationResult<ContactForm
   };
 }
 
-export type NewsletterFormData = {
-  email: string;
-};
-
-export function validateNewsletterForm(body: unknown): ValidationResult<NewsletterFormData> {
-  const data = asRecord(body);
-  const errors: FieldErrors = {};
-
-  const email = readField(data, "email");
-  if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
-  else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
-
-  if (Object.keys(errors).length > 0) return { valid: false, errors };
-  return { valid: true, isBot: isHoneypotTripped(data), data: { email } };
-}
-
 export type MemberApplicationFormData = {
   name: string;
   email: string;
@@ -122,12 +106,21 @@ export type MemberApplicationFormData = {
 };
 
 export const MEMBER_DEPARTMENTS = [
-  "Fahrzeugtechnik",
-  "Elektrotechnik / High-Voltage",
-  "Aerodynamik",
-  "Fahrwerk",
-  "Software / Autonomous",
-  "Marketing & Finanzen",
+  "Project Management",
+  "Workshop",
+  "Chassis and Ergonomics",
+  "Electrics",
+  "Powertrain",
+  "Aerodynamics",
+  "Suspension and Steering Systems",
+  "Driverless",
+  "Vehicle Dynamics",
+  "Testing and Data Acquisition",
+  "Media and Marketing",
+  "Business Plan",
+  "Sponsoring",
+  "Eventmanagement",
+  "Finance",
   "Noch unentschlossen",
 ] as const;
 

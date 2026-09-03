@@ -10,7 +10,7 @@
 const WEBHOOK_TIMEOUT_MS = 8000;
 
 export type FormSubmission = {
-  form: "contact" | "newsletter" | "mitmachen" | "sponsoring";
+  form: "contact" | "mitmachen" | "sponsoring";
   submittedAt: string;
   data: Record<string, string>;
 };

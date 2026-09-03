@@ -1,7 +1,7 @@
 ---
 name: Dani Baum
 role: Leitung Aerodynamik
-department: Aerodynamik
+department: Aerodynamics
 order: 30
 ---
 
