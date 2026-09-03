@@ -1,6 +1,6 @@
 ---
 title: "Teammitglied Elektrotechnik / High-Voltage"
-department: "Elektrotechnik"
+department: "Electrics"
 commitment: "5–10 Std./Woche"
 ---
 

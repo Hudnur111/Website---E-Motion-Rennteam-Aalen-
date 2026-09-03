@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Composites & Fertigung
-department: Fahrzeugtechnik
+department: Chassis and Ergonomics
 order: 11
 ---
 

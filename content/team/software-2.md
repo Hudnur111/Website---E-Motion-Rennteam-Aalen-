@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Embedded Software
-department: Software / Autonomous
+department: Driverless
 order: 51
 ---
 

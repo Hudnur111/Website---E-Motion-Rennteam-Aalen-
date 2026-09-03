@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getTeam } from "@/lib/content";
+import { getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -12,25 +12,40 @@ export const metadata: Metadata = {
 };
 
 const TEAM_DESCRIPTIONS: Record<string, string> = {
-  Teamleitung:
-    "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachbereiche.",
-  Fahrzeugtechnik:
-    "Verantwortlich für Monocoque, Karosserie und die Integration aller Komponenten zum Gesamtfahrzeug.",
-  "Elektrotechnik / High-Voltage":
+  "Project Management":
+    "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachteams.",
+  Workshop:
+    "Betreibt und organisiert die Werkstatt – Maschinen, Material und Fertigungsprozesse für den Fahrzeugbau.",
+  "Chassis and Ergonomics":
+    "Verantwortlich für Monocoque, Karosserie und die ergonomische Integration des Fahrers ins Fahrzeug.",
+  Electrics:
     "Entwickelt Batteriesystem, Leistungselektronik und sorgt für die Hochvolt-Sicherheit des Fahrzeugs.",
-  Aerodynamik:
+  Powertrain:
+    "Konzipiert und baut Motoren, Getriebe und den Antriebsstrang des Fahrzeugs.",
+  Aerodynamics:
     "Optimiert Abtrieb und Luftwiderstand mit CFD-Simulationen und dem Design der Flügelelemente.",
-  Fahrwerk:
-    "Zuständig für Radaufhängung, Dämpfung und die Fahrdynamik-Abstimmung auf der Strecke.",
-  "Software / Autonomous":
-    "Baut die Fahrzeugsoftware, Telemetrie und das autonome Fahrmodul für die Driverless-Disziplin.",
-  "Marketing & Finanzen":
-    "Kümmert sich um Sponsoring, Öffentlichkeitsarbeit und die finanzielle Planung des Teams.",
+  "Suspension and Steering Systems":
+    "Zuständig für Radaufhängung, Lenkung, Dämpfung und die Fahrdynamik-Abstimmung auf der Strecke.",
+  Driverless:
+    "Baut die Fahrzeugsoftware, Sensorik und das autonome Fahrmodul für die Driverless-Disziplin.",
+  "Vehicle Dynamics":
+    "Simuliert und optimiert das Fahrverhalten und die Gesamtabstimmung des Fahrzeugs.",
+  "Testing and Data Acquisition":
+    "Verantwortlich für Telemetrie, Sensorik und die Auswertung aller Test- und Rennfahrtdaten.",
+  "Media and Marketing":
+    "Kümmert sich um Öffentlichkeitsarbeit, Social Media und den Außenauftritt des Teams.",
+  "Business Plan":
+    "Entwickelt das Geschäftskonzept und die strategische Ausrichtung des Teams für den Business-Plan-Wettbewerb.",
+  Sponsoring:
+    "Betreut bestehende Sponsoren und akquiriert neue Partnerschaften für das Team.",
+  Eventmanagement:
+    "Plant und organisiert Team-Events, Rollout und die Teilnahme an Wettbewerben.",
+  Finance:
+    "Verantwortlich für Budgetplanung, Controlling und die finanzielle Steuerung des Teams.",
 };
 
 export default function TeamPage() {
   const team = getTeam();
-  const departments = Array.from(new Set(team.map((m) => m.department)));
 
   return (
     <div className="container-page py-20">
@@ -38,16 +53,16 @@ export default function TeamPage() {
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Die Köpfe hinter dem ERT-14/26</h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Über 60 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
-          gemeinsam unseren elektrischen Rennwagen – organisiert in sieben Fachteams.
+          Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
+          gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
         </p>
       </Reveal>
 
       <div className="mt-14 space-y-14">
-        {departments.map((department, di) => {
+        {TEAM_DEPARTMENTS.map((department, di) => {
           const members = team.filter((member) => member.department === department);
           return (
-            <Reveal key={department} delay={di * 0.05}>
+            <Reveal key={department} delay={di * 0.03}>
               <div className="rounded-2xl border border-border bg-surface/50 p-6 sm:p-8">
                 <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
                   <div>
@@ -63,6 +78,15 @@ export default function TeamPage() {
                   </span>
                 </div>
 
+                {members.length === 0 ? (
+                  <p className="mt-6 text-sm text-muted">
+                    Team wird noch aufgebaut –{" "}
+                    <a href="/mitmachen" className="text-accent-text underline">
+                      hier mitmachen
+                    </a>
+                    .
+                  </p>
+                ) : (
                 <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {members.map((member) => (
                     <StaggerItem key={member.slug}>
@@ -103,6 +127,7 @@ export default function TeamPage() {
                     </StaggerItem>
                   ))}
                 </StaggerGroup>
+                )}
               </div>
             </Reveal>
           );

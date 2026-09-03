@@ -20,7 +20,7 @@ export default function JoinPage() {
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mitmachen</p>
         <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Werde Teil des Teams</h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Egal ob Fahrzeugtechnik, Elektrotechnik, Software oder Marketing – bei uns lernst du,
+          Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du,
           Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation.
         </p>
       </Reveal>

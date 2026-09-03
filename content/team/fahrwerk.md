@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Leitung Fahrwerk
-department: Fahrwerk
+department: Suspension and Steering Systems
 order: 40
 ---
 

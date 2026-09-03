@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Leitung Software
-department: Software / Autonomous
+department: Driverless
 order: 50
 ---
 

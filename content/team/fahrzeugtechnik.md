@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Leitung Fahrzeugtechnik
-department: Fahrzeugtechnik
+department: Chassis and Ergonomics
 order: 10
 ---
 

@@ -4,16 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
-
-const DEPARTMENTS = [
-  "Fahrzeugtechnik",
-  "Elektrotechnik / High-Voltage",
-  "Aerodynamik",
-  "Fahrwerk",
-  "Software / Autonomous",
-  "Marketing & Finanzen",
-  "Noch unentschlossen",
-];
+import { MEMBER_DEPARTMENTS } from "@/lib/validation";
 
 export default function MemberApplicationForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/mitmachen");
@@ -108,10 +99,10 @@ export default function MemberApplicationForm() {
             <select
               id="member-department"
               name="department"
-              defaultValue={DEPARTMENTS[0]}
+              defaultValue={MEMBER_DEPARTMENTS[0]}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             >
-              {DEPARTMENTS.map((dep) => (
+              {MEMBER_DEPARTMENTS.map((dep) => (
                 <option key={dep} value={dep}>
                   {dep}
                 </option>

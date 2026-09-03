@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Fahrdynamik
-department: Fahrwerk
+department: Suspension and Steering Systems
 order: 41
 ---
 

@@ -16,7 +16,7 @@ export function getOrganizationJsonLdScript(): string {
     image: `${SITE_URL}/uploads/ert-14-26-studio.jpg`,
     description: SITE_DESCRIPTION,
     sport: "Motorsport",
-    email: "vorstand@emotion-rennteam.de",
+    email: "info@emotion-rennteam.de",
     telephone: "+49-7361-5762191",
     address: {
       "@type": "PostalAddress",

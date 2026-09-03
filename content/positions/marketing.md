@@ -1,6 +1,6 @@
 ---
 title: "Teammitglied Marketing & Sponsoring"
-department: "Marketing & Finanzen"
+department: "Sponsoring"
 commitment: "3–6 Std./Woche"
 ---
 

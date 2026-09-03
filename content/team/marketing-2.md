@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Sponsoring & Partner
-department: Marketing & Finanzen
+department: Sponsoring
 order: 61
 ---
 

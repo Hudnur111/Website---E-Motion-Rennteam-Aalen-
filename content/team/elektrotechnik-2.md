@@ -1,7 +1,7 @@
 ---
 name: Max Mustermann
 role: Batteriesystem
-department: Elektrotechnik / High-Voltage
+department: Electrics
 order: 21
 ---
 
