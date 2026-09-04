@@ -1,6 +1,7 @@
 ---
 name: Vector
 tier: Gold
+logo: "/Sponsoren-Logo/Vector-Logo.png"
 website: "https://www.vector.com"
 ---
 
