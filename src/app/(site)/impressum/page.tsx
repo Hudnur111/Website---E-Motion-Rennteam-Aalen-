@@ -31,7 +31,7 @@ export default function ImpressumPage() {
 
         <section>
           <h2 className="text-base font-semibold text-foreground">Vertreten durch</h2>
-          <p className="mt-2">[Name des/der Vorstandsvorsitzenden einfügen]</p>
+          <p className="mt-2">Julian Kyselica, 1. Vorstand</p>
         </section>
 
         <section>
@@ -66,9 +66,18 @@ export default function ImpressumPage() {
           <p className="mt-2">
             Eintragung im Vereinsregister.
             <br />
-            Registergericht: [Registergericht einfügen]
+            Registergericht: Amtsgericht Ulm
             <br />
-            Registernummer: [Registernummer einfügen]
+            Registernummer: VR 833
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-foreground">Umsatzsteuer-ID</h2>
+          <p className="mt-2">
+            Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:
+            <br />
+            DE304670383
           </p>
         </section>
 
@@ -77,7 +86,7 @@ export default function ImpressumPage() {
             Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
           </h2>
           <p className="mt-2">
-            [Name, Anschrift wie oben]
+            Julian Kyselica, Anschrift wie oben
           </p>
         </section>
 
