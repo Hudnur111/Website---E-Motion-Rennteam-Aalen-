@@ -82,6 +82,41 @@ export default function ContentForm({
   const submittingRef = useRef(false);
 
   const bField = bodyField(collection);
+  const titleFieldName = collection.fields.find((f) => f.isTitle)?.name;
+  const imageFieldName = fieldsWithoutBody(collection).find((f) => f.type === "image")?.name;
+  const [autoMatchedPhoto, setAutoMatchedPhoto] = useState<string | null>(null);
+  const lookupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nameValue = titleFieldName ? data[titleFieldName] : undefined;
+
+  // "Name = Bild": when the title field (e.g. "Name") is filled in and the
+  // image field is still empty, look for an already-uploaded photo whose
+  // filename matches — most team photos already live under
+  // public/uploads/single-bilder-upload/<Name>.jpg, so editors shouldn't
+  // have to re-upload something that's already there. Never overwrites an
+  // image the editor picked themselves.
+  useEffect(() => {
+    if (!titleFieldName || !imageFieldName) return;
+    if (typeof nameValue !== "string" || !nameValue.trim()) return;
+    if (data[imageFieldName]) return;
+    if (lookupTimer.current) clearTimeout(lookupTimer.current);
+    lookupTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/admin/media/lookup?name=${encodeURIComponent(nameValue)}`);
+        if (!res.ok) return;
+        const result = await res.json();
+        if (result.path && !data[imageFieldName]) {
+          setField(imageFieldName, result.path);
+          setAutoMatchedPhoto(result.path);
+        }
+      } catch {
+        // No match found or lookup failed — editor can still upload manually.
+      }
+    }, 500);
+    return () => {
+      if (lookupTimer.current) clearTimeout(lookupTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nameValue, titleFieldName, imageFieldName]);
 
   // Lets the parent (EditorPanel via CollectionExplorer) confirm before
   // discarding an editor's in-progress work when they close the panel
@@ -198,7 +233,20 @@ export default function ContentForm({
       )}
 
       {fieldsWithoutBody(collection).map((field) => (
-        <FieldEditor key={field.name} field={field} value={data[field.name]} onChange={(v) => setField(field.name, v)} />
+        <FieldEditor
+          key={field.name}
+          field={field}
+          value={data[field.name]}
+          onChange={(v) => {
+            if (field.name === imageFieldName) setAutoMatchedPhoto(null);
+            setField(field.name, v);
+          }}
+          autoMatchedNote={
+            field.name === imageFieldName && autoMatchedPhoto === data[field.name]
+              ? `Automatisch zugeordnet: ${autoMatchedPhoto?.split("/").pop()}`
+              : undefined
+          }
+        />
       ))}
 
       {bField && (
@@ -252,7 +300,17 @@ export default function ContentForm({
   );
 }
 
-function FieldEditor({ field, value, onChange }: { field: FieldDef; value: FieldValue; onChange: (v: FieldValue) => void }) {
+function FieldEditor({
+  field,
+  value,
+  onChange,
+  autoMatchedNote,
+}: {
+  field: FieldDef;
+  value: FieldValue;
+  onChange: (v: FieldValue) => void;
+  autoMatchedNote?: string;
+}) {
   switch (field.type) {
     case "string":
       return (
@@ -341,6 +399,7 @@ function FieldEditor({ field, value, onChange }: { field: FieldDef; value: Field
       return (
         <TextField field={field}>
           <ImageUploadField value={(value as string) ?? ""} onChange={(v) => onChange(v)} />
+          {autoMatchedNote && <p className="mt-1.5 text-xs text-emerald-400">{autoMatchedNote}</p>}
         </TextField>
       );
     case "objectList":
