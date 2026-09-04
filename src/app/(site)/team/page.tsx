@@ -77,17 +77,24 @@ export default function TeamPage() {
             <Reveal key={department} delay={di * 0.03}>
               <div className="overflow-hidden rounded-2xl border border-border bg-surface/50">
                 {banner && (
-                  <div className="relative h-48 w-full overflow-hidden sm:h-64">
+                  <div className="relative h-64 w-full overflow-hidden sm:h-80">
+                    <Image
+                      src={banner}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(min-width: 1024px) 1024px, 100vw"
+                      className="scale-110 object-cover object-top blur-2xl brightness-50"
+                    />
                     <Image
                       src={banner}
                       alt={`Team ${department}`}
                       fill
                       sizes="(min-width: 1024px) 1024px, 100vw"
-                      className="object-cover"
+                      className="object-contain"
                       priority={di === 0}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-6 sm:p-8">
                       <h2 className="text-2xl font-extrabold text-white sm:text-3xl">{department}</h2>
                     </div>
                   </div>
