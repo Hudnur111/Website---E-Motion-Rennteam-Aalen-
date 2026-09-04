@@ -41,11 +41,24 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        // Content photos under /uploads are content-addressed by filename
+        // (a changed photo gets a new name), so it's safe to let browsers
+        // and CDNs cache them for a long time instead of revalidating on
+        // every visit.
+        source: "/uploads/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
       },
     ];
   },
