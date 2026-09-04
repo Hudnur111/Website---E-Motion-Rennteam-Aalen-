@@ -1,0 +1,60 @@
+%!Adobe-FontList 1.24
+%Locale:0x409
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Invalid
+OutlineFileName:/Volumes/SSD_Studium/Caro:14.06.24/Studium/Hochschule Aalen/Emotion Rennteam/ERT-12:24/Website/Website_Event-Results Ordner/Document fonts/AdobeFnt24.lst
+FileLength:1265
+FileModTime:748446172
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Questrial-Regular
+FamilyName:Questrial
+StyleName:Regular
+MenuName:Questrial
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Questrial Regular
+WritingScript:Roman
+OutlineFileName:/Volumes/SSD_Studium/Caro:14.06.24/Studium/Hochschule Aalen/Emotion Rennteam/ERT-12:24/Website/Website_Event-Results Ordner/Document fonts/Questrial-Regular.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:182924
+FileModTime:334620000
+NameArray:0,Win,1,Questrial
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:AirstrikeCondensed
+FamilyName:Airstrike Condensed
+StyleName:Condensed
+MenuName:Airstrike Condensed
+StyleBits:0
+WeightClass:400
+WidthClass:3
+AngleClass:0
+FullName:Airstrike Condensed
+WritingScript:Roman
+OutlineFileName:/Volumes/SSD_Studium/Caro:14.06.24/Studium/Hochschule Aalen/Emotion Rennteam/ERT-12:24/Website/Website_Event-Results Ordner/Document fonts/airstrikecond.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:32516
+FileModTime:394382940
+NameArray:0,Mac,4,Airstrike Condensed
+NameArray:0,Win,1,Airstrike Condensed
+%EndFont
+
