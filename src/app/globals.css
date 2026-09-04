@@ -151,3 +151,94 @@ select:focus-visible,
     animation: none;
   }
 }
+
+/* Tier-animated sponsor cards (Sponsoren-Seite): pulsing gradient border +
+   a periodic light sweep, colored per tier via --tier-* custom properties
+   set inline on each card. Partner-tier cards don't get this class at all
+   and keep the plain hover style, so the effect visually reinforces the
+   tier hierarchy instead of just being decoration. */
+.sponsor-card--tier {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, var(--tier-border-glow), transparent 45%, var(--tier-border-glow)) border-box;
+  animation: sponsor-glow-pulse 3.6s ease-in-out infinite;
+  transition: box-shadow 0.25s ease;
+}
+
+.sponsor-card--tier:hover {
+  animation-play-state: paused;
+  box-shadow: 0 0 34px -4px var(--tier-glow);
+}
+
+.sponsor-card__shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, var(--tier-shimmer) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: -150% 0;
+  opacity: 0;
+  animation: sponsor-shimmer 3.6s ease-in-out infinite;
+  animation-delay: var(--shimmer-delay, 0s);
+}
+
+@keyframes sponsor-shimmer {
+  0%,
+  10% {
+    background-position: -150% 0;
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.9;
+  }
+  50% {
+    background-position: 150% 0;
+    opacity: 0.9;
+  }
+  62%,
+  100% {
+    background-position: 150% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes sponsor-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 26px -2px var(--tier-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-card--tier,
+  .sponsor-card__shimmer {
+    animation: none !important;
+  }
+}
+
+/* Terminal-style typewriter block (technische Daten auf der Fahrzeuge-Seite) */
+.terminal-cursor {
+  animation: terminal-blink 1s step-end infinite;
+}
+
+@keyframes terminal-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
+  }
+}
