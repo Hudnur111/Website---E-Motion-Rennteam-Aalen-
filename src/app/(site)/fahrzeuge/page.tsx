@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
-import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ScrollScale from "@/components/motion/ScrollScale";
+import TerminalSpecs from "@/components/TerminalSpecs";
 
 export const metadata: Metadata = {
   title: "Fahrzeuge",
@@ -73,20 +73,7 @@ export default function VehiclesPage() {
                 </Reveal>
               )}
 
-              {vehicle.specs && vehicle.specs.length > 0 && (
-                <StaggerGroup className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
-                  {vehicle.specs.map((spec) => (
-                    <StaggerItem key={spec.label}>
-                      <div className="rounded-2xl border border-border bg-background p-5 text-center transition-colors hover:border-accent/60">
-                        <div className="text-xs uppercase tracking-wide text-muted">
-                          {spec.label}
-                        </div>
-                        <div className="mt-1.5 text-lg font-semibold">{spec.value}</div>
-                      </div>
-                    </StaggerItem>
-                  ))}
-                </StaggerGroup>
-              )}
+              {vehicle.specs && vehicle.specs.length > 0 && <TerminalSpecs specs={vehicle.specs} />}
             </div>
           </section>
         ))}
