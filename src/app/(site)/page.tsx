@@ -42,6 +42,7 @@ export default function Home() {
                 width={1600}
                 height={900}
                 priority
+                sizes="(min-width: 1024px) 1024px, 100vw"
                 className="h-full w-full object-cover"
               />
             </ScrollScale>

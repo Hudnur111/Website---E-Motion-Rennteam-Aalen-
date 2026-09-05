@@ -51,6 +51,17 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    // Uploaded photos are immutable-cached at the edge for a year (see the
+    // /uploads header rule below); let the image-optimizer cache its
+    // resized/re-encoded variants just as long instead of the 60s default,
+    // so repeat visits never re-run the optimizer for the same source+size.
+    minimumCacheTTL: 31536000,
+  },
+  // Pulls in only the framer-motion submodules actually referenced per file
+  // instead of the whole package, shrinking the client JS bundle shipped
+  // for pages that only use a couple of its features (Reveal, Stagger, ...).
+  experimental: {
+    optimizePackageImports: ["framer-motion"],
   },
   async headers() {
     return [
