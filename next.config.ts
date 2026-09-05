@@ -31,13 +31,21 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    value:
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
   },
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
   { key: "Content-Security-Policy", value: csp },
+  // Isolates the browsing context so other origins can't hold a reference
+  // to this page's window (blocks some cross-origin timing/spectre-style
+  // attacks) without affecting same-origin navigation or the CMS/API.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // Nothing here needs to be embedded by or fetched from another origin.
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
 
 const nextConfig: NextConfig = {
