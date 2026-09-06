@@ -3,6 +3,7 @@ import { getPositions } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
+import AlumniShowcase from "@/components/AlumniShowcase";
 
 export const metadata: Metadata = {
   title: "Mitmachen",
@@ -57,6 +58,16 @@ export default function JoinPage() {
           </StaggerItem>
         ))}
       </StaggerGroup>
+
+      <Reveal delay={0.08} className="mt-6 text-center text-sm text-muted">
+        Dein Fachbereich ist nicht dabei? Wir suchen in allen Bereichen – von Workshop über
+        Powertrain bis Business Plan – laufend Verstärkung.{" "}
+        <a href="#bewerbung" className="font-semibold text-accent-text hover:underline">
+          Schreib uns einfach eine Initiativbewerbung.
+        </a>
+      </Reveal>
+
+      <AlumniShowcase />
 
       <Reveal id="bewerbung" delay={0.1} className="mt-20 scroll-mt-24 rounded-2xl border border-accent/40 bg-surface p-8 sm:p-10">
         <div className="text-center">
