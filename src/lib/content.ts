@@ -63,6 +63,7 @@ export type Vehicle = {
   coverImage?: string;
   current?: boolean;
   specs?: { label: string; value: string }[];
+  goals?: string[];
   body: string;
   slug: string;
 };
