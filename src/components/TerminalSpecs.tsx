@@ -67,12 +67,12 @@ export default function TerminalSpecs({
           <span className="text-muted">:~$</span> cat technische-daten.txt
         </p>
         {shownLines.map((line, i) => (
-          <p key={i} className="mt-1 whitespace-pre-wrap break-words text-[#8ef58e]">
+          <p key={i} className="mt-1 whitespace-pre-wrap break-words text-accent-text">
             {line}
             {!specsDone && i === shownLines.length - 1 && (
               <span
                 aria-hidden="true"
-                className="terminal-cursor ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-[#8ef58e] align-middle"
+                className="terminal-cursor ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-accent-text align-middle"
               />
             )}
           </p>
@@ -91,9 +91,9 @@ export default function TerminalSpecs({
                   initial={reduceMotion ? false : { opacity: 0, x: -6 }}
                   animate={showAchievements ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.25, delay: reduceMotion ? 0 : (i * GOAL_STAGGER_MS) / 1000 }}
-                  className="flex items-start gap-2 text-[#8ef58e]"
+                  className="flex items-start gap-2 text-accent-2-text"
                 >
-                  <span aria-hidden="true" className="mt-0.5 shrink-0 text-accent-text">
+                  <span aria-hidden="true" className="mt-0.5 shrink-0 text-accent-2-text">
                     [✓]
                   </span>
                   <span>{achievement}</span>
