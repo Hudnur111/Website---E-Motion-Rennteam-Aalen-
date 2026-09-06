@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getPage, getVehicles, getSponsors, TEAM_DEPARTMENTS } from "@/lib/content";
+import { getPage, getVehicles, TEAM_DEPARTMENTS } from "@/lib/content";
 import HeroBackground from "@/components/motion/HeroBackground";
 import HeroContent from "@/components/motion/HeroContent";
 import Reveal from "@/components/motion/Reveal";
@@ -17,9 +17,6 @@ const STATS = [
 export default function Home() {
   const page = getPage("home");
   const vehicle = getVehicles().find((v) => v.current) ?? getVehicles()[0];
-  const sponsors = getSponsors()
-    .filter((s) => s.tier === "Platin" || s.tier === "Gold")
-    .slice(0, 6);
 
   return (
     <>
@@ -76,10 +73,10 @@ export default function Home() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
           </Reveal>
-          <StaggerGroup className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
+          <StaggerGroup className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4 items-stretch">
             {vehicle.specs?.slice(0, 4).map((spec) => (
-              <StaggerItem key={spec.label}>
-                <div className="rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/60">
+              <StaggerItem key={spec.label} className="h-full">
+                <div className="flex h-full flex-col justify-center rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/60">
                   <div className="text-xs uppercase tracking-wide text-muted">{spec.label}</div>
                   <div className="mt-1.5 text-lg font-semibold">{spec.value}</div>
                 </div>
@@ -97,39 +94,21 @@ export default function Home() {
         </section>
       )}
 
-      {sponsors.length > 0 && (
-        <section className="container-page py-24">
-          <Reveal>
-            <h2 className="text-center text-sm font-semibold uppercase tracking-widest text-muted">
-              Unsere Haupt- &amp; Gold-Sponsoren
-            </h2>
-          </Reveal>
-          <StaggerGroup className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-8">
-            {sponsors.map((sponsor) => (
-              <StaggerItem key={sponsor.slug}>
-                {sponsor.logo ? (
-                  <Image
-                    src={sponsor.logo}
-                    alt={sponsor.name}
-                    width={140}
-                    height={70}
-                    className="max-h-14 w-auto object-contain opacity-80 transition-opacity hover:opacity-100"
-                  />
-                ) : (
-                  <span className="text-lg font-semibold text-muted/80 transition-colors hover:text-foreground">
-                    {sponsor.name}
-                  </span>
-                )}
-              </StaggerItem>
-            ))}
-          </StaggerGroup>
-          <Reveal className="mt-8 text-center" delay={0.1}>
-            <Link href="/sponsoren" className="text-sm font-semibold text-accent-text hover:underline">
-              Alle Sponsoren ansehen &rarr;
-            </Link>
-          </Reveal>
-        </section>
-      )}
+      <section className="container-page py-24 text-center">
+        <Reveal>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Unsere Sponsoren</h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+            Ohne unsere Partner wäre unser Projekt nicht möglich. Lernen Sie die Unternehmen
+            kennen, die uns unterstützen.
+          </p>
+          <Link
+            href="/sponsoren"
+            className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+          >
+            Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
+          </Link>
+        </Reveal>
+      </section>
     </>
   );
 }

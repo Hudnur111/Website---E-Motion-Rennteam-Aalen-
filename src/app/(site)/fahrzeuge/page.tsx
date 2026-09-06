@@ -4,6 +4,7 @@ import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import ScrollScale from "@/components/motion/ScrollScale";
 import TerminalSpecs from "@/components/TerminalSpecs";
+import VehicleTimeline from "@/components/VehicleTimeline";
 
 export const metadata: Metadata = {
   title: "Fahrzeuge",
@@ -28,6 +29,10 @@ export default function VehiclesPage() {
             der Simulation bis zur Rennstrecke.
           </p>
         </Reveal>
+      </div>
+
+      <div className="mt-16">
+        <VehicleTimeline vehicles={vehicles} />
       </div>
 
       <div className="mt-20 space-y-32">
@@ -75,7 +80,7 @@ export default function VehiclesPage() {
               )}
 
               {vehicle.specs && vehicle.specs.length > 0 && (
-                <TerminalSpecs specs={vehicle.specs} goals={vehicle.goals} />
+                <TerminalSpecs specs={vehicle.specs} achievements={vehicle.achievements} />
               )}
             </div>
           </section>

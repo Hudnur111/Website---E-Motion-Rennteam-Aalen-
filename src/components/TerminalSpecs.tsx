@@ -11,10 +11,10 @@ const GOAL_STAGGER_MS = 140;
 
 export default function TerminalSpecs({
   specs,
-  goals,
+  achievements,
 }: {
   specs: NonNullable<Vehicle["specs"]>;
-  goals?: Vehicle["goals"];
+  achievements?: Vehicle["achievements"];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
@@ -48,7 +48,7 @@ export default function TerminalSpecs({
   }, [inView, reduceMotion]);
 
   const shownLines = (reduceMotion ? fullText : fullText.slice(0, visibleChars)).split("\n");
-  const showGoals = goals && goals.length > 0 && specsDone;
+  const showAchievements = achievements && achievements.length > 0 && specsDone;
 
   return (
     <div
@@ -78,25 +78,25 @@ export default function TerminalSpecs({
           </p>
         ))}
 
-        {goals && goals.length > 0 && (
+        {achievements && achievements.length > 0 && (
           <>
-            <p className={`mt-4 text-muted transition-opacity duration-300 ${showGoals ? "opacity-100" : "opacity-0"}`}>
+            <p className={`mt-4 text-muted transition-opacity duration-300 ${showAchievements ? "opacity-100" : "opacity-0"}`}>
               <span className="text-accent-text">ert@emotion</span>
-              <span className="text-muted">:~$</span> ./saisonziele.sh --status
+              <span className="text-muted">:~$</span> ./erfolge.sh --history
             </p>
             <ul className="mt-1 space-y-1">
-              {goals.map((goal, i) => (
+              {achievements.map((achievement, i) => (
                 <motion.li
-                  key={goal}
+                  key={achievement}
                   initial={reduceMotion ? false : { opacity: 0, x: -6 }}
-                  animate={showGoals ? { opacity: 1, x: 0 } : {}}
+                  animate={showAchievements ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.25, delay: reduceMotion ? 0 : (i * GOAL_STAGGER_MS) / 1000 }}
                   className="flex items-start gap-2 text-[#8ef58e]"
                 >
                   <span aria-hidden="true" className="mt-0.5 shrink-0 text-accent-text">
                     [✓]
                   </span>
-                  <span>{goal}</span>
+                  <span>{achievement}</span>
                 </motion.li>
               ))}
             </ul>
