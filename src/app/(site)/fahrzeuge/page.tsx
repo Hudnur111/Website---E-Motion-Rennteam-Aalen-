@@ -74,7 +74,9 @@ export default function VehiclesPage() {
                 </Reveal>
               )}
 
-              {vehicle.specs && vehicle.specs.length > 0 && <TerminalSpecs specs={vehicle.specs} />}
+              {vehicle.specs && vehicle.specs.length > 0 && (
+                <TerminalSpecs specs={vehicle.specs} goals={vehicle.goals} />
+              )}
             </div>
           </section>
         ))}
