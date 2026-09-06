@@ -37,7 +37,11 @@ export default function VehiclesPage() {
 
       <div className="mt-20 space-y-32">
         {vehicles.map((vehicle, i) => (
-          <section key={vehicle.slug} className={i % 2 === 1 ? "bg-surface/40 py-24" : "py-2"}>
+          <section
+            key={vehicle.slug}
+            id={vehicle.slug}
+            className={`scroll-mt-24 ${i % 2 === 1 ? "bg-surface/40 py-24" : "py-2"}`}
+          >
             <div className="container-page">
               <Reveal className="text-center">
                 <div className="flex items-center justify-center gap-3">
