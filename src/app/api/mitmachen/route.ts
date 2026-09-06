@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (!result.isBot) {
-    await deliverFormSubmission("mitmachen", result.data);
+    await deliverFormSubmission("mitmachen", {
+      ...result.data,
+      skills: result.data.skills.join(", ") || "–",
+    });
   }
 
   return NextResponse.json({ ok: true });

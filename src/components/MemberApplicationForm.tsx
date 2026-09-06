@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
-import { MEMBER_DEPARTMENTS } from "@/lib/validation";
+import { MEMBER_DEPARTMENTS, MEMBER_SKILLS } from "@/lib/validation";
 
 export default function MemberApplicationForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/mitmachen");
@@ -108,6 +108,24 @@ export default function MemberApplicationForm() {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="sm:col-span-2 space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Fachliche Kenntnisse</label>
+              <span className="text-xs text-muted">(optional aber vorteilhaft)</span>
+            </div>
+            <div className="space-y-2.5">
+              {MEMBER_SKILLS.map(({ id, label }) => (
+                <label key={id} className="flex items-center gap-2.5 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    name={`skill_${id}`}
+                    className="h-4 w-4 rounded accent-[var(--color-accent)]"
+                  />
+                  <span className="text-sm group-hover:text-accent-text transition-colors">{label}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="member-message" className="text-sm font-medium">Motivation</label>

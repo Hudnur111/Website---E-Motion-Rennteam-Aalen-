@@ -4,20 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
-
-const SUBJECTS = [
-  "Allgemeine Anfrage",
-  "Sponsoring",
-  "Presse",
-  "Mitmachen / Bewerbung",
-  "Sonstiges",
-];
-
-const SKILLS_OPTIONS = [
-  { id: "cad", label: "CAD Kenntnisse", optional: true },
-  { id: "matlab", label: "MATLAB Kenntnisse", optional: true },
-  { id: "video_photo", label: "Video & Foto Editing", optional: true },
-];
+import { CONTACT_SUBJECTS } from "@/lib/validation";
 
 export default function ContactForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
@@ -103,62 +90,15 @@ export default function ContactForm() {
             <select
               id="subject"
               name="subject"
-              defaultValue={SUBJECTS[0]}
+              defaultValue={CONTACT_SUBJECTS[0]}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             >
-              {SUBJECTS.map((subject) => (
+              {CONTACT_SUBJECTS.map((subject) => (
                 <option key={subject} value={subject}>
                   {subject}
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
-            <div className="flex items-center gap-2">
-              <label htmlFor="student" className="text-sm font-medium">
-                Student/in an der Hochschule Aalen
-              </label>
-            </div>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="student"
-                  value="ja"
-                  className="h-4 w-4 accent-[var(--color-accent)]"
-                />
-                <span className="text-sm">Ja</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="student"
-                  value="nein"
-                  className="h-4 w-4 accent-[var(--color-accent)]"
-                />
-                <span className="text-sm">Nein</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Fachliche Kenntnisse</label>
-              <span className="text-xs text-muted">(optional aber vorteilhaft)</span>
-            </div>
-            <div className="space-y-2.5">
-              {SKILLS_OPTIONS.map(({ id, label, optional }) => (
-                <label key={id} className="flex items-center gap-2.5 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    name={`skill_${id}`}
-                    className="h-4 w-4 rounded accent-[var(--color-accent)]"
-                  />
-                  <span className="text-sm group-hover:text-accent-text transition-colors">{label}</span>
-                </label>
-              ))}
-            </div>
           </div>
           <div>
             <label htmlFor="message" className="text-sm font-medium">
