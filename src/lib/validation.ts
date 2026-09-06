@@ -281,3 +281,63 @@ export function validateSponsorForm(body: unknown): ValidationResult<SponsorForm
     data: { company, contact, email, phone, tier, message },
   };
 }
+
+export type MediaKitFormData = {
+  firstName: string;
+  lastName: string;
+  company: string;
+  email: string;
+  categories: string[];
+  details: string;
+};
+
+/**
+ * Deliberately generic instead of naming individual events (FSG, Alpe
+ * Adria, ...): the event roster changes every season, so per-event
+ * checkboxes would need updating every year. "Renneinsatz" plus the free-text
+ * `details` field covers specific event/season requests without that upkeep.
+ */
+export const MEDIAKIT_CATEGORIES = [
+  { id: "team", label: "Teamfotos" },
+  { id: "vehicle", label: "Fahrzeugfotos (Studio)" },
+  { id: "race", label: "Renneinsatz-Fotos" },
+  { id: "logo", label: "Logo & Markenmaterial" },
+  { id: "video", label: "Video-Material" },
+] as const;
+
+export function validateMediaKitForm(body: unknown): ValidationResult<MediaKitFormData> {
+  const data = asRecord(body);
+  const errors: FieldErrors = {};
+
+  const firstName = readField(data, "firstName");
+  const lastName = readField(data, "lastName");
+  const company = readField(data, "company");
+  const email = readField(data, "email");
+  const details = readField(data, "details");
+  const categories = MEDIAKIT_CATEGORIES.filter(
+    ({ id }) => data[`category_${id}`] === true || data[`category_${id}`] === "on"
+  ).map(({ label }) => label);
+
+  if (!firstName) errors.firstName = "Bitte gib deinen Vornamen an.";
+  else if (firstName.length > LIMITS.name) errors.firstName = "Vorname ist zu lang.";
+
+  if (!lastName) errors.lastName = "Bitte gib deinen Nachnamen an.";
+  else if (lastName.length > LIMITS.name) errors.lastName = "Nachname ist zu lang.";
+
+  if (company && company.length > LIMITS.company) errors.company = "Firmenname ist zu lang.";
+
+  if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
+  else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+  else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
+
+  if (details.length > LIMITS.message) errors.details = "Text ist zu lang.";
+
+  if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
+
+  if (Object.keys(errors).length > 0) return { valid: false, errors };
+  return {
+    valid: true,
+    isBot: isBotSubmission(data),
+    data: { firstName, lastName, company, email, categories, details },
+  };
+}
