@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPage } from "@/lib/content";
 import ContactForm from "@/components/ContactForm";
 import ContactMap from "@/components/ContactMap";
@@ -23,7 +24,13 @@ export default function ContactPage() {
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
           {page?.heroSubtitle ??
-            "Ob Sponsoring, Presse oder Bewerbung – wir freuen uns auf deine Nachricht."}
+            "Ob Sponsoring, Presse oder allgemeine Fragen – wir freuen uns auf deine Nachricht."}
+        </p>
+        <p className="mt-3 text-sm text-muted">
+          Du willst dich fürs Team bewerben?{" "}
+          <Link href="/mitmachen#bewerbung" className="font-semibold text-accent-text hover:underline">
+            Hier geht's zur Bewerbung.
+          </Link>
         </p>
       </Reveal>
 

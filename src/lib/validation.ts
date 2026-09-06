@@ -116,7 +116,6 @@ export const CONTACT_SUBJECTS = [
   "Allgemeine Anfrage",
   "Sponsoring",
   "Presse",
-  "Mitmachen / Bewerbung",
   "Sonstiges",
 ] as const;
 
@@ -159,7 +158,14 @@ export type MemberApplicationFormData = {
   phone: string;
   department: string;
   message: string;
+  skills: string[];
 };
+
+export const MEMBER_SKILLS = [
+  { id: "cad", label: "CAD Kenntnisse" },
+  { id: "matlab", label: "MATLAB Kenntnisse" },
+  { id: "video_photo", label: "Video & Foto Editing" },
+] as const;
 
 export const MEMBER_DEPARTMENTS = [
   "Project Management",
@@ -191,6 +197,9 @@ export function validateMemberApplicationForm(
   const phone = readField(data, "phone");
   const department = readField(data, "department") || MEMBER_DEPARTMENTS[0];
   const message = readField(data, "message");
+  const skills = MEMBER_SKILLS.filter(({ id }) => data[`skill_${id}`] === true || data[`skill_${id}`] === "on").map(
+    ({ label }) => label
+  );
 
   if (!name) errors.name = "Bitte gib deinen Namen an.";
   else if (name.length > LIMITS.name) errors.name = "Name ist zu lang.";
@@ -213,7 +222,7 @@ export function validateMemberApplicationForm(
   return {
     valid: true,
     isBot: isBotSubmission(data),
-    data: { name, email, phone, department, message },
+    data: { name, email, phone, department, message, skills },
   };
 }
 
