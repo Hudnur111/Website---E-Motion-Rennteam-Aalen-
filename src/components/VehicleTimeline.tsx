@@ -22,7 +22,7 @@ export default function VehicleTimeline({ vehicles }: { vehicles: Vehicle[] }) {
                 <span className="font-mono text-sm font-semibold text-accent-text">
                   {vehicle.year}
                 </span>
-                <h3 className="text-lg font-bold tracking-tight">{vehicle.name}</h3>
+                <h2 className="text-lg font-bold tracking-tight">{vehicle.name}</h2>
                 {vehicle.current && (
                   <span className="rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
                     Aktuell im Einsatz

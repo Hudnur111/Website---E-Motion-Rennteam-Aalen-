@@ -71,6 +71,7 @@ export default function ContactMap() {
 
     const iframe = document.createElement('iframe');
     iframe.src = url;
+    iframe.title = 'Standort des E-Motion Rennteams auf der Karte';
     iframe.style.width = '100%';
     iframe.style.height = '100%';
     iframe.style.border = 'none';

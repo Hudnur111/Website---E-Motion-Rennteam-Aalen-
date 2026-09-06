@@ -41,7 +41,7 @@ export default function ContactPage() {
 
           <div className="grid gap-3 grid-cols-2">
             <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Adresse</h3>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Adresse</h2>
               <p className="mt-2 text-xs text-muted leading-relaxed">
                 E-Motion Rennteam<br />
                 Hochschule Aalen<br />
@@ -51,7 +51,7 @@ export default function ContactPage() {
             </div>
 
             <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Kontakt</h3>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Kontakt</h2>
               <p className="mt-2 text-xs text-muted space-y-1">
                 <a href="mailto:info@emotion-rennteam.de" className="block text-accent-text hover:underline">
                   info@emotion-rennteam.de
