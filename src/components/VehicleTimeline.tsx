@@ -6,35 +6,45 @@ export default function VehicleTimeline({ vehicles }: { vehicles: Vehicle[] }) {
 
   return (
     <div className="container-page">
-      <Reveal className="mx-auto max-w-3xl">
-        <ol className="relative border-l border-border pl-8 sm:pl-10">
-          {sorted.map((vehicle) => (
-            <li key={vehicle.slug} className="mb-10 last:mb-0">
-              <span
-                className={`absolute -left-[9px] mt-1.5 h-4 w-4 rounded-full border-2 ${
-                  vehicle.current
-                    ? "border-accent bg-accent"
-                    : "border-border bg-background"
-                }`}
-                aria-hidden="true"
-              />
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-mono text-sm font-semibold text-accent-text">
-                  {vehicle.year}
-                </span>
-                <h2 className="text-lg font-bold tracking-tight">{vehicle.name}</h2>
-                {vehicle.current && (
-                  <span className="rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
-                    Aktuell im Einsatz
-                  </span>
+      <Reveal className="mx-auto max-w-5xl">
+        <nav aria-label="Fahrzeug-Timeline" className="overflow-x-auto pb-2">
+          <ol className="flex w-max items-center gap-1 sm:gap-2">
+            {sorted.map((vehicle, i) => (
+              <li key={vehicle.slug} className="flex items-center">
+                {i > 0 && (
+                  <span
+                    className="mx-1 h-px w-6 shrink-0 bg-border sm:mx-2 sm:w-12"
+                    aria-hidden="true"
+                  />
                 )}
-              </div>
-              {vehicle.tagline && (
-                <p className="mt-1.5 text-sm text-muted">{vehicle.tagline}</p>
-              )}
-            </li>
-          ))}
-        </ol>
+                <a
+                  href={`#${vehicle.slug}`}
+                  className="group flex w-36 shrink-0 flex-col items-center rounded-xl border border-border bg-surface px-3 py-4 text-center transition-colors hover:border-accent/60 sm:w-44 sm:px-4"
+                >
+                  <span
+                    className={`h-3 w-3 rounded-full border-2 ${
+                      vehicle.current
+                        ? "border-accent bg-accent"
+                        : "border-border bg-background"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span className="mt-2 font-mono text-xs font-semibold text-accent-text">
+                    {vehicle.year}
+                  </span>
+                  <span className="mt-1 text-sm font-bold tracking-tight transition-colors group-hover:text-accent-text">
+                    {vehicle.name}
+                  </span>
+                  {vehicle.current && (
+                    <span className="mt-1.5 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">
+                      Aktuell
+                    </span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </Reveal>
     </div>
   );
