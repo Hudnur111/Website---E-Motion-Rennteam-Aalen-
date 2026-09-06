@@ -4,4 +4,4 @@ department: "Electrics"
 commitment: "ab 5 Std./Woche"
 ---
 
-Du interessierst dich für Batteriesysteme, Leistungselektronik und Hochvolt-Sicherheit? Wir suchen Verstärkung für die elektrische Konfiguration unseres Hochvoltspeichers, den Aufbau des Niedervoltbatteriesystems sowie Planung und Verkabelung von Kabelbaum, Ladeinfrastruktur und Inverter. Erste Kenntnisse der Elektrotechnik genügen – Tools wie Altium, Zuken oder CAD-NX lernst du bei uns.
+Du baust an Hochvoltspeicher, Verkabelung und Inverter unseres E-Boliden mit. Erste Elektrotechnik-Kenntnisse reichen – Altium, Zuken & Co. lernst du bei uns.

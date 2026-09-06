@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPositions } from "@/lib/content";
+import { getPositions, getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
@@ -14,6 +14,11 @@ export const metadata: Metadata = {
 
 export default function JoinPage() {
   const positions = getPositions();
+  const stats = [
+    { value: "Seit 2009", label: "Am Start" },
+    { value: String(getTeam().length), label: "Aktive Mitglieder" },
+    { value: String(TEAM_DEPARTMENTS.length), label: "Fachbereiche" },
+  ];
 
   return (
     <div className="container-page py-20">
@@ -24,6 +29,17 @@ export default function JoinPage() {
           Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du,
           Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation.
         </p>
+      </Reveal>
+
+      <Reveal delay={0.03} className="mt-10 grid grid-cols-3 divide-x divide-border rounded-xl border border-border bg-surface">
+        {stats.map((stat) => (
+          <div key={stat.label} className="px-3 py-5 text-center sm:px-6">
+            <p className="text-2xl font-extrabold tracking-tight text-accent-text sm:text-3xl">
+              {stat.value}
+            </p>
+            <p className="mt-1 text-xs text-muted sm:text-sm">{stat.label}</p>
+          </div>
+        ))}
       </Reveal>
 
       <Reveal delay={0.05} className="mt-14">
