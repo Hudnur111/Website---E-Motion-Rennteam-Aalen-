@@ -29,7 +29,7 @@ export default function ContactPage() {
         <p className="mt-3 text-sm text-muted">
           Du willst dich fürs Team bewerben?{" "}
           <Link href="/mitmachen#bewerbung" className="font-semibold text-accent-text hover:underline">
-            Hier geht's zur Bewerbung.
+            Hier geht&apos;s zur Bewerbung.
           </Link>
         </p>
       </Reveal>
