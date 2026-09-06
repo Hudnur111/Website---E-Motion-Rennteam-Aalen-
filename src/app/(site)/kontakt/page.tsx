@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPage } from "@/lib/content";
 import ContactForm from "@/components/ContactForm";
+import ContactMap from "@/components/ContactMap";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
@@ -26,43 +27,40 @@ export default function ContactPage() {
         </p>
       </Reveal>
 
-      <div className="mt-14 grid gap-12 md:grid-cols-2">
+      <div className="mt-14 grid gap-12 lg:grid-cols-2">
         <Reveal direction="left">
-          <ContactForm />
+          <div className="space-y-4">
+            <ContactForm />
+          </div>
         </Reveal>
 
-        <Reveal direction="right" delay={0.1} className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
-            <h2 className="font-semibold">Adresse</h2>
-            <p className="mt-2 text-sm text-muted">
-              E-Motion Rennteam Aalen
-              <br />
-              Hochschule Aalen
-              <br />
-              Beethovenstraße 1
-              <br />
-              73430 Aalen
-            </p>
+        <Reveal direction="right" delay={0.1} className="space-y-6 flex flex-col">
+          <div className="flex-1 min-h-[400px] rounded-xl border border-border overflow-hidden shadow-lg">
+            <ContactMap />
           </div>
-          <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
-            <h2 className="font-semibold">E-Mail</h2>
-            <p className="mt-2 text-sm text-muted">
-              <a href="mailto:info@emotion-rennteam.de" className="text-accent-text underline">
-                info@emotion-rennteam.de
-              </a>
-            </p>
-          </div>
-          <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
-            <h2 className="font-semibold">Telefon</h2>
-            <p className="mt-2 text-sm text-muted">
-              <a href="tel:+4973615762191" className="text-accent-text underline">
-                +49 7361 5762191
-              </a>
-            </p>
-          </div>
-          <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/40">
-            <h2 className="font-semibold">Social Media</h2>
-            <p className="mt-2 text-sm text-muted">Instagram · LinkedIn · YouTube</p>
+
+          <div className="grid gap-3 grid-cols-2">
+            <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Adresse</h3>
+              <p className="mt-2 text-xs text-muted leading-relaxed">
+                E-Motion Rennteam<br />
+                Hochschule Aalen<br />
+                Beethovenstraße 1<br />
+                73430 Aalen
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Kontakt</h3>
+              <p className="mt-2 text-xs text-muted space-y-1">
+                <a href="mailto:info@emotion-rennteam.de" className="block text-accent-text hover:underline">
+                  info@emotion-rennteam.de
+                </a>
+                <a href="tel:+4973615762191" className="block text-accent-text hover:underline">
+                  +49 7361 5762191
+                </a>
+              </p>
+            </div>
           </div>
         </Reveal>
       </div>

@@ -13,6 +13,12 @@ const SUBJECTS = [
   "Sonstiges",
 ];
 
+const SKILLS_OPTIONS = [
+  { id: "cad", label: "CAD Kenntnisse", optional: true },
+  { id: "matlab", label: "MATLAB Kenntnisse", optional: true },
+  { id: "video_photo", label: "Video & Foto Editing", optional: true },
+];
+
 export default function ContactForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
 
@@ -107,6 +113,53 @@ export default function ContactForm() {
               ))}
             </select>
           </div>
+
+          <div className="space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="student" className="text-sm font-medium">
+                Student/in an der Hochschule Aalen
+              </label>
+            </div>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="student"
+                  value="ja"
+                  className="h-4 w-4 accent-[var(--color-accent)]"
+                />
+                <span className="text-sm">Ja</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="student"
+                  value="nein"
+                  className="h-4 w-4 accent-[var(--color-accent)]"
+                />
+                <span className="text-sm">Nein</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Fachliche Kenntnisse</label>
+              <span className="text-xs text-muted">(optional aber vorteilhaft)</span>
+            </div>
+            <div className="space-y-2.5">
+              {SKILLS_OPTIONS.map(({ id, label, optional }) => (
+                <label key={id} className="flex items-center gap-2.5 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    name={`skill_${id}`}
+                    className="h-4 w-4 rounded accent-[var(--color-accent)]"
+                  />
+                  <span className="text-sm group-hover:text-accent-text transition-colors">{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div>
             <label htmlFor="message" className="text-sm font-medium">
               Nachricht <span className="text-accent-text">*</span>
@@ -148,9 +201,16 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+            className="w-full rounded-lg bg-gradient-to-r from-accent to-accent/90 px-6 py-3.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-all duration-300 hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:shadow-lg disabled:shadow-accent/20"
           >
-            {status === "sending" ? "Wird gesendet…" : "Nachricht senden"}
+            {status === "sending" ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                Wird gesendet…
+              </span>
+            ) : (
+              "Nachricht senden"
+            )}
           </button>
         </motion.form>
       )}
