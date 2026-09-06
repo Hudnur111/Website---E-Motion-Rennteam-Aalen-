@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPositions, getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
+import { getPositions, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
@@ -16,7 +16,7 @@ export default function JoinPage() {
   const positions = getPositions();
   const stats = [
     { value: "Seit 2009", label: "Am Start" },
-    { value: String(getTeam().length), label: "Aktive Mitglieder" },
+    { value: "50", label: "Aktive Mitglieder" },
     { value: String(TEAM_DEPARTMENTS.length), label: "Fachbereiche" },
   ];
 
