@@ -107,8 +107,7 @@ export type BlogPost = {
 export type GalleryImage = {
   title: string;
   image: string;
-  category?: string;
-  season?: string;
+  album: string;
   order?: number;
   slug: string;
 };
@@ -190,6 +189,7 @@ function getAutoGalleryImages(): GalleryImage[] {
       return {
         title: title || "Foto",
         image: `/uploads/galerie-upload/${file}`,
+        album: "Weitere Bilder",
         slug: `auto-${file}`,
       };
     });

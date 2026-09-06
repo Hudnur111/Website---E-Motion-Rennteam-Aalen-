@@ -9,7 +9,6 @@ type GalleryImage = {
   slug: string;
   title: string;
   image: string;
-  category?: string;
 };
 
 export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
