@@ -60,6 +60,7 @@ export default function VehiclesPage() {
                     alt={vehicle.name}
                     width={1600}
                     height={900}
+                    sizes="(min-width: 1152px) 1152px, 100vw"
                     className="h-full w-full object-cover"
                   />
                 </ScrollScale>

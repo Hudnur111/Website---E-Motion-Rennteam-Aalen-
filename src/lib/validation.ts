@@ -11,7 +11,43 @@ export type ValidationResult<T> =
   | { valid: true; errors?: undefined; data: T; isBot: boolean }
   | { valid: false; errors: FieldErrors; data?: undefined; isBot?: undefined };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Practical RFC 5321/5322 approximation: no leading/trailing/consecutive dots
+// in the local or domain part, a domain with at least one label + a
+// letters-only TLD of 2+ chars. Deliberately stricter than the previous
+// "anything@anything.anything" pattern to catch obviously-malformed input
+// client-side bots and typo'd addresses both produce.
+const EMAIL_RE =
+  /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+// Well-known disposable/temporary-inbox domains. Not exhaustive (new ones
+// appear constantly), but it catches the handful of services spam bots and
+// low-effort duplicate signups reach for most often. Kept as a plain
+// rejection (not a silent bot-flag) so a genuine sender gets a clear error
+// instead of a submission that silently never arrives.
+const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  "mailinator.com",
+  "guerrillamail.com",
+  "guerrillamail.info",
+  "10minutemail.com",
+  "10minutemail.net",
+  "tempmail.com",
+  "temp-mail.org",
+  "throwawaymail.com",
+  "yopmail.com",
+  "trashmail.com",
+  "sharklasers.com",
+  "getnada.com",
+  "dispostable.com",
+  "fakeinbox.com",
+  "maildrop.cc",
+  "mailnesia.com",
+  "mintemail.com",
+]);
+
+export function isDisposableEmail(value: string): boolean {
+  const domain = value.split("@")[1]?.toLowerCase();
+  return domain !== undefined && DISPOSABLE_EMAIL_DOMAINS.has(domain);
+}
 
 export const LIMITS = {
   name: 120,
@@ -38,12 +74,31 @@ function readField(data: Record<string, unknown>, key: string): string {
 }
 
 /**
- * Honeypot check: a hidden field ("website") that real users never fill in.
- * Bots that auto-fill every input trip it. Callers should still report
- * success to avoid tipping the bot off, just skip actually delivering it.
+ * A real visitor needs at least this long to read the form and type into it.
+ * Scripted bots that fetch the page, fill every field, and POST typically do
+ * so in well under a second.
  */
-function isHoneypotTripped(data: Record<string, unknown>): boolean {
-  return sanitizeText(data.website).length > 0;
+const MIN_HUMAN_SUBMIT_MS = 1500;
+
+/**
+ * Combines two independent bot signals:
+ *  - Honeypot: a hidden field ("website") that real users never fill in but
+ *    bots that auto-fill every input trip.
+ *  - Timing trap: a hidden "formRenderedAt" timestamp (set client-side when
+ *    the form mounts) that flags submissions completed implausibly fast.
+ * Callers should still report success to avoid tipping the bot off, just
+ * skip actually delivering the submission.
+ */
+function isBotSubmission(data: Record<string, unknown>): boolean {
+  if (sanitizeText(data.website).length > 0) return true;
+
+  const renderedAt = Number(data.formRenderedAt);
+  if (Number.isFinite(renderedAt) && renderedAt > 0) {
+    const elapsed = Date.now() - renderedAt;
+    if (elapsed < MIN_HUMAN_SUBMIT_MS) return true;
+  }
+
+  return false;
 }
 
 function asRecord(body: unknown): Record<string, unknown> {
@@ -79,6 +134,7 @@ export function validateContactForm(body: unknown): ValidationResult<ContactForm
 
   if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+  else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
   if (!(CONTACT_SUBJECTS as readonly string[]).includes(subject)) {
     errors.subject = "Ungültiger Betreff.";
@@ -92,7 +148,7 @@ export function validateContactForm(body: unknown): ValidationResult<ContactForm
   if (Object.keys(errors).length > 0) return { valid: false, errors };
   return {
     valid: true,
-    isBot: isHoneypotTripped(data),
+    isBot: isBotSubmission(data),
     data: { name, email, subject, message },
   };
 }
@@ -141,6 +197,7 @@ export function validateMemberApplicationForm(
 
   if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+  else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
   if (phone && phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
 
@@ -155,7 +212,7 @@ export function validateMemberApplicationForm(
   if (Object.keys(errors).length > 0) return { valid: false, errors };
   return {
     valid: true,
-    isBot: isHoneypotTripped(data),
+    isBot: isBotSubmission(data),
     data: { name, email, phone, department, message },
   };
 }
@@ -196,6 +253,7 @@ export function validateSponsorForm(body: unknown): ValidationResult<SponsorForm
 
   if (!email) errors.email = "Bitte gib eine E-Mail-Adresse an.";
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+  else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
   if (phone && phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
 
@@ -210,7 +268,7 @@ export function validateSponsorForm(body: unknown): ValidationResult<SponsorForm
   if (Object.keys(errors).length > 0) return { valid: false, errors };
   return {
     valid: true,
-    isBot: isHoneypotTripped(data),
+    isBot: isBotSubmission(data),
     data: { company, contact, email, phone, tier, message },
   };
 }

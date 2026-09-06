@@ -81,4 +81,70 @@ describe("POST /api/contact", () => {
 
     expect(lastResponse?.status).toBe(429);
   });
+
+  it("rate-limits repeated submissions to the same address across IPs", async () => {
+    vi.spyOn(formDelivery, "deliverFormSubmission").mockResolvedValue(undefined);
+    const email = `flood-${Math.random()}@example.com`;
+
+    let lastResponse;
+    for (let i = 0; i < 6; i += 1) {
+      lastResponse = await POST(postRequest({ ...validPayload, email }));
+    }
+
+    expect(lastResponse?.status).toBe(429);
+  });
+
+  it("rejects requests from a foreign Origin", async () => {
+    const request = new NextRequest("http://localhost/api/contact", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "9.9.9.8",
+        origin: "https://evil.example",
+      },
+      body: JSON.stringify(validPayload),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(403);
+  });
+
+  it("rejects non-JSON content types", async () => {
+    const request = new NextRequest("http://localhost/api/contact", {
+      method: "POST",
+      headers: { "content-type": "text/plain", "x-forwarded-for": "9.9.9.7" },
+      body: JSON.stringify(validPayload),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(415);
+  });
+
+  it("rejects disposable email domains", async () => {
+    const response = await POST(
+      postRequest({ ...validPayload, email: "spammer@mailinator.com" }, "9.9.9.6")
+    );
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.errors.email).toBeDefined();
+  });
+
+  it("silently accepts but does not deliver submissions completed implausibly fast", async () => {
+    const deliverSpy = vi
+      .spyOn(formDelivery, "deliverFormSubmission")
+      .mockResolvedValue(undefined);
+
+    const response = await POST(
+      postRequest(
+        { ...validPayload, email: `fast-${Math.random()}@example.com`, formRenderedAt: Date.now() },
+        "9.9.9.5"
+      )
+    );
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.ok).toBe(true);
+    expect(deliverSpy).not.toHaveBeenCalled();
+  });
 });
