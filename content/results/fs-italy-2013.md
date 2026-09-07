@@ -1,6 +1,6 @@
 ---
-title: "Formula Student Italy 2013"
+title: "FSAE IT 2013"
 year: 2013
-event: "Formula Student Italy"
+event: "FSAE IT"
 placement: "Platz 21 Gesamtwertung"
 ---

@@ -1,6 +1,6 @@
 ---
-title: "Formula Student Austria 2017"
+title: "FS AT 2017"
 year: 2017
-event: "Formula Student Austria"
+event: "FS AT"
 placement: "Platz 13 Gesamtwertung"
 ---
