@@ -31,7 +31,7 @@ export default function ImpressumPage() {
 
         <section>
           <h2 className="text-base font-semibold text-foreground">Vertreten durch</h2>
-          <p className="mt-2">Julian Kyselica, 1. Vorstand</p>
+          <p className="mt-2">Linda Mann, 1. Vorstand (Vorstand 2026)</p>
         </section>
 
         <section>
@@ -86,7 +86,7 @@ export default function ImpressumPage() {
             Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
           </h2>
           <p className="mt-2">
-            Julian Kyselica, Anschrift wie oben
+            Linda Mann, Anschrift wie oben
           </p>
         </section>
 
@@ -135,6 +135,32 @@ export default function ImpressumPage() {
           <p className="mt-2">
             Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
             unterliegen dem deutschen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.
+            Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb
+            der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen
+            Autors bzw. Erstellers.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-foreground">Bildnachweise</h2>
+          <p className="mt-2">
+            Sofern nicht anders gekennzeichnet, liegen die Bildrechte an den auf dieser Website
+            verwendeten Fotografien und Grafiken beim E-Motion Rennteam Aalen e.V. Für Presse- und
+            Sponsoring-Anfragen zur Nutzung unseres Bildmaterials wende dich bitte an die oben
+            genannte Kontaktadresse.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-foreground">Externe Dienste und Datenschutz</h2>
+          <p className="mt-2">
+            Auf einzelnen Seiten dieses Angebots (u. a. der Kontaktseite) binden wir Dienste
+            externer Anbieter ein, etwa zur Darstellung einer interaktiven Karte. Details zur
+            Verarbeitung personenbezogener Daten findest du in unserer{" "}
+            <a href="/datenschutz" className="text-accent-text underline">
+              Datenschutzerklärung
+            </a>
+            .
           </p>
         </section>
       </Reveal>
