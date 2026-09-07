@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const COOKIE_NAME = "cookie-consent";
 const COOKIE_MAX_AGE_DAYS = 180;
@@ -13,22 +13,42 @@ function readConsentCookie(): string | undefined {
     ?.split("=")[1];
 }
 
+const listeners = new Set<() => void>();
+
+/**
+ * document.cookie has no change event, so there is nothing to subscribe to -
+ * writeConsentCookie() below notifies listeners itself right after writing.
+ */
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  return () => {
+    listeners.delete(callback);
+  };
+}
+
+function getSnapshot() {
+  return readConsentCookie();
+}
+
+/**
+ * No cookies exist during SSR. Reporting "answered" here (rather than
+ * undefined) keeps the banner out of the server-rendered markup so it never
+ * flashes in and immediately back out for returning visitors between the
+ * server response and hydration reading the real cookie value.
+ */
+function getServerSnapshot() {
+  return "server-render" as const;
+}
+
 function writeConsentCookie(value: "accepted" | "declined") {
   const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
   document.cookie = `${COOKIE_NAME}=${value}; max-age=${maxAge}; path=/; SameSite=Lax`;
+  for (const callback of listeners) callback();
 }
 
 export default function CookieConsent() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!readConsentCookie()) setVisible(true);
-  }, []);
-
-  function respond(value: "accepted" | "declined") {
-    writeConsentCookie(value);
-    setVisible(false);
-  }
+  const consent = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const visible = consent === undefined;
 
   if (!visible) return null;
 
@@ -51,14 +71,14 @@ export default function CookieConsent() {
         <div className="flex shrink-0 gap-3">
           <button
             type="button"
-            onClick={() => respond("declined")}
+            onClick={() => writeConsentCookie("declined")}
             className="rounded-md border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-accent/60"
           >
             Ablehnen
           </button>
           <button
             type="button"
-            onClick={() => respond("accepted")}
+            onClick={() => writeConsentCookie("accepted")}
             className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
           >
             Verstanden

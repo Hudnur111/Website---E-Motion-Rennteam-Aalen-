@@ -100,7 +100,7 @@ export default function DatenschutzPage() {
           <h2 className="text-base font-semibold text-foreground">6. Schriftarten (Google Fonts)</h2>
           <p className="mt-2">
             Diese Website nutzt zur einheitlichen Darstellung von Schriftarten den Dienst „Google
-            Fonts". Die verwendeten Schriftdateien werden dabei bereits beim Bauen der Website
+            Fonts“. Die verwendeten Schriftdateien werden dabei bereits beim Bauen der Website
             heruntergeladen und lokal auf unserem eigenen Server ausgeliefert. Bei deinem Besuch
             dieser Website findet daher keine Verbindung zu Servern von Google statt und es werden
             keine Daten an Google übertragen.
@@ -111,8 +111,8 @@ export default function DatenschutzPage() {
           <h2 className="text-base font-semibold text-foreground">7. Kartendienst auf der Kontaktseite</h2>
           <p className="mt-2">
             Auf unserer Kontaktseite binden wir eine interaktive Karte ein, um unseren Standort
-            anzuzeigen. Dabei wird die Kartenbibliothek „Leaflet" über das Content Delivery
-            Network „cdnjs" (Betreiber: Cloudflare, Inc.) geladen, und die Kartenkacheln werden
+            anzuzeigen. Dabei wird die Kartenbibliothek „Leaflet“ über das Content Delivery
+            Network „cdnjs“ (Betreiber: Cloudflare, Inc.) geladen, und die Kartenkacheln werden
             vom Anbieter CARTO bezogen (Kartendaten © OpenStreetMap-Mitwirkende). Beim Laden der
             Kontaktseite wird deine IP-Adresse an diese Anbieter übertragen, damit die Karte
             angezeigt werden kann. Dies erfolgt auf Grundlage unseres berechtigten Interesses an
@@ -157,7 +157,7 @@ export default function DatenschutzPage() {
             Diese Website nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung zur
             Übertragung vertraulicher Inhalte, wie zum Beispiel Anfragen, die du über unsere
             Formulare an uns sendest. Eine verschlüsselte Verbindung erkennst du daran, dass die
-            Adresszeile deines Browsers von „http://" auf „https://" wechselt und an dem
+            Adresszeile deines Browsers von „http://“ auf „https://“ wechselt und an dem
             Schloss-Symbol in deiner Browserzeile.
           </p>
         </section>
