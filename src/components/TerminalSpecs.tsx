@@ -53,7 +53,7 @@ export default function TerminalSpecs({
   return (
     <div
       ref={ref}
-      className="mx-auto mt-14 max-w-2xl overflow-hidden rounded-xl border border-border bg-[#0a0c12] shadow-[0_0_40px_-15px_rgba(74,99,247,0.35)]"
+      className="mt-6 overflow-hidden rounded-xl border border-border bg-[#0a0c12] shadow-[0_0_40px_-15px_rgba(74,99,247,0.35)]"
     >
       <div className="flex items-center gap-1.5 border-b border-border/60 bg-surface-2 px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
