@@ -9,7 +9,7 @@
 
 | **Status** | **Technologien** | **Lizenz** |
 | :---: | :---: | :---: |
-| ![Status](https://img.shields.io/badge/Status-In_Entwicklung-blue?style=flat-square) | ![Tech](https://img.shields.io/badge/Tech-Next.js_%7C_TailwindCSS_%7C_Eigenes_CMS-orange?style=flat-square) | ![Lizenz](https://img.shields.io/badge/Lizenz-MIT-green?style=flat-square) |
+| ![Status](https://img.shields.io/badge/Status-In_Entwicklung-blue?style=flat-square) | ![Tech](https://img.shields.io/badge/Tech-Next.js_%7C_TailwindCSS_%7C_Eigenes_CMS-orange?style=flat-square)  |
 
 ---
 
