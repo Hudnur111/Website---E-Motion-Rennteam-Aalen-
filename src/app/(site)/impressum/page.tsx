@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
+import HumanCreatedBadge from "@/components/HumanCreatedBadge";
 
 export const metadata: Metadata = {
   title: "Impressum",
@@ -161,6 +162,13 @@ export default function ImpressumPage() {
               Datenschutzerklärung
             </a>
             .
+          </p>
+        </section>
+
+        <section className="flex flex-col items-center pt-4 text-center">
+          <HumanCreatedBadge className="h-24 w-24 text-muted" />
+          <p className="mt-3 max-w-xs text-xs text-muted">
+            Die Inhalte dieser Website werden von Menschen des E-Motion Rennteams Aalen erstellt.
           </p>
         </section>
       </Reveal>
