@@ -1,6 +1,6 @@
 ---
-title: "Formula Student Netherlands 2021"
+title: "FS NL 2021"
 year: 2021
-event: "Formula Student Netherlands"
+event: "FS NL"
 placement: "Platz 25 Gesamtwertung"
 ---

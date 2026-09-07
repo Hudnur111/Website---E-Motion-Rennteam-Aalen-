@@ -1,6 +1,6 @@
 ---
-title: "Formula Student Italy 2017"
+title: "FSAE IT 2017"
 year: 2017
-event: "Formula Student Italy"
+event: "FSAE IT"
 placement: "Platz 7 Gesamtwertung"
 ---

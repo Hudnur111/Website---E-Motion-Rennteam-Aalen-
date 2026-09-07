@@ -1,6 +1,6 @@
 ---
-title: "Formula Student Austria 2024"
+title: "FS AT 2024"
 year: 2024
-event: "Formula Student Austria"
+event: "FS AT"
 placement: "Platz 30 Gesamtwertung"
 ---
