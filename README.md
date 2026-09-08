@@ -1,70 +1,137 @@
-# 🏎️ Website – E-Motion Rennteam Aalen
+<div align="center">
 
-> **Offizielles Repository für den Webauftritt des E-Motion Rennteams der Hochschule Aalen.**  
-> *Formel Student Electric Racing Team | Innovation, Dynamics & Performance*
+# 🏎️ E-Motion Rennteam Aalen — Website
 
----
+**Offizieller Webauftritt des Formula-Student-Electric-Teams der Hochschule Aalen**
 
-### 📌 Projekt-Übersicht
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19.2-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)](./LICENSE)
 
-| **Status** | **Technologien** | **Lizenz** |
-| :---: | :---: | :---: |
-| ![Status](https://img.shields.io/badge/Status-In_Entwicklung-blue?style=flat-square) | ![Tech](https://img.shields.io/badge/Tech-Next.js_%7C_TailwindCSS_%7C_Eigenes_CMS-orange?style=flat-square)  |
+[![Rendering](https://img.shields.io/badge/Rendering-Static_%2F_SSG-brightgreen?style=flat-square)]()
+[![Bundler](https://img.shields.io/badge/Bundler-Turbopack-0096FF?style=flat-square)]()
+[![A11y](https://img.shields.io/badge/A11y-axe--core_getestet-8A2BE2?style=flat-square)]()
+[![Tests](https://img.shields.io/badge/Tests-Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)]()
 
----
-
-### ⚡ Hauptmerkmale
-
-* **Responsive Design:** Optimiert für Smartphones, Tablets und Desktops
-* **Team- & Fahrzeug-Präsentation:** Übersichtliche Vorstellung von Mitgliedern und Boliden
-* **Sponsoren-Integration:** Prominente Einbindung von Partnern und Unterstützern
-* **News & Events:** Aktuelle Berichte von Rennen, Events und Konstruktion
+</div>
 
 ---
 
-### 🚀 Quickstart
+## 📖 Über dieses Projekt
 
-```bash
-# Repository klonen
-git clone [https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen.git](https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen.git)
+Diese Website ist der offizielle Online-Auftritt des **E-Motion Rennteam Aalen**,
+dem Formula-Student-Electric-Team der Hochschule Aalen. Sie dient als
+zentrale Anlaufstelle für Sponsoren, Presse, Bewerber:innen und Fans:
+Team- und Fahrzeugvorstellung, Renn-/Erfolgshistorie, News, Bildergalerie
+sowie Kontakt-, Bewerbungs-, Sponsoring- und Mediakit-Anfragen.
 
-# In das Verzeichnis wechseln
-cd Website---E-Motion-Rennteam-Aalen
-
-# Abhängigkeiten installieren
-npm install
-
-# Dev-Server starten
-npm run dev
-```
-
-Die Seite ist danach unter `http://localhost:3000` erreichbar.
+Die Seite ist als **statisch generierte Next.js-Anwendung** gebaut: Inhalte
+werden zur Build-Zeit aus Markdown-Dateien gelesen und als vorgerenderte
+HTML-Seiten ausgeliefert — dadurch sind Ladezeiten sehr kurz und es ist
+kein Datenbankserver nötig.
 
 ---
 
-### 🧩 Content-Pflege
+## 🏗️ Architektur & Tech-Stack
 
-Die Inhalte (Team, Fahrzeuge, Sponsoren, News, Blog, Galerie, Erfolge, offene Positionen, Seitentexte) liegen als
-Markdown-Dateien in `content/` und werden direkt im Repository gepflegt.
+| Bereich | Technologie | Zweck |
+| :-- | :-- | :-- |
+| Framework | **Next.js 16** (App Router, Turbopack) | Routing, SSG/SSR, Bild-/Font-Optimierung |
+| UI | **React 19** + **TypeScript 5** | Komponenten, Typsicherheit |
+| Styling | **Tailwind CSS 4** | Utility-first CSS, Dark-mode-fähiges Theme |
+| Animationen | **Framer Motion** | Seitenübergänge, Reveal-/Stagger-Effekte |
+| Content | **Markdown + Gray-Matter** | Redaktionelle Inhalte ohne Datenbank |
+| Rendering | **Marked** + **sanitize-html** | Sicheres Rendern von Markdown-Inhalten |
+| Tests | **Vitest**, **Testing Library**, **axe-core/Playwright** | Unit-, Komponenten- und Accessibility-Tests |
 
-Das eigene Redaktionssystem (Login, Editor, GitHub-Commits) ist **nicht** Teil dieses Branches. Es lebt separat im
-`cms-app`-Branch und wird dort als eigenes, unabhängiges Deployment betrieben – dadurch enthält die öffentliche
-Website keinen Admin-/Login-Code und keine CMS-Abhängigkeiten.
+**Rendering-Strategie:** Fast alle Seiten werden **statisch (SSG)**
+vorgerendert (`○` im Build-Output). Nur Formular-Endpunkte (`/api/*`) sowie
+einzelne dynamische Detailseiten (`/blog/[slug]`, `/news/[slug]`) laufen
+serverseitig on-demand (`ƒ`).
 
-### 📁 Projektstruktur
+---
+
+## 🗺️ Seitenstruktur — was ist alles drin
+
+| Route | Inhalt |
+| :-- | :-- |
+| `/` | Startseite mit Team-Highlights |
+| `/team` | Teammitglieder & Abteilungen |
+| `/fahrzeuge` | Fahrzeughistorie & technische Daten |
+| `/formula-student` | Formula-Student-Regelwerk & Wettbewerbsformat |
+| `/erfolge` | Rennergebnisse & Erfolge |
+| `/sponsoren` | Sponsoren nach Tier (Platin/Gold/Silber/Partner) + Sponsoring-Formular |
+| `/mediakit` | Bild-/Videomaterial-Anfrage für Presse & Sponsoren |
+| `/galerie` | Bildergalerie nach Alben sortiert |
+| `/news` & `/news/[slug]` | Team-News |
+| `/blog` & `/blog/[slug]` | Blog-Beiträge |
+| `/mitmachen` | Offene Positionen & Bewerbungsformular |
+| `/kontakt` | Kontaktformular & Anfahrt (Karte) |
+| `/impressum`, `/datenschutz` | Rechtliche Pflichtseiten |
+| `/sitemap.xml`, `/robots.txt` | SEO-Metadaten |
+
+**Formular-Backends** (`src/app/api/`): `contact`, `mitmachen`, `sponsoring`,
+`mediakit` — jeweils mit serverseitiger Validierung, Rate-Limiting und
+Honeypot-Spam-Schutz.
+
+---
+
+## ⚡ Performance
+
+Gemessen an einem lokalen Produktions-Build (`next build` + `next start`,
+Turbopack, statisch generierte Startseite):
+
+| Metrik | Wert |
+| :-- | :-- |
+| Server-Antwortzeit (TTFB, lokal) | **~4–5 ms** |
+| HTML-Größe Startseite | **~55 KB** |
+| Gesamtgröße statische Assets (`.next/static`) | **~1,2 MB** |
+| Seiten als Static/SSG vorgerendert | **22 von 26** Routen |
+
+> Werte stammen aus einem lokalen Build in dieser Entwicklungsumgebung und
+> nicht von einer produktiven CDN-Auslieferung — reale Ladezeiten im
+> Browser hängen zusätzlich von Netzwerk, Hosting-Standort und Caching ab.
+> Zur laufenden Kontrolle: `npm run analyze` erzeugt einen Bundle-Report
+> unter `.next/diagnostics/analyze/index.html`.
+
+---
+
+## 🧩 Content-Pflege
+
+Redaktionelle Inhalte (Team, Fahrzeuge, Sponsoren, News, Blog, Galerie,
+Erfolge, offene Positionen, Seitentexte) liegen als Markdown-Dateien in
+`content/` und werden versioniert im Repository gepflegt — kein CMS, keine
+Datenbank, keine Laufzeit-Abhängigkeit auf einen Redaktions-Server.
+
+Ein separates Redaktionssystem (Login, Editor, GitHub-Commits) existiert
+unabhängig davon im `cms-app`-Branch als eigenes Deployment. Dadurch enthält
+die öffentliche Website selbst keinen Admin-/Login-Code.
+
+## 📁 Projektstruktur
 
 ```
 content/            # Markdown-Inhalte (Team, Fahrzeuge, Sponsoren, News, Seiten, …)
-src/app/            # Next.js App Router Seiten
-src/components/     # Wiederverwendbare UI-Komponenten
+src/app/             # Next.js App Router: Seiten & API-Routen
+src/components/      # Wiederverwendbare UI-Komponenten
 ```
 
-### 🧪 Qualitätssicherung
+## 🧪 Qualitätssicherung
 
-| Befehl | Zweck |
-| :--- | :--- |
-| `npm run lint` | ESLint |
-| `npx tsc --noEmit` | TypeScript-Typprüfung |
-| `npm test` | Vitest (Unit-/Komponententests) |
-| `npm run test:a11y` | axe-core-Scan gegen den Produktions-Build (`npm run build` vorher ausführen) |
-| `npm run analyze` | Bundle-Analyse via Next.js' eingebautem `--experimental-analyze` (Turbopack-basiert; das ältere `@next/bundle-analyzer`-Paket funktioniert hier **nicht**, da es auf Webpack-Hooks aufbaut und dieses Projekt mit Turbopack baut). Ergebnis liegt danach in `.next/diagnostics/analyze/index.html`. |
+| Prüfung | Befehl |
+| :-- | :-- |
+| ESLint | `npm run lint` |
+| TypeScript | `npx tsc --noEmit` |
+| Unit-/Komponententests (Vitest) | `npm test` |
+| Accessibility-Scan (axe-core, gegen Produktions-Build) | `npm run test:a11y` |
+| Bundle-Analyse (Turbopack) | `npm run analyze` |
+
+---
+
+## 📜 Lizenz
+
+Dieses Repository steht unter einer **proprietären Lizenz** — Einsehen ist
+frei möglich, Nutzung, Bearbeitung und Weiterverbreitung sind ausschließlich
+autorisierten Mitgliedern und Eigentümern des E-Motion Rennteam Aalen
+vorbehalten. Details siehe [`LICENSE`](./LICENSE).
