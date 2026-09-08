@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPage } from "@/lib/content";
 import ContactForm from "@/components/ContactForm";
-import ContactMap from "@/components/ContactMap";
+import ImageCarousel from "@/components/ImageCarousel";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
@@ -43,7 +43,7 @@ export default function ContactPage() {
 
         <Reveal direction="right" delay={0.1} className="space-y-6 flex flex-col">
           <div className="flex-1 min-h-[400px] rounded-xl border border-border overflow-hidden shadow-lg">
-            <ContactMap />
+            <ImageCarousel />
           </div>
 
           <div className="grid gap-3 grid-cols-2">
