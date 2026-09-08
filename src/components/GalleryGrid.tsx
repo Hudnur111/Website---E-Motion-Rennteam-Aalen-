@@ -82,6 +82,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
+                priority={i < 3}
               />
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-background/80 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <span className="text-sm font-semibold text-foreground">{img.title}</span>

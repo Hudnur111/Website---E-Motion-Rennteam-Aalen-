@@ -79,6 +79,14 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
+      {
+        // Belt-and-suspenders alongside robots.txt: a disallow rule alone
+        // doesn't stop a search engine from indexing a URL it finds linked
+        // elsewhere, just from crawling it. This header blocks indexing
+        // outright for the admin CMS, which has no business in search results.
+        source: "/admin/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
     ];
   },
 };

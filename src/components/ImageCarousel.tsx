@@ -60,6 +60,7 @@ export default function ImageCarousel() {
             src={CAROUSEL_IMAGES[current]}
             alt={`E-Motion Rennteam Bild ${current + 1}`}
             fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
             priority
           />
