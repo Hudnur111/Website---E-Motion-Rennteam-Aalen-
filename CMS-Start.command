@@ -37,10 +37,11 @@ fi
 
 # Automatisches Update von GitHub, sofern moeglich. Blockiert den Start nie
 # - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen), laeuft
-# es einfach mit der vorhandenen Version weiter.
-if [ -d ".git" ]; then
-    bash "scripts/cms-update.sh"
-fi
+# es einfach mit der vorhandenen Version weiter. Fehlt ".git" (z.B. nach
+# "Download ZIP" von GitHub statt "git clone"), richtet cms-update.sh beim
+# allerersten Aufruf automatisch ein Git-Repo ein, damit kuenftige Updates
+# funktionieren.
+bash "scripts/cms-update.sh"
 
 # Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 # node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.

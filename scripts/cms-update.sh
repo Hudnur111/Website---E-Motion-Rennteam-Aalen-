@@ -12,16 +12,64 @@
 # Code-Update-Check geprueft/entfernt werden - siehe dortigen Kommentar.
 CONTENT_SYNC_MARKER="[cms-content-sync]"
 
-if ! command -v git >/dev/null 2>&1; then
-    exit 0
-fi
+REPO_URL="https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen-.git"
+REPO_NAME="Website---E-Motion-Rennteam-Aalen-"
 
-if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if ! command -v git >/dev/null 2>&1; then
     exit 0
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
+
+# Kein Git-Repo? Das passiert, wenn jemand ueber GitHub "Download ZIP" statt
+# "git clone" verwendet hat - dabei wird kein .git-Ordner mitgeliefert, und
+# ohne den funktioniert die automatische Update-Pruefung unten nie. Richtet
+# deshalb einmalig ein Git-Repo ein, das mit GitHub verbunden ist. Ueberschreibt
+# dabei absichtlich den kompletten Stand mit dem von GitHub (git reset --hard) -
+# das ist beim allerersten Start unproblematisch (es gibt noch keine eigenen
+# Aenderungen) und bringt gleichzeitig eventuell unvollstaendige/veraltete
+# Dateien aus dem ZIP auf den aktuellen Stand. Nicht versionierte Dateien wie
+# .env.local oder node_modules bleiben davon unberuehrt.
+if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Richte automatische Updates ein (einmalig)..."
+
+    # Branch aus dem Ordnernamen ableiten - GitHub benennt ZIP-Downloads nach
+    # dem Muster <repo>-<branch>. Klappt das nicht, wird der Standard-Branch
+    # des Repositorys auf GitHub verwendet.
+    folder_name="$(basename "$repo_root")"
+    branch=""
+    case "$folder_name" in
+        "$REPO_NAME"-*)
+            branch="${folder_name#"$REPO_NAME"-}"
+            ;;
+    esac
+
+    (
+        cd "$repo_root" || exit 1
+        git init --quiet
+        git remote add origin "$REPO_URL"
+
+        if [ -z "$branch" ]; then
+            branch="$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's#^ref: refs/heads/\(.*\)\tHEAD#\1#p')"
+            branch="${branch:-main}"
+        fi
+
+        if git checkout --quiet -b "$branch" 2>/dev/null && git fetch --quiet origin "$branch" 2>/dev/null; then
+            git reset --quiet --hard "origin/$branch"
+            echo "Fertig - kuenftige Updates werden ab jetzt automatisch erkannt."
+        else
+            echo "[HINWEIS] Automatische Updates konnten nicht eingerichtet werden"
+            echo "(keine Internetverbindung oder Branch '$branch' nicht gefunden)."
+            rm -rf "$repo_root/.git"
+        fi
+    )
+    echo ""
+fi
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    exit 0
+fi
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then
