@@ -26,11 +26,42 @@ function authHeaders(token: string) {
   };
 }
 
+/**
+ * A raw "(401)"/"(403)" tells a redactor nothing they can act on. The two
+ * codes that actually show up in practice both trace back to the same
+ * fixable thing (the token in .env.local), so name it and point at the
+ * fix instead of leaving them to guess.
+ */
+function describeGithubError(status: number, owner: string, repo: string, branch: string): string {
+  if (status === 401) {
+    return (
+      "GitHub-Anmeldung fehlgeschlagen (401): Der GITHUB_TOKEN in .env.local ist ungültig, " +
+      "falsch eingefügt oder abgelaufen. Einen neuen Token erstellen unter " +
+      "https://github.com/settings/tokens (fine-grained, Berechtigung \"Contents: Read and write\" " +
+      `für das Repository "${owner}/${repo}") und über den Einrichtungsassistenten (CMS-Zugangsdaten-aendern) neu eintragen.`
+    );
+  }
+  if (status === 403) {
+    return (
+      "GitHub hat den Zugriff verweigert (403): Entweder hat der GITHUB_TOKEN keine Schreibrechte " +
+      `für "${owner}/${repo}" (Berechtigung "Contents: Read and write" fehlt), oder das GitHub-API-Ratenlimit ` +
+      "wurde erreicht. Token-Berechtigung unter https://github.com/settings/tokens prüfen."
+    );
+  }
+  if (status === 404) {
+    return (
+      `GitHub-Repository oder Branch nicht gefunden (404): "${owner}/${repo}" (Branch "${branch}") existiert nicht ` +
+      "oder der Token hat keinen Zugriff darauf. GITHUB_OWNER/GITHUB_REPO/GITHUB_BRANCH in .env.local prüfen."
+    );
+  }
+  return `GitHub-Anfrage fehlgeschlagen (${status}).`;
+}
+
 async function getFileSha(config: GithubConfig, path: string): Promise<string | undefined> {
   const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodeURI(path)}?ref=${config.branch}`;
   const res = await fetch(url, { headers: authHeaders(config.token) });
   if (res.status === 404) return undefined;
-  if (!res.ok) throw new Error(`GitHub: Datei konnte nicht gelesen werden (${res.status})`);
+  if (!res.ok) throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));
   const data = await res.json();
   return data.sha as string;
 }
@@ -59,6 +90,9 @@ export async function commitFile(
     }),
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403 || res.status === 404) {
+      throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));
+    }
     const body = await res.text();
     throw new Error(`GitHub-Commit fehlgeschlagen (${res.status}): ${body}`);
   }
@@ -90,6 +124,9 @@ export async function commitBinaryFile(
     }),
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403 || res.status === 404) {
+      throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));
+    }
     const body = await res.text();
     throw new Error(`GitHub-Commit fehlgeschlagen (${res.status}): ${body}`);
   }
@@ -115,6 +152,9 @@ export async function deleteFile(path: string, message: string, authorName: stri
     }),
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403 || res.status === 404) {
+      throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));
+    }
     const body = await res.text();
     throw new Error(`GitHub-Löschung fehlgeschlagen (${res.status}): ${body}`);
   }
