@@ -55,22 +55,28 @@ export default function ContactPage() {
             <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Adresse</h2>
               <p className="mt-2 text-xs text-muted leading-relaxed">
-                E-Motion Rennteam<br />
-                Hochschule Aalen<br />
-                Beethovenstraße 1<br />
-                73430 Aalen
+                {address.split("\n").map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    <br />
+                  </span>
+                ))}
               </p>
             </div>
 
             <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface to-surface/80 p-4 hover:border-accent/40 transition-colors duration-300">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-accent-text">Kontakt</h2>
               <p className="mt-2 text-xs text-muted space-y-1">
-                <a href="mailto:info@emotion-rennteam.de" className="block text-accent-text hover:underline">
-                  info@emotion-rennteam.de
+                <a href={`mailto:${email}`} className="block text-accent-text hover:underline">
+                  {email}
                 </a>
-                <a href="tel:+4973615762191" className="block text-accent-text hover:underline">
-                  +49 7361 5762191
+                <a
+                  href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+                  className="block text-accent-text hover:underline"
+                >
+                  {phone}
                 </a>
+                {socialMedia && <span className="block pt-1 text-muted">{socialMedia}</span>}
               </p>
             </div>
           </div>

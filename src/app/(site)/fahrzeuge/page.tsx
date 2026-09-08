@@ -20,11 +20,11 @@ export default function VehiclesPage() {
       <Reveal className="text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
         <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
-          Unsere Boliden
+          {page?.heroTitle ?? "Unsere Boliden"}
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
-          Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
-          der Simulation bis zur Rennstrecke.
+          {page?.heroSubtitle ??
+            "Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von der Simulation bis zur Rennstrecke."}
         </p>
       </Reveal>
 

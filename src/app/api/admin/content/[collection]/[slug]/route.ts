@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCollection } from "@/lib/cms/collections";
-import { getItem, saveItem, deleteItem, isValidSlug } from "@/lib/cms/content";
+import { getItem, saveItem, deleteItem, isValidSlug, ValidationError } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
 
 export async function GET(
@@ -43,6 +43,9 @@ export async function PUT(
     const result = await saveItem(collectionName, slug, body.data ?? {}, body.body ?? "", user.username);
     return NextResponse.json(result);
   } catch (err) {
+    if (err instanceof ValidationError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
     return NextResponse.json({ error: err instanceof Error ? err.message : "Speichern fehlgeschlagen." }, { status: 502 });
   }
 }

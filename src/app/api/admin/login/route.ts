@@ -31,6 +31,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const sessionSecret = process.env.CMS_SESSION_SECRET;
+  if (!sessionSecret || sessionSecret.length < 16) {
+    return NextResponse.json(
+      { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_SESSION_SECRET fehlt oder ist zu kurz)." },
+      { status: 500 }
+    );
+  }
+
   let mustChangePassword = false;
   let authenticated = false;
 

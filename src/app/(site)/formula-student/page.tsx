@@ -29,15 +29,25 @@ export default async function FormulaStudentPage() {
               Formula Student
             </p>
             <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-              Studierendenteams bauen Rennwagen
+              {page?.heroTitle ?? "Studierendenteams bauen Rennwagen"}
             </h1>
           </div>
           <p className="max-w-xl text-base text-muted">
-            Ein internationaler Konstruktionswettbewerb, in dem Teams Elektrorennwagen entwickeln,
-            bauen und auf Rennstrecken testen – Technik trifft Teamgeist.
+            {page?.heroSubtitle ??
+              "Ein internationaler Konstruktionswettbewerb, in dem Teams Elektrorennwagen entwickeln, bauen und auf Rennstrecken testen – Technik trifft Teamgeist."}
           </p>
         </div>
       </Reveal>
+
+      {/* Editorial-Text aus dem CMS */}
+      {bodyHtml && (
+        <Reveal delay={0.03}>
+          <div
+            className="prose prose-sm max-w-2xl text-muted [&_a]:text-accent-text [&_a]:underline [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-foreground"
+            dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          />
+        </Reveal>
+      )}
 
       {/* Stats */}
       <Reveal delay={0.05}>

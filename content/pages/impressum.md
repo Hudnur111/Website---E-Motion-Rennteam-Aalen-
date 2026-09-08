@@ -13,7 +13,7 @@ Beethovenstraße 1
 
 ## Vertreten durch
 
-[Name des/der Vorstandsvorsitzenden einfügen]
+Linda Mann, 1. Vorstand (Vorstand 2026)
 
 ## Website
 
@@ -22,18 +22,23 @@ E-Mail: [denny.svalia@emotion-rennteam.de](mailto:denny.svalia@emotion-rennteam.
 
 ## Kontakt
 
-Telefon: 07361 5762191
-E-Mail: [vorstand@emotion-rennteam.de](mailto:vorstand@emotion-rennteam.de)
+Telefon: +49 7361 5762191
+E-Mail: [info@emotion-rennteam.de](mailto:info@emotion-rennteam.de)
 
 ## Registereintrag
 
 Eintragung im Vereinsregister.
-Registergericht: [Registergericht einfügen]
-Registernummer: [Registernummer einfügen]
+Registergericht: Amtsgericht Ulm
+Registernummer: VR 833
+
+## Umsatzsteuer-ID
+
+Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:
+DE304670383
 
 ## Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
 
-[Name, Anschrift wie oben]
+Linda Mann, Anschrift wie oben
 
 ## EU-Streitschlichtung
 
@@ -49,4 +54,12 @@ Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir
 
 ## Urheberrecht
 
-Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.
+Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+
+## Bildnachweise
+
+Sofern nicht anders gekennzeichnet, liegen die Bildrechte an den auf dieser Website verwendeten Fotografien und Grafiken beim E-Motion Rennteam Aalen e.V. Für Presse- und Sponsoring-Anfragen zur Nutzung unseres Bildmaterials wende dich bitte an die oben genannte Kontaktadresse.
+
+## Externe Dienste und Datenschutz
+
+Auf einzelnen Seiten dieses Angebots (u. a. der Kontaktseite) binden wir Dienste externer Anbieter ein, etwa zur Darstellung einer interaktiven Karte. Details zur Verarbeitung personenbezogener Daten findest du in unserer [Datenschutzerklärung](/datenschutz).

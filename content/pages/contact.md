@@ -3,8 +3,8 @@ title: Kontakt
 heroTitle: "Kontaktiere uns"
 heroSubtitle: "Ob Sponsoring, Presse oder Bewerbung – wir freuen uns auf deine Nachricht."
 address: "E-Motion Rennteam Aalen\nHochschule Aalen\nBeethovenstraße 1\n73430 Aalen"
-email: "vorstand@emotion-rennteam.de"
-phone: "07361 5762191"
+email: "info@emotion-rennteam.de"
+phone: "+49 7361 5762191"
 socialMedia: "Instagram · LinkedIn · YouTube"
 ---
 

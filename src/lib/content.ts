@@ -4,22 +4,30 @@ import matter from "gray-matter";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
+// Eine einzelne beschaedigte Markdown-Datei (kaputtes YAML-Frontmatter,
+// liegengebliebene Git-Konflikt-Marker, halber Schreibvorgang) darf nie die
+// gesamte Collection - und damit die Live-Seite fuer alle Besucher - zum
+// Absturz bringen. Defekte Eintraege werden uebersprungen und geloggt statt
+// den Fehler weiterzuwerfen.
 function readCollection<T>(collection: string): (T & { slug: string })[] {
   const dir = path.join(CONTENT_DIR, collection);
   if (!fs.existsSync(dir)) return [];
 
-  return fs
-    .readdirSync(dir)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
+  const items: (T & { slug: string; body: string })[] = [];
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+    try {
       const raw = fs.readFileSync(path.join(dir, file), "utf8");
       const { data, content } = matter(raw);
-      return {
+      items.push({
         ...(data as T),
         slug: file.replace(/\.md$/, ""),
         body: content,
-      } as T & { slug: string; body: string };
-    });
+      } as T & { slug: string; body: string });
+    } catch (error) {
+      console.error(`[content] Ueberspringe defekte Datei ${collection}/${file}:`, error);
+    }
+  }
+  return items;
 }
 
 /**

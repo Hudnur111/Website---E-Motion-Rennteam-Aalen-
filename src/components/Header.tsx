@@ -17,6 +17,8 @@ const MORE_LINKS = [
   { href: "/formula-student", label: "Formula Student" },
   { href: "/galerie", label: "Galerie" },
   { href: "/erfolge", label: "Timeline" },
+  { href: "/news", label: "News" },
+  { href: "/blog", label: "Blog" },
   { href: "/kontakt", label: "Kontakt" },
 ];
 

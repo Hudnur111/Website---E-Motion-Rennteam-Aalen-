@@ -6,8 +6,9 @@
 // nie im Git-Repository und bleibt deshalb auch von einem automatischen
 // Update (git pull) unberuehrt.
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 export interface CmsUser {
   username: string;
@@ -36,8 +37,15 @@ function readStore(): CmsUser[] {
   }
 }
 
+// Schreibt ueber eine Temp-Datei + atomares rename() statt direkt in die
+// Zieldatei - verhindert, dass ein Absturz mitten im Schreiben (oder ein
+// gleichzeitiger zweiter Request) eine halb geschriebene, korrupte
+// .cms-users.json hinterlaesst, aus der readStore() sonst still "keine
+// Benutzer" liest und Accounts kommentarlos ausgesperrt waeren.
 function writeStore(users: CmsUser[]): void {
-  writeFileSync(USERS_FILE, JSON.stringify({ users }, null, 2) + "\n", "utf-8");
+  const tmpFile = `${USERS_FILE}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  writeFileSync(tmpFile, JSON.stringify({ users }, null, 2) + "\n", "utf-8");
+  renameSync(tmpFile, USERS_FILE);
 }
 
 export function listUsers(): CmsUser[] {

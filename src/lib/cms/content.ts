@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { getCollection } from "./collections";
+import { getCollection, type CollectionDef } from "./collections";
 import { commitFile, commitBinaryFile, deleteFile as githubDeleteFile, getGithubConfig } from "./github";
 
 const ROOT = process.cwd();
@@ -54,13 +54,22 @@ export async function listItems(collectionName: string): Promise<ContentItem[]> 
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
   const dir = path.join(/* turbopackIgnore: true */ ROOT, collection.path);
   const files = (await readDirSafe(dir)).filter((f) => f.endsWith(".md"));
-  const items = await Promise.all(
+  // Eine einzelne defekte Datei darf die Redaktion nicht aussperren - sonst
+  // laesst sich die Liste, mit der man genau diese Datei reparieren wuerde,
+  // gar nicht mehr oeffnen. Kaputte Eintraege werden uebersprungen und geloggt.
+  const results = await Promise.all(
     files.map(async (file) => {
-      const raw = await fs.readFile(path.join(dir, file), "utf-8");
-      const parsed = matter(raw);
-      return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim() };
+      try {
+        const raw = await fs.readFile(path.join(dir, file), "utf-8");
+        const parsed = matter(raw);
+        return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim() };
+      } catch (error) {
+        console.error(`[cms] Ueberspringe defekte Datei ${collectionName}/${file}:`, error);
+        return null;
+      }
     })
   );
+  const items = results.filter((item): item is ContentItem => item !== null);
   return items.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
@@ -82,6 +91,38 @@ function serialize(data: Record<string, unknown>, body: string): string {
   return matter.stringify(body ? `\n${body}\n` : "\n", data);
 }
 
+/** Thrown for invalid/incomplete input, as opposed to storage/network failures. */
+export class ValidationError extends Error {}
+
+function isEmptyValue(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "string") return value.trim().length === 0;
+  if (typeof value === "number") return Number.isNaN(value);
+  return false;
+}
+
+/**
+ * The admin UI already enforces `required` client-side, but that alone
+ * leaves the server accepting incomplete data straight from the API - e.g.
+ * a vehicle without `year` or a news post without `date` silently breaks
+ * the `b.year - a.year` / `new Date(b.date)` sort used on the live site
+ * (NaN, not a crash, just a wrong/undeterministic order). Enforce the same
+ * `required` fields server-side so that can't happen.
+ */
+function validateRequiredFields(
+  collection: CollectionDef,
+  data: Record<string, unknown>,
+  body: string
+): void {
+  for (const field of collection.fields) {
+    if (!field.required) continue;
+    const value = field.isBody ? body : data[field.name];
+    if (isEmptyValue(value)) {
+      throw new ValidationError(`Pflichtfeld "${field.label}" fehlt oder ist leer.`);
+    }
+  }
+}
+
 export async function saveItem(
   collectionName: string,
   slug: string,
@@ -92,6 +133,7 @@ export async function saveItem(
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
   if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
+  validateRequiredFields(collection, data, body);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
   const content = serialize(data, body);
 
