@@ -22,13 +22,13 @@ const DISCIPLINES: Discipline[] = [
 
 // Sequential ramp on the site accent hue, light → dark, mapped high points → dark.
 const RAMP = [
-  "#4a63f7",
-  "#5d74f8",
-  "#6f86f8",
-  "#8297f9",
-  "#95a8fa",
-  "#a8b9fb",
-  "#bacbfb",
+  "#0071b5",
+  "#1d80bf",
+  "#3b90c9",
+  "#589fd3",
+  "#75aede",
+  "#92bde8",
+  "#b0cdf2",
   "#cddcfc",
 ];
 

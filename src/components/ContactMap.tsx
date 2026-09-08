@@ -32,9 +32,9 @@ export default function ContactMap() {
             justify-content: center;
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, #0071B5, #162E7B);
             border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 113, 181, 0.3);
             border: 2px solid white;
             font-size: 18px;
           }
@@ -51,7 +51,7 @@ export default function ContactMap() {
           }).addTo(map);
 
           const markerIcon = L.divIcon({
-            html: '<div style="width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 2px solid white; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 18px; font-weight: bold;">📍</span></div>',
+            html: '<div style="width: 36px; height: 36px; background: linear-gradient(135deg, #0071B5, #162E7B); border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 113, 181, 0.3); border: 2px solid white; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 18px; font-weight: bold;">📍</span></div>',
             iconSize: [36, 36],
             iconAnchor: [18, 36],
             popupAnchor: [0, -36]
