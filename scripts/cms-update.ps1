@@ -32,7 +32,7 @@ $GitTimeoutArgs = @("-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=15
 # als bester Versuch: schlaegt irgendetwas fehl oder gibt es eine noch
 # ungesicherte lokale Bearbeitung, wird das einfach uebersprungen.
 function Sync-Content([string]$repoRoot) {
-    $contentBranch = "main"
+    $contentBranch = "website"
     $envPath = Join-Path $repoRoot ".env.local"
     if (Test-Path $envPath) {
         $line = Select-String -Path $envPath -Pattern '^GITHUB_BRANCH=' -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -126,7 +126,7 @@ if ($LASTEXITCODE -ne 0) {
             if ($symref) {
                 $branch = $symref.Matches[0].Groups[1].Value
             } else {
-                $branch = "main"
+                $branch = "website"
             }
         }
 

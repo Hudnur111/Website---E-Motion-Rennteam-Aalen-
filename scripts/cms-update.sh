@@ -58,7 +58,7 @@ if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 
         if [ -z "$branch" ]; then
             branch="$(git "${GIT_TIMEOUT_ARGS[@]}" ls-remote --symref origin HEAD 2>/dev/null | sed -n 's#^ref: refs/heads/\(.*\)\tHEAD#\1#p')"
-            branch="${branch:-main}"
+            branch="${branch:-website}"
         fi
 
         if git checkout --quiet -b "$branch" 2>/dev/null && git "${GIT_TIMEOUT_ARGS[@]}" fetch --quiet origin "$branch" 2>/dev/null; then
@@ -108,7 +108,7 @@ sync_content() {
     if [ -f "$repo_root/.env.local" ]; then
         content_branch="$(grep -m1 '^GITHUB_BRANCH=' "$repo_root/.env.local" 2>/dev/null | cut -d= -f2- | tr -d '\r\n')"
     fi
-    content_branch="${content_branch:-main}"
+    content_branch="${content_branch:-website}"
 
     if [ -n "$(git status --porcelain --untracked-files=no -- content 2>/dev/null)" ]; then
         return 0

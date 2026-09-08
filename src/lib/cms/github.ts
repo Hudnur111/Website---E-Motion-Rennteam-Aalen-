@@ -13,7 +13,11 @@ export function getGithubConfig(): GithubConfig | null {
   const token = process.env.GITHUB_TOKEN;
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || "main";
+  // "main" does NOT exist on this repo (its actual default branch is
+  // "website" - verified via the GitHub API). Falling back to a
+  // nonexistent branch made every content read/write fail whenever
+  // GITHUB_BRANCH was left unset.
+  const branch = process.env.GITHUB_BRANCH || "website";
   if (!token || !owner || !repo) return null;
   return { token, owner, repo, branch };
 }

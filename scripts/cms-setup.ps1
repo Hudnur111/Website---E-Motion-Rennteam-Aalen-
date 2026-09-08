@@ -123,7 +123,7 @@ function Test-GithubToken([string]$token, [string]$owner, [string]$repo) {
 
 $githubOwner = "Hudnur111"
 $githubRepo = "Website---E-Motion-Rennteam-Aalen-"
-$githubBranch = "main"
+$githubBranch = "website"
 $githubToken = ""
 
 while ($true) {

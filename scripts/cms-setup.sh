@@ -65,7 +65,7 @@ echo "Der Token wird nur lokal in .env.local gespeichert (nicht Teil des Git-Rep
 
 github_owner="Hudnur111"
 github_repo="Website---E-Motion-Rennteam-Aalen-"
-github_branch="main"
+github_branch="website"
 github_token=""
 
 # Prueft den Token sofort gegen die GitHub-API, statt ihn blind zu
