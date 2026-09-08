@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-// Startet den Next.js-Server als Kindprozess und prueft periodisch (Standard:
-// alle 5 Minuten) im Hintergrund auf GitHub-Updates, waehrend das CMS laeuft -
-// nicht nur beim Start. Wird ein Update gefunden, wendet dieses Skript es an
-// (per scripts/cms-update.sh bzw. .ps1 - dieselbe, bereits beim Start
-// verwendete Update-Logik, inkl. Inhalte-Abgleich) und startet den Server bei
-// echten Code-Aenderungen automatisch neu. Reine Inhalte-Aenderungen (ueber
-// das CMS gespeicherte Texte/Bilder) erfordern keinen Neustart, da diese bei
-// jeder Anfrage frisch von der Festplatte gelesen werden.
+// Startet den Next.js-Server als Kindprozess. Kein Update-Check beim Start -
+// der Server ist sofort da. Erst wenn sich jemand einloggt und im
+// Admin-Panel landet, legt UpdateBanner.tsx (per
+// /api/admin/trigger-update-check) die Trigger-Datei ".cms-update-trigger"
+// an; dieses Skript pollt kurz darauf, findet sie, prueft dann im
+// Hintergrund einmalig auf GitHub-Updates und haelt danach die periodische
+// 5-Minuten-Pruefung am Laufen, solange die App laeuft - ohne den Start
+// selbst je zu verzoegern oder die Redaktion beim Arbeiten zu stoeren.
+//
+// Wird ein Update gefunden, wendet dieses Skript es an (per
+// scripts/cms-update.sh bzw. .ps1 - dieselbe, bereits beim Start verwendete
+// Update-Logik, inkl. Inhalte-Abgleich) und startet den Server bei echten
+// Code-Aenderungen automatisch neu. Reine Inhalte-Aenderungen (ueber das CMS
+// gespeicherte Texte/Bilder) erfordern keinen Neustart, da diese bei jeder
+// Anfrage frisch von der Festplatte gelesen werden.
 //
 // Der aktuelle Status wird in ".cms-update-status.json" im Projektordner
 // abgelegt; das Admin-Panel liest diese Datei ueber /api/admin/update-status
@@ -17,22 +24,25 @@
 // wird dadurch nie unterbrochen.
 
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 const statusFile = path.join(repoRoot, ".cms-update-status.json");
+const triggerFile = path.join(repoRoot, ".cms-update-trigger");
 const isWin = process.platform === "win32";
 
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+const TRIGGER_POLL_MS = 3000;
 
 const portIndex = process.argv.indexOf("-p");
 const port = portIndex !== -1 ? process.argv[portIndex + 1] : "3000";
 
 let child = null;
 let shuttingDown = false;
+let backgroundChecksStarted = false;
 
 function writeStatus(status, extra = {}) {
   try {
@@ -176,27 +186,40 @@ async function checkForUpdate() {
   writeStatus("updated", { appliedAt: new Date().toISOString() });
 }
 
+function startBackgroundChecks() {
+  if (backgroundChecksStarted) return;
+  backgroundChecksStarted = true;
+  checkForUpdate().catch(() => writeStatus("up-to-date"));
+  setInterval(() => {
+    checkForUpdate().catch(() => writeStatus("up-to-date"));
+  }, CHECK_INTERVAL_MS);
+}
+
+// Wartet, bis jemand eingeloggt im Admin-Panel ankommt (UpdateBanner.tsx
+// legt dann ueber /api/admin/trigger-update-check diese Datei an), statt
+// selbst sofort beim Start zu pruefen - so wird der Start-Vorgang nie durch
+// einen Update-Check verzoegert oder gestoert.
+try {
+  if (existsSync(triggerFile)) unlinkSync(triggerFile);
+} catch {
+  // Kein Problem, wird beim naechsten Poll erneut versucht.
+}
+setInterval(() => {
+  if (backgroundChecksStarted) return;
+  if (!existsSync(triggerFile)) return;
+  try {
+    unlinkSync(triggerFile);
+  } catch {
+    // Datei ggf. schon weg - trotzdem Checks starten.
+  }
+  startBackgroundChecks();
+}, TRIGGER_POLL_MS);
+
 writeStatus("up-to-date");
 startServer();
 
-// Der Update-Check lief frueher synchron in CMS-Start.bat/.command, BEVOR
-// der Server ueberhaupt gestartet wurde - das verzoegerte jeden Start
-// unnoetig (Redaktion starrte auf "Suche nach Updates..." statt sofort
-// zur Login-Seite zu kommen). Jetzt startet der Server sofort, und der
-// erste Check laeuft im Hintergrund nebenher - findet er ein Update,
-// greift die normale Restart-Logik genauso wie bei jedem spaeteren
-// periodischen Check.
-setTimeout(() => {
-  checkForUpdate().catch(() => writeStatus("up-to-date"));
-}, 3000);
-
-const interval = setInterval(() => {
-  checkForUpdate().catch(() => writeStatus("up-to-date"));
-}, CHECK_INTERVAL_MS);
-
 function shutdown(signal) {
   shuttingDown = true;
-  clearInterval(interval);
   if (child) {
     if (isWin) {
       spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"]);

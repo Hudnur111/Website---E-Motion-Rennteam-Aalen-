@@ -20,6 +20,18 @@ export default function UpdateBanner() {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const wasBusyRef = useRef(false);
 
+  // Der Supervisor prueft absichtlich nicht schon beim Server-Start auf
+  // Updates - das wuerde den Start verzoegern, bevor ueberhaupt jemand da
+  // ist. Stattdessen stoesst genau dieser Aufruf hier den ersten (und
+  // danach periodischen) Hintergrund-Check erst an, sobald tatsaechlich
+  // jemand eingeloggt im Panel ankommt.
+  useEffect(() => {
+    fetch("/api/admin/trigger-update-check", { method: "POST" }).catch(() => {
+      // Kein laufender Supervisor oder Netzwerkproblem - dann bleibt es
+      // einfach beim manuellen/spaeteren Start, kein Fehlerfall.
+    });
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
