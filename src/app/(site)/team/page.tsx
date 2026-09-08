@@ -55,8 +55,7 @@ const TEAM_DESCRIPTIONS: Record<string, string> = {
     "Verantwortlich für Budgetplanung, Controlling und die finanzielle Steuerung des Teams.",
 };
 
-// Mitglieder werden aktuell über das CMS neu gepflegt und bis dahin ausgeblendet.
-const SHOW_TEAM_MEMBERS = false;
+const SHOW_TEAM_MEMBERS = true;
 
 export default function TeamPage() {
   const team = SHOW_TEAM_MEMBERS ? getTeam() : [];
