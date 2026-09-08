@@ -59,7 +59,7 @@ export default function FSTimeline() {
           <div className="flex-1 space-y-2 pb-6">
             <div className="flex items-baseline gap-3">
               <span className="text-2xl font-bold text-accent">{event.year}</span>
-              <h4 className="font-semibold text-foreground">{event.title}</h4>
+              <h3 className="font-semibold text-foreground">{event.title}</h3>
             </div>
             <p className="text-sm text-muted">{event.description}</p>
           </div>
