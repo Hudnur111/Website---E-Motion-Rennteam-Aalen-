@@ -1,0 +1,26 @@
+/**
+ * Official list of the team's specialist groups, in display order. Single
+ * source of truth so the Team page, the homepage stat, the Mitmachen
+ * application form, and the CMS "Abteilung" field can't drift apart again.
+ *
+ * Kept in its own module (no fs/path imports) so it can be imported both
+ * from server-only code (src/lib/content.ts) and from client components
+ * (src/lib/cms/collections.ts is bundled into the admin UI).
+ */
+export const TEAM_DEPARTMENTS = [
+  "Project Management",
+  "Workshop",
+  "Chassis and Ergonomics",
+  "Electrics",
+  "Powertrain",
+  "Aerodynamics",
+  "Suspension and Steering Systems",
+  "Driverless",
+  "Vehicle Dynamics",
+  "Testing and Data Acquisition",
+  "Media and Marketing",
+  "Business Plan",
+  "Sponsoring",
+  "Eventmanagement",
+  "Finance",
+] as const;

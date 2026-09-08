@@ -30,28 +30,7 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
   return items;
 }
 
-/**
- * Official list of the team's specialist groups, in display order. Single
- * source of truth so the Team page, the homepage stat, and the Mitmachen
- * application form can't drift apart again.
- */
-export const TEAM_DEPARTMENTS = [
-  "Project Management",
-  "Workshop",
-  "Chassis and Ergonomics",
-  "Electrics",
-  "Powertrain",
-  "Aerodynamics",
-  "Suspension and Steering Systems",
-  "Driverless",
-  "Vehicle Dynamics",
-  "Testing and Data Acquisition",
-  "Media and Marketing",
-  "Business Plan",
-  "Sponsoring",
-  "Eventmanagement",
-  "Finance",
-] as const;
+export { TEAM_DEPARTMENTS } from "@/lib/team-departments";
 
 export type TeamMember = {
   name: string;

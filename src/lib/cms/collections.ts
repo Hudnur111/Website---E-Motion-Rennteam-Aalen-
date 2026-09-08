@@ -1,6 +1,8 @@
 // Single source of truth for the editable content collections. Both the
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
+import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+
 export type FieldType =
   | "string"
   | "text"
@@ -43,15 +45,13 @@ export const collections: CollectionDef[] = [
         name: "department",
         label: "Abteilung",
         type: "select",
-        options: [
-          "Fahrzeugtechnik",
-          "Elektrotechnik / High-Voltage",
-          "Aerodynamik",
-          "Fahrwerk",
-          "Software / Autonomous",
-          "Marketing & Finanzen",
-          "Teamleitung",
-        ],
+        // Muss exakt den Werten aus TEAM_DEPARTMENTS entsprechen - die
+        // Team-Seite filtert Mitglieder strikt nach diesen Strings
+        // (team.filter(member => member.department === department)). Ein
+        // hier abweichender Wert fuehrt dazu, dass ein gespeichertes
+        // Mitglied auf /team in keiner Abteilungs-Sektion auftaucht, ohne
+        // dass ein Fehler angezeigt wird.
+        options: [...TEAM_DEPARTMENTS],
       },
       { name: "photo", label: "Foto", type: "image" },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },
