@@ -1,8 +1,9 @@
 ---
-name: Max Mustermann
+name: Danijel
 role: Batteriesystem
-department: Elektrotechnik / High-Voltage
+department: Electrics
 order: 21
+photo: /uploads/single-bilder-upload/Danijel.jpg
 ---
 
 Entwickelt und testet den Akkumulator sowie das Batteriemanagementsystem.

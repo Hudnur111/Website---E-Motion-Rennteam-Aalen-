@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getTeam, getPage } from "@/lib/content";
+import { getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -11,27 +11,55 @@ export const metadata: Metadata = {
   alternates: { canonical: "/team" },
 };
 
-const DEFAULT_DESCRIPTIONS: Record<string, string> = {
-  Teamleitung:
-    "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachbereiche.",
-  Fahrzeugtechnik:
-    "Verantwortlich für Monocoque, Karosserie und die Integration aller Komponenten zum Gesamtfahrzeug.",
-  "Elektrotechnik / High-Voltage":
-    "Entwickelt Batteriesystem, Leistungselektronik und sorgt für die Hochvolt-Sicherheit des Fahrzeugs.",
-  Aerodynamik:
-    "Optimiert Abtrieb und Luftwiderstand mit CFD-Simulationen und dem Design der Flügelelemente.",
-  Fahrwerk:
-    "Zuständig für Radaufhängung, Dämpfung und die Fahrdynamik-Abstimmung auf der Strecke.",
-  "Software / Autonomous":
-    "Baut die Fahrzeugsoftware, Telemetrie und das autonome Fahrmodul für die Driverless-Disziplin.",
-  "Marketing & Finanzen":
-    "Kümmert sich um Sponsoring, Öffentlichkeitsarbeit und die finanzielle Planung des Teams.",
+const DEPARTMENT_IMAGES: Record<string, string> = {
+  "Project Management": "/uploads/Team%20wdp/Vorstand.jpg",
+  "Chassis and Ergonomics": "/uploads/Team%20wdp/CCBOM.jpg",
+  Powertrain: "/uploads/Team%20wdp/Powertrain.jpg",
+  Aerodynamics: "/uploads/Team%20wdp/Aero.jpg",
+  "Suspension and Steering Systems": "/uploads/Team%20wdp/Wheelpackage.jpg",
+  Driverless: "/uploads/Team%20wdp/Driverless.jpg",
+  "Vehicle Dynamics": "/uploads/Team%20wdp/Vehicle%20Dynamics.jpg",
+  "Media and Marketing": "/uploads/Team%20wdp/Media.jpg",
 };
 
+const TEAM_DESCRIPTIONS: Record<string, string> = {
+  "Project Management":
+    "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachteams.",
+  Workshop:
+    "Betreibt und organisiert die Werkstatt – Maschinen, Material und Fertigungsprozesse für den Fahrzeugbau.",
+  "Chassis and Ergonomics":
+    "Verantwortlich für Monocoque, Karosserie und die ergonomische Integration des Fahrers ins Fahrzeug.",
+  Electrics:
+    "Entwickelt Batteriesystem, Leistungselektronik und sorgt für die Hochvolt-Sicherheit des Fahrzeugs.",
+  Powertrain:
+    "Konzipiert und baut Motoren, Getriebe und den Antriebsstrang des Fahrzeugs.",
+  Aerodynamics:
+    "Optimiert Abtrieb und Luftwiderstand mit CFD-Simulationen und dem Design der Flügelelemente.",
+  "Suspension and Steering Systems":
+    "Zuständig für Radaufhängung, Lenkung, Dämpfung und die Fahrdynamik-Abstimmung auf der Strecke.",
+  Driverless:
+    "Baut die Fahrzeugsoftware, Sensorik und das autonome Fahrmodul für die Driverless-Disziplin.",
+  "Vehicle Dynamics":
+    "Simuliert und optimiert das Fahrverhalten und die Gesamtabstimmung des Fahrzeugs.",
+  "Testing and Data Acquisition":
+    "Verantwortlich für Telemetrie, Sensorik und die Auswertung aller Test- und Rennfahrtdaten.",
+  "Media and Marketing":
+    "Kümmert sich um Öffentlichkeitsarbeit, Social Media und den Außenauftritt des Teams.",
+  "Business Plan":
+    "Entwickelt das Geschäftskonzept und die strategische Ausrichtung des Teams für den Business-Plan-Wettbewerb.",
+  Sponsoring:
+    "Betreut bestehende Sponsoren und akquiriert neue Partnerschaften für das Team.",
+  Eventmanagement:
+    "Plant und organisiert Team-Events, Rollout und die Teilnahme an Wettbewerben.",
+  Finance:
+    "Verantwortlich für Budgetplanung, Controlling und die finanzielle Steuerung des Teams.",
+};
+
+// Mitglieder werden aktuell über das CMS neu gepflegt und bis dahin ausgeblendet.
+const SHOW_TEAM_MEMBERS = false;
+
 export default function TeamPage() {
-  const team = getTeam();
-  const page = getPage("team");
-  const departments = Array.from(new Set(team.map((m) => m.department)));
+  const team = SHOW_TEAM_MEMBERS ? getTeam() : [];
 
   const descriptions: Record<string, string> = { ...DEFAULT_DESCRIPTIONS };
   if (page?.departmentDescriptions?.length) {
@@ -48,21 +76,46 @@ export default function TeamPage() {
           {page?.heroTitle ?? "Die Köpfe hinter dem ERT-14/26"}
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          {page?.heroSubtitle ??
-            "Über 60 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen gemeinsam unseren elektrischen Rennwagen – organisiert in sieben Fachteams."}
+          Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
+          gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
         </p>
       </Reveal>
 
       <div className="mt-14 space-y-14">
-        {departments.map((department, di) => {
+        {TEAM_DEPARTMENTS.map((department, di) => {
           const members = team.filter((member) => member.department === department);
+          const banner = DEPARTMENT_IMAGES[department];
           return (
-            <Reveal key={department} delay={di * 0.05}>
-              <div className="rounded-2xl border border-border bg-surface/50 p-6 sm:p-8">
+            <Reveal key={department} delay={di * 0.03}>
+              <div className="overflow-hidden rounded-2xl border border-border bg-surface/50">
+                {banner && (
+                  <div className="relative h-64 w-full overflow-hidden sm:h-80">
+                    <Image
+                      src={banner}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(min-width: 1024px) 1024px, 100vw"
+                      className="scale-110 object-cover object-top blur-2xl brightness-50"
+                    />
+                    <Image
+                      src={banner}
+                      alt={`Team ${department}`}
+                      fill
+                      sizes="(min-width: 1024px) 1024px, 100vw"
+                      className="object-contain"
+                      priority={di === 0}
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-6 sm:p-8">
+                      <h2 className="text-2xl font-extrabold text-white sm:text-3xl">{department}</h2>
+                    </div>
+                  </div>
+                )}
+                <div className="p-6 sm:p-8">
                 <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
                   <div>
-                    <h2 className="text-xl font-bold">{department}</h2>
-                    {descriptions[department] && (
+                    {!banner && <h2 className="text-xl font-bold">{department}</h2>}
+                    {TEAM_DESCRIPTIONS[department] && (
                       <p className="mt-1.5 max-w-xl text-sm text-muted">
                         {descriptions[department]}
                       </p>
@@ -73,10 +126,19 @@ export default function TeamPage() {
                   </span>
                 </div>
 
+                {members.length === 0 ? (
+                  <p className="mt-6 text-sm text-muted">
+                    Team wird noch aufgebaut –{" "}
+                    <a href="/mitmachen" className="text-accent-text underline">
+                      hier mitmachen
+                    </a>
+                    .
+                  </p>
+                ) : (
                 <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {members.map((member) => (
                     <StaggerItem key={member.slug}>
-                      <div className="group h-full rounded-xl border border-border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(74,99,247,0.35)]">
+                      <div className="group h-full rounded-xl border border-border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]">
                         <div className="aspect-square overflow-hidden rounded-lg bg-surface-2">
                           {member.photo ? (
                             <Image
@@ -113,6 +175,8 @@ export default function TeamPage() {
                     </StaggerItem>
                   ))}
                 </StaggerGroup>
+                )}
+                </div>
               </div>
             </Reveal>
           );

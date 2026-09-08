@@ -3,9 +3,9 @@ import { getResults, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
-  title: "Erfolge",
+  title: "Timeline",
   description:
-    "Die Erfolge des E-Motion Rennteams Aalen bei Formula-Student-Wettbewerben: Platzierungen, Events und Meilensteine im Überblick.",
+    "Die Timeline des E-Motion Rennteams Aalen: Platzierungen, Events und Meilensteine der Teamgeschichte im Überblick.",
   alternates: { canonical: "/erfolge" },
 };
 
@@ -16,13 +16,13 @@ export default function ResultsPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Erfolge</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-          {page?.heroTitle ?? "Unsere Meilensteine"}
-        </h1>
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
+        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">Unsere Historie</h1>
         <p className="mt-4 max-w-2xl text-muted">
-          {page?.heroSubtitle ??
-            "Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise durch die Geschichte des E-Motion Rennteams."}
+          Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
+          durch die Geschichte des E-Motion Rennteams. Seit 2012 sind wir bei internationalen
+          Formula-Student-Events angetreten und landeten dabei immer wieder in den Top 5
+          einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
         </p>
       </Reveal>
 

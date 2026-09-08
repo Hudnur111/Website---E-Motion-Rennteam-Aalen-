@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MotionProvider from "@/components/MotionProvider";
+import CookieConsent from "@/components/CookieConsent";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { getOrganizationJsonLdScript } from "@/lib/structuredData";
 
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: getOrganizationJsonLdScript() }}
         />
         <MotionProvider>{children}</MotionProvider>
+        <CookieConsent />
       </body>
     </html>
   );

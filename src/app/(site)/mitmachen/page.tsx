@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { getPositions, getPage } from "@/lib/content";
+import { getPositions, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
+import AlumniShowcase from "@/components/AlumniShowcase";
 
 export const metadata: Metadata = {
   title: "Mitmachen",
@@ -13,7 +14,11 @@ export const metadata: Metadata = {
 
 export default function JoinPage() {
   const positions = getPositions();
-  const page = getPage("join");
+  const stats = [
+    { value: "Seit 2009", label: "Am Start" },
+    { value: "50", label: "Aktive Mitglieder" },
+    { value: String(TEAM_DEPARTMENTS.length), label: "Fachbereiche" },
+  ];
 
   return (
     <div className="container-page py-20">
@@ -23,9 +28,20 @@ export default function JoinPage() {
           {page?.heroTitle ?? "Werde Teil des Teams"}
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          {page?.heroSubtitle ??
-            "Egal ob Fahrzeugtechnik, Elektrotechnik, Software oder Marketing – bei uns lernst du, Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation."}
+          Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du,
+          Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation.
         </p>
+      </Reveal>
+
+      <Reveal delay={0.03} className="mt-10 grid grid-cols-3 divide-x divide-border rounded-xl border border-border bg-surface">
+        {stats.map((stat) => (
+          <div key={stat.label} className="px-3 py-5 text-center sm:px-6">
+            <p className="text-2xl font-extrabold tracking-tight text-accent-text sm:text-3xl">
+              {stat.value}
+            </p>
+            <p className="mt-1 text-xs text-muted sm:text-sm">{stat.label}</p>
+          </div>
+        ))}
       </Reveal>
 
       <Reveal delay={0.05} className="mt-14">
@@ -60,6 +76,16 @@ export default function JoinPage() {
           </StaggerItem>
         ))}
       </StaggerGroup>
+
+      <Reveal delay={0.08} className="mt-6 text-center text-sm text-muted">
+        Dein Fachbereich ist nicht dabei? Wir suchen in allen Bereichen – von Workshop über
+        Powertrain bis Business Plan – laufend Verstärkung.{" "}
+        <a href="#bewerbung" className="font-semibold text-accent-text hover:underline">
+          Schreib uns einfach eine Initiativbewerbung.
+        </a>
+      </Reveal>
+
+      <AlumniShowcase />
 
       <Reveal id="bewerbung" delay={0.1} className="mt-20 scroll-mt-24 rounded-2xl border border-accent/40 bg-surface p-8 sm:p-10">
         <div className="text-center">

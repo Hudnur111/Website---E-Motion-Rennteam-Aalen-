@@ -4,14 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
-
-const SUBJECTS = [
-  "Allgemeine Anfrage",
-  "Sponsoring",
-  "Presse",
-  "Mitmachen / Bewerbung",
-  "Sonstiges",
-];
+import { CONTACT_SUBJECTS } from "@/lib/validation";
 
 export default function ContactForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
@@ -97,10 +90,10 @@ export default function ContactForm() {
             <select
               id="subject"
               name="subject"
-              defaultValue={SUBJECTS[0]}
+              defaultValue={CONTACT_SUBJECTS[0]}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             >
-              {SUBJECTS.map((subject) => (
+              {CONTACT_SUBJECTS.map((subject) => (
                 <option key={subject} value={subject}>
                   {subject}
                 </option>
@@ -148,9 +141,16 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="rounded-md bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+            className="w-full rounded-lg bg-gradient-to-r from-accent to-accent/90 px-6 py-3.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition-all duration-300 hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:shadow-lg disabled:shadow-accent/20"
           >
-            {status === "sending" ? "Wird gesendet…" : "Nachricht senden"}
+            {status === "sending" ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                Wird gesendet…
+              </span>
+            ) : (
+              "Nachricht senden"
+            )}
           </button>
         </motion.form>
       )}

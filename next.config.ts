@@ -37,21 +37,53 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    value:
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
   },
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
   { key: "Content-Security-Policy", value: csp },
+  // Isolates the browsing context so other origins can't hold a reference
+  // to this page's window (blocks some cross-origin timing/spectre-style
+  // attacks) without affecting same-origin navigation or the CMS/API.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // Nothing here needs to be embedded by or fetched from another origin.
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    formats: ["image/avif", "image/webp"],
+    // Uploaded photos are immutable-cached at the edge for a year (see the
+    // /uploads header rule below); let the image-optimizer cache its
+    // resized/re-encoded variants just as long instead of the 60s default,
+    // so repeat visits never re-run the optimizer for the same source+size.
+    minimumCacheTTL: 31536000,
+  },
+  // Pulls in only the framer-motion submodules actually referenced per file
+  // instead of the whole package, shrinking the client JS bundle shipped
+  // for pages that only use a couple of its features (Reveal, Stagger, ...).
+  experimental: {
+    optimizePackageImports: ["framer-motion"],
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        // Content photos under /uploads are content-addressed by filename
+        // (a changed photo gets a new name), so it's safe to let browsers
+        // and CDNs cache them for a long time instead of revalidating on
+        // every visit.
+        source: "/uploads/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
       },
     ];
   },

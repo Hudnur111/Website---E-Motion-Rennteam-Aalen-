@@ -1,8 +1,9 @@
 ---
-name: Max Mustermann
+name: Feli
 role: Strömungssimulation
-department: Aerodynamik
+department: Aerodynamics
 order: 31
+photo: /uploads/single-bilder-upload/Feli.jpg
 ---
 
 Entwickelt Simulationsmodelle zur Optimierung des Gesamtabtriebs.

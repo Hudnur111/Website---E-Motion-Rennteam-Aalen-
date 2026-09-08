@@ -1,144 +1,137 @@
-# 🏎️ Website – E-Motion Rennteam Aalen
+<div align="center">
 
-> **Offizielles Repository für den Webauftritt des E-Motion Rennteams der Hochschule Aalen.**  
-> *Formel Student Electric Racing Team | Innovation, Dynamics & Performance*
+# 🏎️ E-Motion Rennteam Aalen — Website
 
----
+**Offizieller Webauftritt des Formula-Student-Electric-Teams der Hochschule Aalen**
 
-### 📌 Projekt-Übersicht
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19.2-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)](./LICENSE)
 
-| **Status** | **Technologien** | **Lizenz** |
-| :---: | :---: | :---: |
-| ![Status](https://img.shields.io/badge/Status-In_Entwicklung-blue?style=flat-square) | ![Tech](https://img.shields.io/badge/Tech-Next.js_%7C_TailwindCSS_%7C_Eigenes_CMS-orange?style=flat-square) | ![Lizenz](https://img.shields.io/badge/Lizenz-MIT-green?style=flat-square) |
+[![Rendering](https://img.shields.io/badge/Rendering-Static_%2F_SSG-brightgreen?style=flat-square)]()
+[![Bundler](https://img.shields.io/badge/Bundler-Turbopack-0096FF?style=flat-square)]()
+[![A11y](https://img.shields.io/badge/A11y-axe--core_getestet-8A2BE2?style=flat-square)]()
+[![Tests](https://img.shields.io/badge/Tests-Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)]()
 
----
-
-### ⚡ Hauptmerkmale
-
-* **Responsive Design:** Optimiert für Smartphones, Tablets und Desktops
-* **Team- & Fahrzeug-Präsentation:** Übersichtliche Vorstellung von Mitgliedern und Boliden
-* **Sponsoren-Integration:** Prominente Einbindung von Partnern und Unterstützern
-* **News & Events:** Aktuelle Berichte von Rennen, Events und Konstruktion
+</div>
 
 ---
 
-### 🚀 Quickstart
+## 📖 Über dieses Projekt
 
-```bash
-# Repository klonen
-git clone [https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen.git](https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen.git)
+Diese Website ist der offizielle Online-Auftritt des **E-Motion Rennteam Aalen**,
+dem Formula-Student-Electric-Team der Hochschule Aalen. Sie dient als
+zentrale Anlaufstelle für Sponsoren, Presse, Bewerber:innen und Fans:
+Team- und Fahrzeugvorstellung, Renn-/Erfolgshistorie, News, Bildergalerie
+sowie Kontakt-, Bewerbungs-, Sponsoring- und Mediakit-Anfragen.
 
-# In das Verzeichnis wechseln
-cd Website---E-Motion-Rennteam-Aalen
-
-# Abhängigkeiten installieren
-npm install
-
-# Dev-Server starten
-npm run dev
-```
-
-Die Seite ist danach unter `http://localhost:3000` erreichbar.
+Die Seite ist als **statisch generierte Next.js-Anwendung** gebaut: Inhalte
+werden zur Build-Zeit aus Markdown-Dateien gelesen und als vorgerenderte
+HTML-Seiten ausgeliefert — dadurch sind Ladezeiten sehr kurz und es ist
+kein Datenbankserver nötig.
 
 ---
 
-### 🧩 Content-Pflege mit dem eigenen CMS
+## 🏗️ Architektur & Tech-Stack
 
-Die Inhalte (Team, Fahrzeuge, Sponsoren, News, Blog, Galerie, Erfolge, offene Positionen, Seitentexte) liegen als
-Markdown-Dateien in `content/` und können direkt bearbeitet werden – oder komfortabel über das eingebaute,
-selbst entwickelte Redaktionssystem unter `/admin`. Anders als eine externe SaaS-Lösung läuft das CMS komplett
-im eigenen Next.js-Code: eigener Login, eigenes Design, eigene Anbindung an GitHub.
+| Bereich | Technologie | Zweck |
+| :-- | :-- | :-- |
+| Framework | **Next.js 16** (App Router, Turbopack) | Routing, SSG/SSR, Bild-/Font-Optimierung |
+| UI | **React 19** + **TypeScript 5** | Komponenten, Typsicherheit |
+| Styling | **Tailwind CSS 4** | Utility-first CSS, Dark-mode-fähiges Theme |
+| Animationen | **Framer Motion** | Seitenübergänge, Reveal-/Stagger-Effekte |
+| Content | **Markdown + Gray-Matter** | Redaktionelle Inhalte ohne Datenbank |
+| Rendering | **Marked** + **sanitize-html** | Sicheres Rendern von Markdown-Inhalten |
+| Tests | **Vitest**, **Testing Library**, **axe-core/Playwright** | Unit-, Komponenten- und Accessibility-Tests |
 
-**Funktionsweise:**
+**Rendering-Strategie:** Fast alle Seiten werden **statisch (SSG)**
+vorgerendert (`○` im Build-Output). Nur Formular-Endpunkte (`/api/*`) sowie
+einzelne dynamische Detailseiten (`/blog/[slug]`, `/news/[slug]`) laufen
+serverseitig on-demand (`ƒ`).
 
-- Login unter `/admin/login` mit Benutzername/Passwort (serverseitig, signierte Session-Cookies).
-- Nach dem Login: Übersicht aller Inhaltsbereiche, Texte bearbeiten, Bilder hochladen, Einträge anlegen/löschen.
-- Jede Speicherung wird – sofern konfiguriert – automatisch als **Commit direkt ins GitHub-Repository** geschrieben
-  (über die GitHub Contents API), inklusive Bild-Uploads nach `public/uploads/`.
+---
 
-**Einrichtung unter Windows/macOS/Linux (für Redakteure ohne Entwicklungsumgebung):**
+## 🗺️ Seitenstruktur — was ist alles drin
 
-Im Hauptverzeichnis liegt je ein Start-Programm pro Plattform – `.bat` für Windows, `.command` für macOS,
-`.sh` für Linux:
+| Route | Inhalt |
+| :-- | :-- |
+| `/` | Startseite mit Team-Highlights |
+| `/team` | Teammitglieder & Abteilungen |
+| `/fahrzeuge` | Fahrzeughistorie & technische Daten |
+| `/formula-student` | Formula-Student-Regelwerk & Wettbewerbsformat |
+| `/erfolge` | Rennergebnisse & Erfolge |
+| `/sponsoren` | Sponsoren nach Tier (Platin/Gold/Silber/Partner) + Sponsoring-Formular |
+| `/mediakit` | Bild-/Videomaterial-Anfrage für Presse & Sponsoren |
+| `/galerie` | Bildergalerie nach Alben sortiert |
+| `/news` & `/news/[slug]` | Team-News |
+| `/blog` & `/blog/[slug]` | Blog-Beiträge |
+| `/mitmachen` | Offene Positionen & Bewerbungsformular |
+| `/kontakt` | Kontaktformular & Anfahrt (Karte) |
+| `/impressum`, `/datenschutz` | Rechtliche Pflichtseiten |
+| `/sitemap.xml`, `/robots.txt` | SEO-Metadaten |
 
-- **`CMS-Start.bat`** / **`CMS-Start.command`** / **`CMS-Start.sh`** – beim allerersten Start fragt ein
-  Assistent einmalig Benutzername, Passwort und optional den GitHub-Token ab, richtet alles automatisch ein
-  und startet danach den Server. Es öffnet sich sofort ein eigenes App-Fenster mit einer kurzen Ladeanzeige
-  ("Kurzes Update wird geprüft …"), das automatisch zur Login-Seite weiterspringt, sobald der Server bereit
-  ist – mit bereits ausgefülltem Benutzernamen, es muss nur noch das Passwort eingegeben werden. Bei jedem
-  weiteren Doppelklick wird ganz ohne Eingaben direkt der Server gestartet.
-- **`CMS-Zugangsdaten-aendern.bat`** / **`.command`** / **`.sh`** – startet den Einrichtungsassistenten
-  erneut, z. B. um das Passwort zu ändern oder den GitHub-Token nachträglich einzutragen.
+**Formular-Backends** (`src/app/api/`): `contact`, `mitmachen`, `sponsoring`,
+`mediakit` — jeweils mit serverseitiger Validierung, Rate-Limiting und
+Honeypot-Spam-Schutz.
 
-Das parallel geöffnete Terminal-/Konsolenfenster bleibt bewusst sichtbar (dort erscheinen Fehlermeldungen,
-falls etwas schiefgeht) – es ist aber nicht mehr das, worauf man während des Starts schaut: Das App-Fenster
-mit der Ladeanzeige übernimmt das, direkt nach dem Doppelklick.
+---
 
-Voraussetzung ist eine installierte [Node.js](https://nodejs.org/) LTS-Version; alles Weitere (Abhängigkeiten,
-Zugangsdaten) übernehmen die Skripte. Der GitHub-Token wird ausschließlich lokal in der (nicht versionierten)
-`.env.local` gespeichert – er landet nie im Git-Repository und wird deshalb bewusst nicht in `CMS-Start.bat`/
-`.command` fest hinterlegt. Einmal über den Assistenten eingetragen, muss er danach nicht mehr eingegeben
-werden.
+## ⚡ Performance
 
-**Automatische Updates:** `CMS-Start.bat`/`.command`/`.sh` prüfen bei jedem Start automatisch, ob es im
-GitHub-Repository eine neuere Version gibt (`scripts/cms-update.ps1` bzw. `scripts/cms-update.sh`), und
-übernehmen sie per Fast-Forward, bevor der Server startet – neue Funktionen landen dadurch von selbst auf
-jedem Gerät, ohne dass jemand manuell etwas herunterladen muss. Haben sich `package.json`/`package-lock.json`
-geändert, werden die Abhängigkeiten dabei automatisch neu installiert. Die Prüfung ist rein informativ und
-blockiert den Start nie: Ohne Internetverbindung, ohne lokal installiertes Git oder bei lokalen Änderungen an
-versionierten Dateien läuft die vorhandene Version einfach unverändert weiter. Das läuft technisch im
-Terminal-Fenster ab, ist für die Person am Rechner aber nur noch die kurze "Kurzes Update wird geprüft …"-
-Anzeige im App-Fenster – das eigentliche Update dauert in aller Regel nur wenige Sekunden.
+Gemessen an einem lokalen Produktions-Build (`next build` + `next start`,
+Turbopack, statisch generierte Startseite):
 
-Bei diesem Update-Check wird außerdem `content/` mit dem in `GITHUB_BRANCH` konfigurierten Branch (Standard:
-`main`) abgeglichen – dort landen die Speicherungen des CMS, unabhängig davon, von welchem Branch aus diese
-CMS-Installation selbst läuft. Ohne diesen Abgleich würde die lokale Ansicht der Inhalte mit der Zeit veralten,
-sobald von einem anderen Gerät aus gespeichert wird. Der Abgleich passiert rein lokal (nie ein Push) und wird –
-genau wie der Code-Update-Check – übersprungen, sobald es eine noch ungesicherte lokale Bearbeitung gibt.
+| Metrik | Wert |
+| :-- | :-- |
+| Server-Antwortzeit (TTFB, lokal) | **~4–5 ms** |
+| HTML-Größe Startseite | **~55 KB** |
+| Gesamtgröße statische Assets (`.next/static`) | **~1,2 MB** |
+| Seiten als Static/SSG vorgerendert | **22 von 26** Routen |
 
-**Einrichtung manuell (lokal & Produktion):**
+> Werte stammen aus einem lokalen Build in dieser Entwicklungsumgebung und
+> nicht von einer produktiven CDN-Auslieferung — reale Ladezeiten im
+> Browser hängen zusätzlich von Netzwerk, Hosting-Standort und Caching ab.
+> Zur laufenden Kontrolle: `npm run analyze` erzeugt einen Bundle-Report
+> unter `.next/diagnostics/analyze/index.html`.
 
-1. `.env.local.example` nach `.env.local` kopieren.
-2. Login-Zugangsdaten setzen:
-   - `CMS_ADMIN_USER=admin`
-   - Passwort-Hash erzeugen: `npm run cms:hash-password -- "mein-passwort"` und das Ergebnis in
-     `CMS_ADMIN_PASSWORD_HASH` eintragen.
-   - `CMS_SESSION_SECRET` auf einen zufälligen, langen String setzen (z. B. `openssl rand -hex 32`).
-3. Für die GitHub-Anbindung ein *fine-grained* GitHub Personal Access Token mit `Contents: Read and write` auf
-   dieses Repository erzeugen und in `GITHUB_TOKEN` eintragen; `GITHUB_OWNER`, `GITHUB_REPO` und `GITHUB_BRANCH`
-   entsprechend setzen (Beispielwerte sind bereits vorausgefüllt).
-4. `npm run dev` starten, dann `http://localhost:3000/admin/login` öffnen.
+---
 
-Ohne gesetzte GitHub-Variablen funktioniert das CMS weiterhin (Änderungen werden lokal auf der Festplatte
-gespeichert), zeigt im Dashboard aber deutlich an, dass nichts auf GitHub gesichert wurde.
+## 🧩 Content-Pflege
 
-**Mehrere Benutzer:** Der über `.env.local`/den Einrichtungsassistenten konfigurierte Zugang
-(`CMS_ADMIN_USER`) ist der Hauptadministrator und hat volle Berechtigung, u. a. für die Benutzerverwaltung
-unter `/admin/benutzer`. Dort kann er weitere Redaktions-Zugänge anlegen (Benutzername + temporäres
-Passwort), damit z. B. Teamkolleg:innen sich von ihrem eigenen Gerät aus einloggen können. Beim ersten Login
-mit dem temporären Passwort wird die Person automatisch aufgefordert, ein eigenes, nur ihr bekanntes Passwort
-zu vergeben, bevor sie das CMS weiter nutzen kann. Diese Zusatz-Zugänge werden – wie `.env.local` – nur lokal
-in einer nicht versionierten Datei (`.cms-users.json`) gespeichert und bleiben auch von automatischen Updates
-unberührt.
+Redaktionelle Inhalte (Team, Fahrzeuge, Sponsoren, News, Blog, Galerie,
+Erfolge, offene Positionen, Seitentexte) liegen als Markdown-Dateien in
+`content/` und werden versioniert im Repository gepflegt — kein CMS, keine
+Datenbank, keine Laufzeit-Abhängigkeit auf einen Redaktions-Server.
 
-### 📁 Projektstruktur
+Ein separates Redaktionssystem (Login, Editor, GitHub-Commits) existiert
+unabhängig davon im `cms-app`-Branch als eigenes Deployment. Dadurch enthält
+die öffentliche Website selbst keinen Admin-/Login-Code.
+
+## 📁 Projektstruktur
 
 ```
 content/            # Markdown-Inhalte (Team, Fahrzeuge, Sponsoren, News, Seiten, …)
-src/app/            # Next.js App Router Seiten
-src/app/admin/       # Eigenes CMS: Login + Redaktionsbereich
-src/app/api/admin/   # CMS-Backend: Auth, Content-CRUD, Bild-Upload
-src/components/admin/ # CMS-UI-Komponenten (Formulare, Bild-Upload, Sidebar)
-src/lib/cms/          # CMS-Kernlogik (Schema, Auth, GitHub-Anbindung, Content-I/O)
-src/components/     # Wiederverwendbare UI-Komponenten
+src/app/             # Next.js App Router: Seiten & API-Routen
+src/components/      # Wiederverwendbare UI-Komponenten
 ```
 
-### 🧪 Qualitätssicherung
+## 🧪 Qualitätssicherung
 
-| Befehl | Zweck |
-| :--- | :--- |
-| `npm run lint` | ESLint |
-| `npx tsc --noEmit` | TypeScript-Typprüfung |
-| `npm test` | Vitest (Unit-/Komponententests) |
-| `npm run test:a11y` | axe-core-Scan gegen den Produktions-Build (`npm run build` vorher ausführen) |
-| `npm run analyze` | Bundle-Analyse via Next.js' eingebautem `--experimental-analyze` (Turbopack-basiert; das ältere `@next/bundle-analyzer`-Paket funktioniert hier **nicht**, da es auf Webpack-Hooks aufbaut und dieses Projekt mit Turbopack baut). Ergebnis liegt danach in `.next/diagnostics/analyze/index.html`. |
+| Prüfung | Befehl |
+| :-- | :-- |
+| ESLint | `npm run lint` |
+| TypeScript | `npx tsc --noEmit` |
+| Unit-/Komponententests (Vitest) | `npm test` |
+| Accessibility-Scan (axe-core, gegen Produktions-Build) | `npm run test:a11y` |
+| Bundle-Analyse (Turbopack) | `npm run analyze` |
+
+---
+
+## 📜 Lizenz
+
+Dieses Repository steht unter einer **proprietären Lizenz** — Einsehen ist
+frei möglich, Nutzung, Bearbeitung und Weiterverbreitung sind ausschließlich
+autorisierten Mitgliedern und Eigentümern des E-Motion Rennteam Aalen
+vorbehalten. Details siehe [`LICENSE`](./LICENSE).

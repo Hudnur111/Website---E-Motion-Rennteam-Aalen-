@@ -37,7 +37,7 @@ describe("deliverFormSubmission", () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200 });
     vi.stubGlobal("fetch", fetchMock);
 
-    await deliverFormSubmission("newsletter", { email: "team@example.com" });
+    await deliverFormSubmission("sponsoring", { email: "team@example.com" });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
@@ -46,7 +46,7 @@ describe("deliverFormSubmission", () => {
     expect(init.headers).toEqual({ "Content-Type": "application/json" });
     expect(init.signal).toBeInstanceOf(AbortSignal);
     const body = JSON.parse(init.body);
-    expect(body.form).toBe("newsletter");
+    expect(body.form).toBe("sponsoring");
     expect(body.data).toEqual({ email: "team@example.com" });
     expect(consoleErrorSpy).not.toHaveBeenCalled();
   });

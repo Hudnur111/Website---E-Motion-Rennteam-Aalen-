@@ -1,7 +1,7 @@
 ---
 title: "Teammitglied Elektrotechnik / High-Voltage"
-department: "Elektrotechnik"
-commitment: "5–10 Std./Woche"
+department: "Electrics"
+commitment: "ab 5 Std./Woche"
 ---
 
-Du interessierst dich für Batteriesysteme, Leistungselektronik und Hochvolt-Sicherheit? Wir suchen Verstärkung für die Entwicklung und den Aufbau unseres Akkumulatorsystems.
+Du baust an Hochvoltspeicher, Verkabelung und Inverter unseres E-Boliden mit. Erste Elektrotechnik-Kenntnisse reichen – Altium, Zuken & Co. lernst du bei uns.

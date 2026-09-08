@@ -22,6 +22,29 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
     });
 }
 
+/**
+ * Official list of the team's specialist groups, in display order. Single
+ * source of truth so the Team page, the homepage stat, and the Mitmachen
+ * application form can't drift apart again.
+ */
+export const TEAM_DEPARTMENTS = [
+  "Project Management",
+  "Workshop",
+  "Chassis and Ergonomics",
+  "Electrics",
+  "Powertrain",
+  "Aerodynamics",
+  "Suspension and Steering Systems",
+  "Driverless",
+  "Vehicle Dynamics",
+  "Testing and Data Acquisition",
+  "Media and Marketing",
+  "Business Plan",
+  "Sponsoring",
+  "Eventmanagement",
+  "Finance",
+] as const;
+
 export type TeamMember = {
   name: string;
   role: string;
@@ -40,6 +63,7 @@ export type Vehicle = {
   coverImage?: string;
   current?: boolean;
   specs?: { label: string; value: string }[];
+  achievements?: string[];
   body: string;
   slug: string;
 };
@@ -89,7 +113,7 @@ export type BlogPost = {
 export type GalleryImage = {
   title: string;
   image: string;
-  category?: string;
+  album: string;
   order?: number;
   slug: string;
 };
@@ -171,6 +195,7 @@ function getAutoGalleryImages(): GalleryImage[] {
       return {
         title: title || "Foto",
         image: `/uploads/galerie-upload/${file}`,
+        album: "Weitere Bilder",
         slug: `auto-${file}`,
       };
     });

@@ -1,6 +1,7 @@
 ---
 name: Bosch
 tier: Platin
+logo: "/Sponsoren-Logo/Bosch-Logo.png"
 website: "https://www.bosch.de"
 ---
 

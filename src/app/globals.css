@@ -7,16 +7,19 @@
   --surface-2: #171a26;
   --foreground: #f5f6f8;
   --muted: #9aa0b4;
-  --accent: #4a63f7;
-  --accent-2: #8b5cf6;
+  /* Brand colors: mittelblau (#0071B5) as the primary accent, dunkelblau
+     (#162E7B) as the secondary accent. */
+  --accent: #0071b5;
+  --accent-2: #162e7b;
   /* Lightened variants of --accent/--accent-2 for use as *text* color. The base
-     accent colors are only ~3.4-4.2:1 against our dark backgrounds - enough for
-     borders/icons/large headings (3:1) but below the 4.5:1 WCAG AA threshold for
-     normal-size text, including on the semi-transparent accent/15 badge fills
-     used across the site. Verified against every background these run against
-     (background/surface/surface-2 and the accent/15 + accent-2/15 badge fills). */
-  --accent-text: #8092f9;
-  --accent-2-text: #a27df8;
+     accent colors are only ~1.6-3.9:1 against our dark backgrounds - enough for
+     borders/icons/large headings (3:1, dunkelblau even falls short of that) but
+     below the 4.5:1 WCAG AA threshold for normal-size text, including on the
+     semi-transparent accent/15 badge fills used across the site. Verified
+     against every background these run against (background/surface/surface-2
+     and the accent/15 + accent-2/15 badge fills). */
+  --accent-text: #5aa6d6;
+  --accent-2-text: #7c8bc9;
   --accent-foreground: #ffffff;
   --border: #232635;
 }
@@ -118,22 +121,127 @@ select:focus-visible,
   opacity: 0.5;
 }
 
-/* Fallback für Framer Motion: wenn JS nicht lädt oder prefers-reduced-motion */
-@media (prefers-reduced-motion: reduce) {
-  [style*="opacity:0"] {
-    opacity: 1 !important;
-    transform: none !important;
+@keyframes drive-across {
+  from {
+    left: -15%;
+  }
+  to {
+    left: 112%;
   }
 }
 
-/* CSS Animation als Backup für den Login-Form */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
+@keyframes wheel-bounce {
+  0%,
+  100% {
     transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-drive-across {
+  animation: drive-across 1.7s linear infinite;
+}
+
+.animate-wheel-bounce {
+  animation: wheel-bounce 0.3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drive-across,
+  .animate-wheel-bounce {
+    animation: none;
+  }
+}
+
+/* Tier-animated sponsor cards (Sponsoren-Seite): pulsing gradient border +
+   a periodic light sweep, colored per tier via --tier-* custom properties
+   set inline on each card. Partner-tier cards don't get this class at all
+   and keep the plain hover style, so the effect visually reinforces the
+   tier hierarchy instead of just being decoration. */
+.sponsor-card--tier {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, var(--tier-border-glow), transparent 45%, var(--tier-border-glow)) border-box;
+  animation: sponsor-glow-pulse 3.6s ease-in-out infinite;
+  transition: box-shadow 0.25s ease;
+}
+
+.sponsor-card--tier:hover {
+  animation-play-state: paused;
+  box-shadow: 0 0 34px -4px var(--tier-glow);
+}
+
+.sponsor-card__shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, var(--tier-shimmer) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: -150% 0;
+  opacity: 0;
+  animation: sponsor-shimmer 3.6s ease-in-out infinite;
+  animation-delay: var(--shimmer-delay, 0s);
+}
+
+@keyframes sponsor-shimmer {
+  0%,
+  10% {
+    background-position: -150% 0;
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.9;
+  }
+  50% {
+    background-position: 150% 0;
+    opacity: 0.9;
+  }
+  62%,
+  100% {
+    background-position: 150% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes sponsor-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 26px -2px var(--tier-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-card--tier,
+  .sponsor-card__shimmer {
+    animation: none !important;
+  }
+}
+
+/* Terminal-style typewriter block (technische Daten auf der Fahrzeuge-Seite) */
+.terminal-cursor {
+  animation: terminal-blink 1s step-end infinite;
+}
+
+@keyframes terminal-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
   }
 }

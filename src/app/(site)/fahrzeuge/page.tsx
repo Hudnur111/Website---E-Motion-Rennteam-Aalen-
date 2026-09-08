@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getVehicles, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
-import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
-import ScrollScale from "@/components/motion/ScrollScale";
+import TerminalSpecs from "@/components/TerminalSpecs";
 
 export const metadata: Metadata = {
   title: "Fahrzeuge",
@@ -17,80 +16,87 @@ export default function VehiclesPage() {
   const page = getPage("vehicles");
 
   return (
-    <div className="py-20">
-      <div className="container-page">
-        <Reveal className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
-          <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
-            {page?.heroTitle ?? "Unsere Boliden"}
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
-            {page?.heroSubtitle ??
-              "Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von der Simulation bis zur Rennstrecke."}
-          </p>
-        </Reveal>
-      </div>
+    <div className="container-page py-20">
+      <Reveal className="text-center">
+        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
+        <h1 className="mx-auto mt-2 max-w-2xl text-5xl font-extrabold tracking-tight sm:text-6xl">
+          Unsere Boliden
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
+          Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
+          der Simulation bis zur Rennstrecke.
+        </p>
+      </Reveal>
 
-      <div className="mt-20 space-y-32">
-        {vehicles.map((vehicle, i) => (
-          <section key={vehicle.slug} className={i % 2 === 1 ? "bg-surface/40 py-24" : "py-2"}>
-            <div className="container-page">
-              <Reveal className="text-center">
-                <div className="flex items-center justify-center gap-3">
-                  <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-                    {vehicle.year}
-                  </p>
-                  {vehicle.current && (
-                    <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
-                      Aktuell
-                    </span>
-                  )}
-                </div>
-                <h2 className="mx-auto mt-3 text-4xl font-extrabold tracking-tight sm:text-6xl">
-                  {vehicle.name}
-                </h2>
-                <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
-              </Reveal>
-            </div>
+      <div className="relative mt-20">
+        <div className="absolute left-4 top-0 h-full w-px bg-border sm:left-1/2" />
 
-            {vehicle.coverImage && (
-              <div className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen px-4 sm:px-8">
-                <ScrollScale className="mx-auto aspect-[16/9] w-full max-w-6xl overflow-hidden rounded-[1.5rem] border border-border/60 bg-surface sm:aspect-[21/9] sm:rounded-[2.5rem]">
-                  <Image
-                    src={vehicle.coverImage}
-                    alt={vehicle.name}
-                    width={1600}
-                    height={900}
-                    className="h-full w-full object-cover"
+        <div className="space-y-16 sm:space-y-24">
+          {vehicles.map((vehicle, i) => (
+            <Reveal
+              key={vehicle.slug}
+              direction={i % 2 === 0 ? "left" : "right"}
+              className={`relative flex flex-col gap-4 sm:flex-row sm:items-center ${
+                i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
+              }`}
+            >
+              <span className="absolute left-4 top-6 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center sm:left-1/2">
+                {vehicle.current && (
+                  <span
+                    className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-50"
+                    aria-hidden="true"
                   />
-                </ScrollScale>
+                )}
+                <span
+                  className={`relative h-3 w-3 rounded-full border-2 ${
+                    vehicle.current ? "border-accent bg-accent" : "border-border bg-background"
+                  }`}
+                />
+              </span>
+
+              <div
+                className={`w-full pl-10 sm:w-1/2 sm:pl-0 ${
+                  i % 2 === 0 ? "sm:pr-12" : "sm:pl-12"
+                }`}
+              >
+                <div className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/50">
+                  {vehicle.coverImage && (
+                    <div className="relative aspect-[16/9] w-full">
+                      <Image
+                        src={vehicle.coverImage}
+                        alt={vehicle.name}
+                        fill
+                        sizes="(min-width: 640px) 50vw, 100vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6 sm:p-8">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono text-sm font-semibold text-accent-text">
+                        {vehicle.year}
+                      </span>
+                      {vehicle.current && (
+                        <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+                          Aktuell
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
+                      {vehicle.name}
+                    </h2>
+                    {vehicle.tagline && <p className="mt-2 text-muted">{vehicle.tagline}</p>}
+                    {vehicle.body && <p className="mt-4 text-sm text-muted">{vehicle.body}</p>}
+
+                    {vehicle.specs && vehicle.specs.length > 0 && (
+                      <TerminalSpecs specs={vehicle.specs} achievements={vehicle.achievements} />
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-
-            <div className="container-page">
-              {vehicle.body && (
-                <Reveal className="mx-auto mt-14 max-w-2xl text-center text-muted">
-                  {vehicle.body}
-                </Reveal>
-              )}
-
-              {vehicle.specs && vehicle.specs.length > 0 && (
-                <StaggerGroup className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
-                  {vehicle.specs.map((spec) => (
-                    <StaggerItem key={spec.label}>
-                      <div className="rounded-2xl border border-border bg-background p-5 text-center transition-colors hover:border-accent/60">
-                        <div className="text-xs uppercase tracking-wide text-muted">
-                          {spec.label}
-                        </div>
-                        <div className="mt-1.5 text-lg font-semibold">{spec.value}</div>
-                      </div>
-                    </StaggerItem>
-                  ))}
-                </StaggerGroup>
-              )}
-            </div>
-          </section>
-        ))}
+            </Reveal>
+          ))}
+        </div>
       </div>
     </div>
   );

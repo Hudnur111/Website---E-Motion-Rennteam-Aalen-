@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { getSponsors, getPage, type Sponsor } from "@/lib/content";
+import { getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
+import SponsorCard from "@/components/SponsorCard";
 
 export const metadata: Metadata = {
   title: "Sponsoren",
@@ -42,31 +42,9 @@ export default function SponsorsPage() {
               </h2>
             </Reveal>
             <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map((sponsor) => (
+              {list.map((sponsor, si) => (
                 <StaggerItem key={sponsor.slug}>
-                  <a
-                    href={sponsor.website ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(74,99,247,0.35)]"
-                  >
-                    {sponsor.logo ? (
-                      <Image
-                        src={sponsor.logo}
-                        alt={sponsor.name}
-                        width={160}
-                        height={80}
-                        className="max-h-16 w-auto object-contain"
-                      />
-                    ) : (
-                      <span className="text-2xl font-bold uppercase tracking-tight text-foreground">
-                        {sponsor.name}
-                      </span>
-                    )}
-                    {sponsor.body && (
-                      <p className="mt-3 text-sm text-muted">{sponsor.body}</p>
-                    )}
-                  </a>
+                  <SponsorCard sponsor={sponsor} index={si} />
                 </StaggerItem>
               ))}
             </StaggerGroup>
@@ -79,7 +57,7 @@ export default function SponsorsPage() {
           <h2 className="text-2xl font-bold">Interesse an einem Sponsoring?</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted">
             Werdet Teil unseres Erfolgs und unterstützt das E-Motion Rennteam Aalen. Füllt einfach
-            das Formular aus – wir melden uns zeitnah bei euch.
+            das Formular aus – wir stellen euch unsere Sponsoring-Pakete individuell vor.
           </p>
         </div>
         <div className="mx-auto mt-8 max-w-2xl">

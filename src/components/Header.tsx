@@ -15,10 +15,8 @@ const NAV_LINKS = [
 
 const MORE_LINKS = [
   { href: "/formula-student", label: "Formula Student" },
-  { href: "/news", label: "News" },
-  { href: "/blog", label: "Blog" },
   { href: "/galerie", label: "Galerie" },
-  { href: "/erfolge", label: "Erfolge" },
+  { href: "/erfolge", label: "Timeline" },
   { href: "/kontakt", label: "Kontakt" },
 ];
 
