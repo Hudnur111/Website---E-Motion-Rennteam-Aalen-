@@ -4,7 +4,6 @@ import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 import SponsorCard from "@/components/SponsorCard";
-import MediaKitRequestForm from "@/components/MediaKitRequestForm";
 
 export const metadata: Metadata = {
   title: "Sponsoren",
@@ -60,20 +59,6 @@ export default function SponsorsPage() {
         </div>
         <div className="mx-auto mt-8 max-w-2xl">
           <SponsorForm />
-        </div>
-      </Reveal>
-
-      <Reveal className="mt-14 rounded-2xl border border-border bg-surface p-8 sm:p-10" delay={0.1}>
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mediakit</p>
-          <h2 className="mt-2 text-2xl font-bold">Bild- und Videomaterial anfragen</h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted">
-            Für Präsentationen, Pressemitteilungen oder eure eigene Website: Sagt uns, welches
-            Material ihr braucht – wir stellen es passend zusammen.
-          </p>
-        </div>
-        <div className="mx-auto mt-8 max-w-2xl">
-          <MediaKitRequestForm />
         </div>
       </Reveal>
     </div>
