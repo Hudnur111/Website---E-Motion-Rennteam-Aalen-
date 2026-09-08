@@ -12,6 +12,12 @@
 # Code-Update-Check geprueft/entfernt werden - siehe dortigen Kommentar.
 CONTENT_SYNC_MARKER="[cms-content-sync]"
 
+# Ohne dies kann ein netzwerkseitig haengender (nicht sofort scheiternder)
+# Verbindungsversuch git fetch/ls-remote unbegrenzt lange blockieren und
+# damit den gesamten CMS-Start aufhalten. Bricht Uebertragungen ab, die
+# laenger als 15s unter 1000 Bytes/s fallen.
+GIT_TIMEOUT_ARGS=(-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15)
+
 REPO_URL="https://github.com/Hudnur111/Website---E-Motion-Rennteam-Aalen-.git"
 REPO_NAME="Website---E-Motion-Rennteam-Aalen-"
 
@@ -51,11 +57,11 @@ if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         git remote add origin "$REPO_URL"
 
         if [ -z "$branch" ]; then
-            branch="$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's#^ref: refs/heads/\(.*\)\tHEAD#\1#p')"
+            branch="$(git "${GIT_TIMEOUT_ARGS[@]}" ls-remote --symref origin HEAD 2>/dev/null | sed -n 's#^ref: refs/heads/\(.*\)\tHEAD#\1#p')"
             branch="${branch:-main}"
         fi
 
-        if git checkout --quiet -b "$branch" 2>/dev/null && git fetch --quiet origin "$branch" 2>/dev/null; then
+        if git checkout --quiet -b "$branch" 2>/dev/null && git "${GIT_TIMEOUT_ARGS[@]}" fetch --quiet origin "$branch" 2>/dev/null; then
             git reset --quiet --hard "origin/$branch"
             echo "Fertig - kuenftige Updates werden ab jetzt automatisch erkannt."
         else
@@ -108,7 +114,7 @@ sync_content() {
         return 0
     fi
 
-    if ! git fetch --quiet origin "$content_branch" >/dev/null 2>&1; then
+    if ! git "${GIT_TIMEOUT_ARGS[@]}" fetch --quiet origin "$content_branch" >/dev/null 2>&1; then
         return 0
     fi
 
@@ -143,7 +149,7 @@ sync_content() {
 
 echo "Suche nach Updates..."
 
-if ! git fetch --quiet origin "$branch" >/dev/null 2>&1; then
+if ! git "${GIT_TIMEOUT_ARGS[@]}" fetch --quiet origin "$branch" >/dev/null 2>&1; then
     echo "Keine Verbindung zu GitHub - Update-Pruefung uebersprungen."
     echo ""
     exit 0

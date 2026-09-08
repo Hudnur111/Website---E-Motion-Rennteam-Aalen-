@@ -16,6 +16,12 @@ function Test-Command($name) {
     return [bool](Get-Command $name -ErrorAction SilentlyContinue)
 }
 
+# Ohne dies kann ein netzwerkseitig haengender (nicht sofort scheiternder)
+# Verbindungsversuch git fetch/ls-remote unbegrenzt lange blockieren und
+# damit den gesamten CMS-Start aufhalten. Bricht Uebertragungen ab, die
+# laenger als 15s unter 1000 Bytes/s fallen.
+$GitTimeoutArgs = @("-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=15")
+
 # Inhalte, die ueber das CMS gespeichert werden, landen als Commit auf dem in
 # .env.local konfigurierten GITHUB_BRANCH (Standard: main) - nicht
 # zwingend auf dem Branch, von dem diese CMS-Installation selbst laeuft
@@ -41,7 +47,7 @@ function Sync-Content([string]$repoRoot) {
         return
     }
 
-    git fetch --quiet origin $contentBranch *> $null
+    git @GitTimeoutArgs fetch --quiet origin $contentBranch *> $null
     if ($LASTEXITCODE -ne 0) {
         return
     }
@@ -116,7 +122,7 @@ if ($LASTEXITCODE -ne 0) {
         git remote add origin $RepoUrl
 
         if ([string]::IsNullOrWhiteSpace($branch)) {
-            $symref = git ls-remote --symref origin HEAD 2>$null | Select-String -Pattern '^ref: refs/heads/(\S+)\s+HEAD' | Select-Object -First 1
+            $symref = git @GitTimeoutArgs ls-remote --symref origin HEAD 2>$null | Select-String -Pattern '^ref: refs/heads/(\S+)\s+HEAD' | Select-Object -First 1
             if ($symref) {
                 $branch = $symref.Matches[0].Groups[1].Value
             } else {
@@ -125,7 +131,7 @@ if ($LASTEXITCODE -ne 0) {
         }
 
         git checkout --quiet -b $branch 2>$null
-        git fetch --quiet origin $branch 2>$null
+        git @GitTimeoutArgs fetch --quiet origin $branch 2>$null
         if ($LASTEXITCODE -eq 0) {
             git reset --quiet --hard "origin/$branch"
             Write-Host "Fertig - kuenftige Updates werden ab jetzt automatisch erkannt."
@@ -166,7 +172,7 @@ if ($headSubject -eq $ContentSyncMarker -and -not $fullStatus) {
 
 Write-Host "Suche nach Updates..."
 
-git fetch --quiet origin $branch *> $null
+git @GitTimeoutArgs fetch --quiet origin $branch *> $null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Keine Verbindung zu GitHub - Update-Pruefung uebersprungen."
     Write-Host ""

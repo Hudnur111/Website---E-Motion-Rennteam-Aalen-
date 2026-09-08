@@ -157,7 +157,7 @@
           hintEl.textContent = "Beim allerersten Start kann die Installation ein paar Minuten dauern.";
           retryEl.classList.add("visible");
         }
-        if (elapsed >= 120000 && !handedOff) {
+        if (elapsed >= 180000 && !handedOff) {
           cardEl.classList.add("error");
           statusEl.textContent = "Der Server antwortet nicht.";
           hintEl.textContent = "Bitte das Terminal-/Konsolenfenster auf Fehlermeldungen prüfen.";
