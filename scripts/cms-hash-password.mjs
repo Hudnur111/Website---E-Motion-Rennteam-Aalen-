@@ -1,15 +1,15 @@
-import crypto from 'node:crypto';
+#!/usr/bin/env node
+// Generates a CMS_ADMIN_PASSWORD_HASH value for .env.local.
+// Usage: node scripts/cms-hash-password.mjs "mein-passwort"
 
-if (process.argv.length < 3) {
-  console.error('Usage: node cms-hash-password.mjs <password>');
+import { randomBytes, scryptSync } from "node:crypto";
+
+const password = process.argv[2];
+if (!password) {
+  console.error('Usage: node scripts/cms-hash-password.mjs "mein-passwort"');
   process.exit(1);
 }
 
-const password = process.argv[2];
-
-// Simple PBKDF2 hash (compatible with Node.js built-in)
-const salt = crypto.randomBytes(16).toString('hex');
-const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha256').toString('hex');
-const result = `${salt}:${hash}`;
-
-console.log(result);
+const salt = randomBytes(16).toString("hex");
+const hash = scryptSync(password, salt, 64).toString("hex");
+console.log(`${salt}:${hash}`);
