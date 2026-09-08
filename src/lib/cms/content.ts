@@ -1,10 +1,59 @@
 import { promises as fs } from "node:fs";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import path from "node:path";
 import matter from "gray-matter";
 import { getCollection, type CollectionDef } from "./collections";
 import { commitFile, commitBinaryFile, deleteFile as githubDeleteFile, getGithubConfig } from "./github";
 
 const ROOT = process.cwd();
+const execFileAsync = promisify(execFile);
+
+// Must match the marker cms-update.sh/.ps1 look for to peel off this commit
+// again before their own fast-forward-only merge (see the comment there).
+const CONTENT_SYNC_MARKER = "[cms-content-sync]";
+
+/**
+ * A CMS save writes straight to disk (see below) and commits via the GitHub
+ * API - it never touches the local git index. Left alone, that permanently
+ * dirties the local working tree relative to local HEAD, and cms-update.sh/
+ * .ps1's "are there local changes?" guard then refuses to fast-forward ever
+ * again, even though the exact same change already exists as a real commit
+ * on GitHub. Fold the just-written path into a local, never-pushed marker
+ * commit (reusing the existing "[cms-content-sync]" convention, which
+ * cms-update.sh/.ps1 already knows to strip off before its own update
+ * check) so `git status` goes clean again right away. Best-effort and
+ * silent: if git isn't installed/available here, the GitHub commit above is
+ * already the source of truth, so this is a nicety, not a requirement.
+ */
+async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
+  try {
+    const git = (args: string[]) => execFileAsync("git", args, { cwd: ROOT, timeout: 5000 });
+
+    await git(["rev-parse", "--is-inside-work-tree"]);
+    await git(["add", "--", relPath]);
+
+    const { stdout: staged } = await git(["diff", "--cached", "--name-only"]);
+    if (!staged.trim()) return; // Nothing actually changed (e.g. re-saving identical content).
+
+    const { stdout: lastSubject } = await git(["log", "-1", "--format=%s"]).catch(() => ({ stdout: "" }));
+    const amend = lastSubject.trim() === CONTENT_SYNC_MARKER;
+
+    await git([
+      "-c",
+      "user.name=CMS Auto-Sync",
+      "-c",
+      "user.email=cms-sync@localhost",
+      "commit",
+      "--quiet",
+      ...(amend ? ["--amend"] : []),
+      "-m",
+      CONTENT_SYNC_MARKER,
+    ]);
+  } catch {
+    // Best effort only - see comment above.
+  }
+}
 
 export interface ContentItem {
   slug: string;
@@ -163,6 +212,7 @@ export async function saveItem(
     `cms: ${collection.label} "${slug}" aktualisieren`,
     authorName
   );
+  await syncLocalGitAfterCommit(relPath);
   return { committedToGithub: true, commitUrl };
 }
 
@@ -187,6 +237,7 @@ export async function deleteItem(collectionName: string, slug: string, authorNam
   }
 
   await githubDeleteFile(relPath, `cms: ${collection.label} "${slug}" löschen`, authorName);
+  await syncLocalGitAfterCommit(relPath);
   return { committedToGithub: true, commitUrl: null };
 }
 
@@ -242,5 +293,6 @@ export async function saveUploadedImage(
   }
 
   const { commitUrl } = await commitBinaryFile(relPath, bytes, `cms: Bild "${safeName}" hochladen`, authorName);
+  await syncLocalGitAfterCommit(relPath);
   return { publicPath, committedToGithub: true, commitUrl };
 }
