@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
+import { getBlogPosts, getNews } from "@/lib/content";
 
 const STATIC_ROUTES: {
   path: string;
@@ -16,15 +17,33 @@ const STATIC_ROUTES: {
   { path: "/erfolge", priority: 0.6, changeFrequency: "monthly" },
   { path: "/mitmachen", priority: 0.7, changeFrequency: "monthly" },
   { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" },
+  { path: "/blog", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/news", priority: 0.6, changeFrequency: "weekly" },
   { path: "/impressum", priority: 0.2, changeFrequency: "yearly" },
   { path: "/datenschutz", priority: 0.2, changeFrequency: "yearly" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return STATIC_ROUTES.map((route) => ({
+  const staticEntries = STATIC_ROUTES.map((route) => ({
     url: `${SITE_URL}${route.path}`,
     lastModified: new Date(),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));
+
+  const blogEntries = getBlogPosts().map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const newsEntries = getNews().map((post) => ({
+    url: `${SITE_URL}/news/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  return [...staticEntries, ...blogEntries, ...newsEntries];
 }
