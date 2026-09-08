@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useInView, useReducedMotion } from "framer-motion";
 import type { Vehicle } from "@/lib/content";
 
 const TYPE_SPEED_MS = 18;
 const LINE_PAUSE_MS = 260;
+const ACHIEVEMENT_PAUSE_MS = 140;
 const START_DELAY_MS = 350;
-const GOAL_STAGGER_MS = 140;
+
+type Segment = {
+  text: string;
+  kind: "command" | "output";
+  pauseAfter: number;
+};
 
 export default function TerminalSpecs({
   specs,
@@ -19,36 +25,65 @@ export default function TerminalSpecs({
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const reduceMotion = useReducedMotion();
+  const [segmentIndex, setSegmentIndex] = useState(0);
   const [visibleChars, setVisibleChars] = useState(0);
 
-  const fullText = specs.map((s) => `${s.label}: ${s.value}`).join("\n");
-  const specsDone = reduceMotion || visibleChars >= fullText.length;
+  // The whole terminal session — specs output, then the history command and
+  // each achievement line — is one continuous typed sequence, so every line
+  // appears on its own like real shell output instead of fading in at once.
+  const segments = useMemo<Segment[]>(() => {
+    const list: Segment[] = specs.map((s) => ({
+      text: `${s.label}: ${s.value}`,
+      kind: "output",
+      pauseAfter: LINE_PAUSE_MS,
+    }));
+    if (achievements && achievements.length > 0) {
+      list.push({ text: "./erfolge.sh --history", kind: "command", pauseAfter: LINE_PAUSE_MS });
+      achievements.forEach((achievement, i) => {
+        list.push({
+          text: `[✓] ${achievement}`,
+          kind: "output",
+          pauseAfter: i === achievements.length - 1 ? 0 : ACHIEVEMENT_PAUSE_MS,
+        });
+      });
+    }
+    return list;
+  }, [specs, achievements]);
 
-  // Reduced-motion users skip the animation entirely: the full text is
-  // rendered straight away via `done`/the slice below, no state update needed.
+  const done = reduceMotion || segmentIndex >= segments.length;
+
   useEffect(() => {
     if (!inView || reduceMotion) return;
     let cancelled = false;
-    let i = 0;
+    let seg = 0;
+    let chars = 0;
     let timer: ReturnType<typeof setTimeout>;
+
     function tick() {
       if (cancelled) return;
-      i += 1;
-      setVisibleChars(i);
-      if (i >= fullText.length) return;
-      const nextDelay = fullText[i - 1] === "\n" ? LINE_PAUSE_MS : TYPE_SPEED_MS;
-      timer = setTimeout(tick, nextDelay);
+      if (seg >= segments.length) return;
+      const current = segments[seg];
+      chars += 1;
+      setSegmentIndex(seg);
+      setVisibleChars(chars);
+      if (chars < current.text.length) {
+        timer = setTimeout(tick, TYPE_SPEED_MS);
+        return;
+      }
+      seg += 1;
+      chars = 0;
+      setSegmentIndex(seg);
+      if (seg < segments.length) {
+        timer = setTimeout(tick, current.pauseAfter || TYPE_SPEED_MS);
+      }
     }
+
     timer = setTimeout(tick, START_DELAY_MS);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, reduceMotion]);
-
-  const shownLines = (reduceMotion ? fullText : fullText.slice(0, visibleChars)).split("\n");
-  const showAchievements = achievements && achievements.length > 0 && specsDone;
+  }, [inView, reduceMotion, segments]);
 
   return (
     <div
@@ -64,42 +99,40 @@ export default function TerminalSpecs({
           <span className="text-accent-text">ert@emotion</span>
           <span className="text-muted">:~$</span> cat technische-daten.txt
         </p>
-        {shownLines.map((line, i) => (
-          <p key={i} className="mt-1 whitespace-pre-wrap break-words text-accent-text">
-            {line}
-            {!specsDone && i === shownLines.length - 1 && (
-              <span
-                aria-hidden="true"
-                className="terminal-cursor ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-accent-text align-middle"
-              />
-            )}
-          </p>
-        ))}
 
-        {achievements && achievements.length > 0 && (
-          <>
-            <p className={`mt-4 text-muted transition-opacity duration-300 ${showAchievements ? "opacity-100" : "opacity-0"}`}>
-              <span className="text-accent-text">ert@emotion</span>
-              <span className="text-muted">:~$</span> ./erfolge.sh --history
+        {segments.map((segment, i) => {
+          if (!reduceMotion && i > segmentIndex) return null;
+          const isTyping = !reduceMotion && i === segmentIndex && !done;
+          const text = isTyping ? segment.text.slice(0, visibleChars) : segment.text;
+          const cursor = isTyping && (
+            <span
+              aria-hidden="true"
+              className="terminal-cursor ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-accent-text align-middle"
+            />
+          );
+
+          if (segment.kind === "command") {
+            return (
+              <p key={i} className="mt-4 text-muted">
+                <span className="text-accent-text">ert@emotion</span>
+                <span className="text-muted">:~$</span> {text}
+                {cursor}
+              </p>
+            );
+          }
+
+          return (
+            <p
+              key={i}
+              className={`mt-1 whitespace-pre-wrap break-words ${
+                segment.text.startsWith("[✓]") ? "text-accent-2-text" : "text-accent-text"
+              }`}
+            >
+              {text}
+              {cursor}
             </p>
-            <ul className="mt-1 space-y-1">
-              {achievements.map((achievement, i) => (
-                <motion.li
-                  key={achievement}
-                  initial={reduceMotion ? false : { opacity: 0, x: -6 }}
-                  animate={showAchievements ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.25, delay: reduceMotion ? 0 : (i * GOAL_STAGGER_MS) / 1000 }}
-                  className="flex items-start gap-2 text-accent-2-text"
-                >
-                  <span aria-hidden="true" className="mt-0.5 shrink-0 text-accent-2-text">
-                    [✓]
-                  </span>
-                  <span>{achievement}</span>
-                </motion.li>
-              ))}
-            </ul>
-          </>
-        )}
+          );
+        })}
       </div>
     </div>
   );
