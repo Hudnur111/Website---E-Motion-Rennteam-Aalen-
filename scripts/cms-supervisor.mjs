@@ -206,3 +206,14 @@ function shutdown(signal) {
 
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
+// Closing the Terminal/Konsole window this runs in (macOS Terminal.app,
+// most Linux terminal emulators) sends SIGHUP to the foreground process
+// when its controlling terminal goes away - without a handler, Node's
+// default action is to terminate immediately, skipping shutdown() entirely.
+// The Next.js server child is started with `detached: true` (needed so
+// killChild() can signal its whole process group at once) precisely
+// because it can outlive this process; without catching SIGHUP too, that
+// detached child becomes a permanent orphan still holding the port after
+// every single window close, forcing every next start to fail with
+// "port already in use". No effect on Windows (SIGHUP doesn't apply there).
+if (!isWin) process.on("SIGHUP", () => shutdown("SIGHUP"));
