@@ -44,13 +44,13 @@ function LoginFormInner({ defaultUsername }: LoginFormProps) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative w-full max-w-md"
-    >
-      <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-accent/60 via-accent-2/40 to-transparent opacity-60 blur-md" />
+    <div className="relative w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-accent/60 via-accent-2/40 to-transparent opacity-60 blur-md"
+      />
       <div className="relative rounded-2xl border border-border bg-surface/90 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-surface-2">
@@ -118,13 +118,13 @@ function LoginFormInner({ defaultUsername }: LoginFormProps) {
           <span>Geschützter Bereich</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export default function LoginForm({ defaultUsername }: LoginFormProps) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="relative w-full max-w-md h-64" />}>
       <LoginFormInner defaultUsername={defaultUsername} />
     </Suspense>
   );

@@ -117,3 +117,23 @@ select:focus-visible,
   background-color: #0a0a0a;
   opacity: 0.5;
 }
+
+/* Fallback für Framer Motion: wenn JS nicht lädt oder prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  [style*="opacity:0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* CSS Animation als Backup für den Login-Form */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
