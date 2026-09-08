@@ -212,6 +212,13 @@ if ([string]::IsNullOrWhiteSpace($remoteRev) -or $localRev -eq $remoteRev) {
                     npm install --no-audit --no-fund
                 }
             }
+
+            # Der Turbopack-Build-Cache in .next kann nach einem git merge
+            # inkonsistent werden - Dateien aendern sich "von aussen", nicht
+            # ueber den eigenen Dateibeobachter des Dev-Servers, was zu
+            # haengenden oder fehlerhaften Rebuilds fuehren kann. Nach einem
+            # echten Code-Update wird deshalb sauber neu gebaut.
+            Remove-Item -Recurse -Force (Join-Path $repoRoot ".next") -ErrorAction SilentlyContinue
             Write-Host ""
         }
     }

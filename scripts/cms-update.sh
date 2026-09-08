@@ -186,6 +186,13 @@ else
                     npm install --no-audit --no-fund
                 fi
             fi
+
+            # Der Turbopack-Build-Cache in .next kann nach einem git merge
+            # inkonsistent werden - Dateien aendern sich "von aussen", nicht
+            # ueber den eigenen Dateibeobachter des Dev-Servers, was zu
+            # haengenden oder fehlerhaften Rebuilds fuehren kann. Nach einem
+            # echten Code-Update wird deshalb sauber neu gebaut.
+            rm -rf "$repo_root/.next"
             echo ""
         fi
     fi
