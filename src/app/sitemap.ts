@@ -12,6 +12,7 @@ const STATIC_ROUTES: {
   { path: "/sponsoren", priority: 0.7, changeFrequency: "monthly" },
   { path: "/formula-student", priority: 0.6, changeFrequency: "yearly" },
   { path: "/galerie", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/mediakit", priority: 0.4, changeFrequency: "yearly" },
   { path: "/erfolge", priority: 0.6, changeFrequency: "monthly" },
   { path: "/mitmachen", priority: 0.7, changeFrequency: "monthly" },
   { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" },

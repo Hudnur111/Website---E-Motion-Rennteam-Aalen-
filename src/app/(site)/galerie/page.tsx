@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getGallery } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import GalleryAlbumPicker from "@/components/GalleryAlbumPicker";
@@ -47,12 +48,12 @@ export default function GalleryPage() {
           Sponsoren und Presse können unser Mediakit mit Logos, Fahrzeugbildern und Team-Fotos in
           hoher Auflösung direkt bei uns anfragen.
         </p>
-        <a
-          href="mailto:info@emotion-rennteam.de?subject=Anfrage%20Mediakit"
+        <Link
+          href="/mediakit"
           className="mt-6 inline-flex items-center gap-1 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
         >
           Mediakit anfragen
-        </a>
+        </Link>
       </Reveal>
     </div>
   );
