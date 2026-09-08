@@ -142,7 +142,10 @@ echo ""
 
 bash "scripts/cms-open-app.sh" &
 
-npm run dev -- -p 3000
+# Der Supervisor startet den eigentlichen Server und prueft waehrend des
+# Betriebs alle paar Minuten selbststaendig auf Updates - wird eines
+# gefunden, wendet er es an und startet den Server automatisch neu.
+node "scripts/cms-supervisor.mjs" -p 3000
 
 echo ""
 echo "Der Server wurde beendet."

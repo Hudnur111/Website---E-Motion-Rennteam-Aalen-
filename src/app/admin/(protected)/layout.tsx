@@ -6,6 +6,7 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import Sidebar from "@/components/admin/Sidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
 import MobileNav from "@/components/admin/MobileNav";
+import UpdateBanner from "@/components/admin/UpdateBanner";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -17,6 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-screen bg-background">
+      <UpdateBanner />
       <header className="sticky top-0 z-20 border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">

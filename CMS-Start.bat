@@ -139,7 +139,10 @@ echo.
 
 start "" /min powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-open-app.ps1"
 
-call npm run dev -- -p 3000
+REM Der Supervisor startet den eigentlichen Server und prueft waehrend des
+REM Betriebs alle paar Minuten selbststaendig auf Updates - wird eines
+REM gefunden, wendet er es an und startet den Server automatisch neu.
+call node "scripts\cms-supervisor.mjs" -p 3000
 
 echo.
 echo Der Server wurde beendet.

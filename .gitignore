@@ -45,6 +45,9 @@ next-env.d.ts
 # CMS: lokal angelegte Zusatz-Benutzer (Passwort-Hashes, nie versionieren)
 /.cms-users.json
 
+# CMS: Laufzeit-Status des Auto-Update-Supervisors (scripts/cms-supervisor.mjs)
+/.cms-update-status.json
+
 # tinacms
 /tina/__generated__
 /public/admin
