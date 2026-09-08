@@ -45,10 +45,11 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
   async function uploadFile(file: File) {
     setUploading(true);
     setNotice(null);
+    let res: Response | undefined;
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      res = await fetch("/api/admin/upload", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) {
         setNotice({ kind: "error", message: data.error || "Upload fehlgeschlagen." });
@@ -62,7 +63,17 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       });
       await refresh();
     } catch {
-      setNotice({ kind: "error", message: "Verbindung fehlgeschlagen." });
+      // `res` having a value here means the server answered but with a body
+      // that wasn't valid JSON (e.g. a crashed/HTML error page) - worth
+      // surfacing the status code instead of implying the network itself
+      // is down, which is what actually happens when `res` is still
+      // undefined (fetch() itself threw).
+      setNotice({
+        kind: "error",
+        message: res
+          ? `Server-Antwort ungültig (Status ${res.status}). Bitte Server-Konsole prüfen.`
+          : "Verbindung fehlgeschlagen. Bitte Internetverbindung und Server-Status prüfen.",
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -98,8 +109,9 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     if (!confirm(`Datei "${filename}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
     setDeleting(filename);
     setNotice(null);
+    let res: Response | undefined;
     try {
-      const res = await fetch("/api/admin/media", {
+      res = await fetch("/api/admin/media", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename }),
@@ -117,7 +129,12 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       });
       setFiles((prev) => prev.filter((f) => f.name !== filename));
     } catch {
-      setNotice({ kind: "error", message: "Verbindung fehlgeschlagen." });
+      setNotice({
+        kind: "error",
+        message: res
+          ? `Server-Antwort ungültig (Status ${res.status}). Bitte Server-Konsole prüfen.`
+          : "Verbindung fehlgeschlagen. Bitte Internetverbindung und Server-Status prüfen.",
+      });
     } finally {
       setDeleting(null);
     }
