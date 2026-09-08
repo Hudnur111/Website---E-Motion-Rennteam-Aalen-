@@ -48,7 +48,7 @@ export default function FSCompetitions() {
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <div className="text-2xl">{comp.region}</div>
-              <h4 className="font-semibold text-foreground">{comp.name}</h4>
+              <h3 className="font-semibold text-foreground">{comp.name}</h3>
               <p className="text-xs text-muted">{comp.location}</p>
             </div>
             <div className="text-right">
