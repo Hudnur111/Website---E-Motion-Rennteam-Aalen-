@@ -35,6 +35,14 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Informative Warnung wenn Git fehlt (blockiert NOT)
+if ! command -v git >/dev/null 2>&1; then
+    echo "[HINWEIS] Git ist nicht installiert."
+    echo "Automatische Updates sind deaktiviert."
+    echo "Zum Aktivieren: Git installieren von https://git-scm.com/"
+    echo ""
+fi
+
 # Automatisches Update von GitHub, sofern moeglich. Blockiert den Start nie
 # - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen), laeuft
 # es einfach mit der vorhandenen Version weiter. Fehlt ".git" (z.B. nach

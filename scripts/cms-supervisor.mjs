@@ -42,9 +42,37 @@ function writeStatus(status, extra = {}) {
   }
 }
 
+function isGitAvailable() {
+  try {
+    const r = spawnSync("git", ["--version"], {
+      cwd: repoRoot,
+      stdio: "pipe",
+      shell: isWin,
+      timeout: 2000,
+    });
+    return r.status === 0 && !r.error;
+  } catch {
+    return false;
+  }
+}
+
+function runGitCommand(args) {
+  try {
+    const r = spawnSync("git", args, {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+      shell: isWin,
+      timeout: 5000,
+    });
+    return r.status === 0 ? r.stdout.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 function currentHead() {
-  const r = spawnSync("git", ["rev-parse", "HEAD"], { cwd: repoRoot, encoding: "utf8" });
-  return r.status === 0 ? r.stdout.trim() : null;
+  return runGitCommand(["rev-parse", "HEAD"]);
 }
 
 function runAsync(cmd, args) {
@@ -98,7 +126,18 @@ async function restartServer() {
 }
 
 async function checkForUpdate() {
-  if (!existsSync(path.join(repoRoot, ".git"))) return;
+  if (!existsSync(path.join(repoRoot, ".git"))) {
+    writeStatus("git-repo-missing");
+    return;
+  }
+
+  if (!isGitAvailable()) {
+    writeStatus("git-not-available", {
+      error: "Git ist nicht installiert oder nicht erreichbar",
+      hint: "Zur Aktivierung von Auto-Updates: Git installieren und neu starten",
+    });
+    return;
+  }
 
   const before = currentHead();
   writeStatus("checking");
@@ -117,8 +156,8 @@ async function checkForUpdate() {
   // Nur bei tatsaechlichen Code-Aenderungen neu starten - ein reiner
   // Inhalte-Abgleich (content/) wird ohne Neustart sofort wirksam, da
   // Inhalte bei jeder Anfrage frisch von der Festplatte gelesen werden.
-  const diff = spawnSync("git", ["diff", "--name-only", before, after], { cwd: repoRoot, encoding: "utf8" });
-  const changedFiles = (diff.stdout || "").split("\n").filter(Boolean);
+  const diff = runGitCommand(["diff", "--name-only", before, after]);
+  const changedFiles = (diff || "").split("\n").filter(Boolean);
   const onlyContent = changedFiles.length > 0 && changedFiles.every((f) => f.startsWith("content/"));
   if (onlyContent) {
     writeStatus("up-to-date");

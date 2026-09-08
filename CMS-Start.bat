@@ -36,6 +36,15 @@ if not exist "package.json" (
     exit /b 1
 )
 
+REM Informative Warnung wenn Git fehlt (blockiert NOT)
+where git >nul 2>nul
+if errorlevel 1 (
+    echo [HINWEIS] Git ist nicht installiert.
+    echo Automatische Updates sind deaktiviert.
+    echo Zum Aktivieren: Git installieren von https://git-scm.com/
+    echo.
+)
+
 REM Automatisches Update von GitHub, sofern moeglich. Blockiert den Start
 REM nie - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen),
 REM laeuft es einfach mit der vorhandenen Version weiter. Fehlt ".git" (z.B.
