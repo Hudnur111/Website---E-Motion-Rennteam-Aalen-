@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>E-Motion Rennteam Aalen – Redaktions-CMS</title>
+<style>
+  :root {
+    --background: #06070d;
+    --surface: #10121b;
+    --surface-2: #171a26;
+    --foreground: #f5f6f8;
+    --muted: #9aa0b4;
+    --accent: #4a63f7;
+    --accent-2: #8b5cf6;
+    --border: #232635;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .card {
+    width: min(420px, 90vw);
+    text-align: center;
+  }
+  .mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 28px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 22px;
+    box-shadow: 0 8px 30px -8px rgba(74, 99, 247, 0.55);
+  }
+  h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 32px;
+  }
+  .spinner {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .status {
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 20px;
+    transition: opacity 0.25s ease;
+  }
+  .hint {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--muted);
+    min-height: 16px;
+  }
+  .retry {
+    display: none;
+    margin-top: 22px;
+  }
+  .retry.visible { display: block; }
+  .retry a {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--foreground);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .retry a:hover { border-color: var(--accent); }
+  .error .spinner { display: none; }
+  .error .mark { box-shadow: 0 8px 30px -8px rgba(248, 113, 113, 0.45); }
+  .error .status { color: var(--danger); }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="mark">EM</div>
+    <h1>E-Motion Rennteam Aalen</h1>
+    <p class="sub">Redaktions-CMS</p>
+    <div class="spinner" id="spinner"></div>
+    <p class="status" id="status">Kurzes Update wird geprüft – einen Moment bitte…</p>
+    <p class="hint" id="hint">&nbsp;</p>
+    <div class="retry" id="retry">
+      <a id="retryLink" href="http://localhost:3000/admin/login">Trotzdem öffnen</a>
+    </div>
+  </div>
+
+  <script>
+    // Polls the local CMS server until it responds, then hands off to the
+    // real app. Deliberately avoids fetch()/XHR: this file is opened via
+    // file://, and browsers block cross-origin fetch from a file:// page
+    // even for a same-machine http://localhost target. A plain <img> load
+    // has no such restriction (only *reading* the pixels would need CORS),
+    // and a full-page navigation at the end is never CORS-restricted either.
+    (function () {
+      var PORT = 3000;
+      var TARGET = "http://localhost:" + PORT + "/admin/login";
+      var PING = "http://localhost:" + PORT + "/favicon.ico?_=";
+      var statusEl = document.getElementById("status");
+      var hintEl = document.getElementById("hint");
+      var cardEl = document.getElementById("card");
+      var retryEl = document.getElementById("retry");
+      document.getElementById("retryLink").href = TARGET;
+
+      var startedAt = Date.now();
+      var handedOff = false;
+      var messages = [
+        [0, "Kurzes Update wird geprüft – einen Moment bitte…"],
+        [6000, "Server wird gestartet…"],
+        [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
+        [35000, "Das dauert gerade ungewöhnlich lange…"],
+      ];
+      var currentMessage = -1;
+
+      function tick() {
+        var elapsed = Date.now() - startedAt;
+
+        for (var i = messages.length - 1; i >= 0; i--) {
+          if (elapsed >= messages[i][0] && i !== currentMessage) {
+            currentMessage = i;
+            statusEl.textContent = messages[i][1];
+          }
+        }
+        if (elapsed >= 35000) {
+          hintEl.textContent = "Beim allerersten Start kann die Installation ein paar Minuten dauern.";
+          retryEl.classList.add("visible");
+        }
+        if (elapsed >= 120000 && !handedOff) {
+          cardEl.classList.add("error");
+          statusEl.textContent = "Der Server antwortet nicht.";
+          hintEl.textContent = "Bitte das Terminal-/Konsolenfenster auf Fehlermeldungen prüfen.";
+          return;
+        }
+
+        // Only onload counts as "ready": favicon.ico is a real file Next.js
+        // serves once it's actually up, so a successful image load means
+        // there's a real server behind that port. onerror fires just as
+        // fast for "connection refused" as for a broken response, so it
+        // must NOT be treated as ready - it just means "try again".
+        var probe = new Image();
+        probe.onload = function () {
+          if (handedOff) return;
+          handedOff = true;
+          statusEl.textContent = "Bereit.";
+          window.location.replace(TARGET);
+        };
+        probe.src = PING + Date.now();
+
+        if (!handedOff) setTimeout(tick, 700);
+      }
+
+      tick();
+    })();
+  </script>
+</body>
+</html>
