@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getGallery } from "@/lib/content";
+import { getGallery, getPage } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import GalleryAlbumPicker from "@/components/GalleryAlbumPicker";
 
@@ -22,6 +22,7 @@ function groupByAlbum(images: ReturnType<typeof getGallery>) {
 export default function GalleryPage() {
   const albums = groupByAlbum(getGallery());
   const hasImages = albums.length > 0;
+  const page = getPage("gallery");
 
   return (
     <div className="container-page py-20">
@@ -31,8 +32,8 @@ export default function GalleryPage() {
           {page?.heroTitle ?? "Impressionen"}
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Eindrücke von Wettbewerben, aus der Werkstatt und von Events – das E-Motion
-          Rennteam Aalen in Bildern, nach Album sortiert.
+          {page?.heroSubtitle ??
+            "Eindrücke von Wettbewerben, aus der Werkstatt und von Events – das E-Motion Rennteam Aalen in Bildern, nach Album sortiert."}
         </p>
       </Reveal>
 

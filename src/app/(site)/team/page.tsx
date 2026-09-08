@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
+import { getPage, getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -60,8 +60,9 @@ const SHOW_TEAM_MEMBERS = false;
 
 export default function TeamPage() {
   const team = SHOW_TEAM_MEMBERS ? getTeam() : [];
+  const page = getPage("team");
 
-  const descriptions: Record<string, string> = { ...DEFAULT_DESCRIPTIONS };
+  const descriptions: Record<string, string> = { ...TEAM_DESCRIPTIONS };
   if (page?.departmentDescriptions?.length) {
     for (const d of page.departmentDescriptions) {
       descriptions[d.label] = d.value;
@@ -76,8 +77,8 @@ export default function TeamPage() {
           {page?.heroTitle ?? "Die Köpfe hinter dem ERT-14/26"}
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
-          gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
+          {page?.heroSubtitle ??
+            `Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen gemeinsam unseren elektrischen Rennwagen – organisiert in ${TEAM_DEPARTMENTS.length} Fachteams.`}
         </p>
       </Reveal>
 

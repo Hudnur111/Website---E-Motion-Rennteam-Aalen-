@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSponsors, type Sponsor } from "@/lib/content";
+import { getPage, getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
