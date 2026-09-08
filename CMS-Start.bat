@@ -45,13 +45,11 @@ if errorlevel 1 (
     echo.
 )
 
-REM Automatisches Update von GitHub, sofern moeglich. Blockiert den Start
-REM nie - schlaegt es fehl (kein Git, kein Internet, lokale Aenderungen),
-REM laeuft es einfach mit der vorhandenen Version weiter. Fehlt ".git" (z.B.
-REM nach "Download ZIP" von GitHub statt "git clone"), richtet
-REM cms-update.ps1 beim allerersten Aufruf automatisch ein Git-Repo ein,
-REM damit kuenftige Updates funktionieren.
-powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\cms-update.ps1"
+REM Der Update-Check laeuft NICHT mehr hier im Vordergrund - das wuerde den
+REM Start unnoetig verzoegern, bevor ueberhaupt etwas zu sehen ist. Stattdessen
+REM prueft scripts\cms-supervisor.mjs direkt beim Start (und danach alle paar
+REM Minuten) im Hintergrund auf Updates, waehrend der Server bereits laeuft -
+REM man landet dadurch sofort auf der Login-Seite.
 
 REM Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 REM node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.

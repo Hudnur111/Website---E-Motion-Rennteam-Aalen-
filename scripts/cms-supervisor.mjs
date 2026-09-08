@@ -179,6 +179,17 @@ async function checkForUpdate() {
 writeStatus("up-to-date");
 startServer();
 
+// Der Update-Check lief frueher synchron in CMS-Start.bat/.command, BEVOR
+// der Server ueberhaupt gestartet wurde - das verzoegerte jeden Start
+// unnoetig (Redaktion starrte auf "Suche nach Updates..." statt sofort
+// zur Login-Seite zu kommen). Jetzt startet der Server sofort, und der
+// erste Check laeuft im Hintergrund nebenher - findet er ein Update,
+// greift die normale Restart-Logik genauso wie bei jedem spaeteren
+// periodischen Check.
+setTimeout(() => {
+  checkForUpdate().catch(() => writeStatus("up-to-date"));
+}, 3000);
+
 const interval = setInterval(() => {
   checkForUpdate().catch(() => writeStatus("up-to-date"));
 }, CHECK_INTERVAL_MS);
