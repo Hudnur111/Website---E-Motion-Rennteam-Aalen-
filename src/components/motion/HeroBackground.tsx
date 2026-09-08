@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export default function HeroBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(74,99,247,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(74,99,247,0.06)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black_40%,transparent_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,113,181,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(0,113,181,0.06)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black_40%,transparent_100%)]" />
 
       <motion.div
         className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-accent/20 blur-[100px]"
@@ -18,7 +18,7 @@ export default function HeroBackground() {
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(74,99,247,0.12),transparent_45%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,113,181,0.12),transparent_45%)]" />
     </div>
   );
 }

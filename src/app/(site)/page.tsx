@@ -32,7 +32,7 @@ export default function Home() {
 
         {vehicle?.coverImage && (
           <div className="container-page relative pb-20 sm:pb-28">
-            <ScrollScale className="mx-auto aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border/60 bg-surface shadow-[0_40px_120px_-40px_rgba(74,99,247,0.35)] sm:aspect-[21/9]">
+            <ScrollScale className="mx-auto aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border/60 bg-surface shadow-[0_40px_120px_-40px_rgba(0,113,181,0.35)] sm:aspect-[21/9]">
               <Image
                 src={vehicle.coverImage}
                 alt={vehicle.name}
