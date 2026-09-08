@@ -55,11 +55,9 @@ export default function TerminalSpecs({
       ref={ref}
       className="mt-6 overflow-hidden rounded-xl border border-border bg-[#0a0c12] shadow-[0_0_40px_-15px_rgba(0,113,181,0.35)]"
     >
-      <div className="flex items-center gap-1.5 border-b border-border/60 bg-surface-2 px-4 py-2.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
-        <span className="ml-3 font-mono text-xs text-muted">technische-daten.sh</span>
+      <div className="flex items-center gap-2 border-b border-border/60 bg-surface-2 px-4 py-2.5">
+        <span aria-hidden="true" className="font-mono text-sm text-accent-text">{">"}_</span>
+        <span className="font-mono text-xs text-muted">technische-daten.sh</span>
       </div>
       <div className="p-5 font-mono text-sm leading-relaxed">
         <p className="text-muted">
