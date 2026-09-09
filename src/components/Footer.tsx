@@ -37,6 +37,8 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
+            <li><Link href="/news" className="transition-colors hover:text-accent-text">News</Link></li>
+            <li><Link href="/blog" className="transition-colors hover:text-accent-text">Blog</Link></li>
             <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
             <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
