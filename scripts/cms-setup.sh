@@ -159,6 +159,55 @@ while true; do
     break
 done
 
+echo ""
+echo "--- Online-Benutzerverwaltung (optional) ---"
+echo "Damit koennen mehrere Personen eigene CMS-Zugaenge mit Rollen (Admin,"
+echo "Sponsoring-Management, ...) bekommen, verschluesselt gespeichert im"
+echo "privaten Repo 'Login-Benutzerverwaltung'. Ohne diese Angaben funktioniert"
+echo "das CMS wie bisher (nur der oben eingerichtete Zugang, lokal)."
+echo "WICHTIG: Diese vier Werte muessen VORHER einmalig im 'Login-Benutzerverwaltung'-"
+echo "Projekt selbst erzeugt worden sein (siehe dessen README, 'npm run add-admin') -"
+echo "hier werden nur die fertigen Werte eingetragen, nicht neu erzeugt."
+
+credentials_token=""
+credentials_owner="E-Motion-Rennteam-Aalen-e-V"
+credentials_repo="Login-Benutzerverwaltung"
+credentials_key=""
+credentials_key_id="v1"
+
+read -r -p "Online-Benutzerverwaltung jetzt einrichten? (j/n) " setup_credentials
+case "$setup_credentials" in
+    j|J)
+        read -r -s -p "Fine-grained Token NUR fuer das 'Login-Benutzerverwaltung'-Repo: " credentials_token
+        echo ""
+        credentials_token="$(echo "$credentials_token" | xargs || true)"
+        read -r -p "GitHub-Organisation (Enter fuer '$credentials_owner'): " owner_input
+        if [ -n "$owner_input" ]; then credentials_owner="$owner_input"; fi
+        read -r -p "Repository-Name (Enter fuer '$credentials_repo'): " repo_input
+        if [ -n "$repo_input" ]; then credentials_repo="$repo_input"; fi
+        read -r -s -p "Verschluesselungsschluessel (CMS_CREDENTIALS_ENCRYPTION_KEY aus dem anderen Projekt): " credentials_key
+        echo ""
+        credentials_key="$(echo "$credentials_key" | xargs || true)"
+        read -r -p "Key-ID (Enter fuer '$credentials_key_id'): " key_id_input
+        if [ -n "$key_id_input" ]; then credentials_key_id="$key_id_input"; fi
+
+        if [ -z "$credentials_token" ] || [ -z "$credentials_key" ]; then
+            echo "Token oder Schluessel fehlt - Online-Benutzerverwaltung wird NICHT aktiviert."
+            credentials_token=""
+            credentials_key=""
+        else
+            echo "Token wird geprueft..."
+            result="$(test_github_token "$credentials_token" "$credentials_owner" "$credentials_repo")"
+            status="${result%%|*}"
+            message="${result#*|}"
+            echo "$message"
+            if [ "$status" = "FAIL" ]; then
+                echo "Wird trotzdem uebernommen - bei falschen Werten meldet das CMS beim Login einen Fehler."
+            fi
+        fi
+        ;;
+esac
+
 cat > "$env_path" <<EOF
 CMS_ADMIN_USER=$username
 CMS_ADMIN_PASSWORD_HASH=$hash
@@ -167,6 +216,11 @@ GITHUB_TOKEN=$github_token
 GITHUB_OWNER=$github_owner
 GITHUB_REPO=$github_repo
 GITHUB_BRANCH=$github_branch
+CMS_CREDENTIALS_TOKEN=$credentials_token
+CMS_CREDENTIALS_OWNER=$credentials_owner
+CMS_CREDENTIALS_REPO=$credentials_repo
+CMS_CREDENTIALS_ENCRYPTION_KEY=$credentials_key
+CMS_CREDENTIALS_KEY_ID=$credentials_key_id
 EOF
 
 echo ""

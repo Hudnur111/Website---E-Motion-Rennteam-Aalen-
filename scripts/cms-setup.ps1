@@ -155,6 +155,51 @@ while ($true) {
     }
 }
 
+Write-Host ""
+Write-Host "--- Online-Benutzerverwaltung (optional) ---"
+Write-Host "Damit koennen mehrere Personen eigene CMS-Zugaenge mit Rollen (Admin,"
+Write-Host "Sponsoring-Management, ...) bekommen, verschluesselt gespeichert im"
+Write-Host "privaten Repo 'Login-Benutzerverwaltung'. Ohne diese Angaben funktioniert"
+Write-Host "das CMS wie bisher (nur der oben eingerichtete Zugang, lokal)."
+Write-Host "WICHTIG: Diese vier Werte muessen VORHER einmalig im 'Login-Benutzerverwaltung'-"
+Write-Host "Projekt selbst erzeugt worden sein (siehe dessen README, 'npm run add-admin')-"
+Write-Host "hier werden nur die fertigen Werte eingetragen, nicht neu erzeugt."
+
+$credentialsToken = ""
+$credentialsOwner = "E-Motion-Rennteam-Aalen-e-V"
+$credentialsRepo = "Login-Benutzerverwaltung"
+$credentialsKey = ""
+$credentialsKeyId = "v1"
+
+$setupCredentials = Read-Host "Online-Benutzerverwaltung jetzt einrichten? (j/n)"
+if ($setupCredentials -match '^[jJ]') {
+    $credentialsToken = (Read-Host "Fine-grained Token NUR fuer das 'Login-Benutzerverwaltung'-Repo").Trim()
+    $ownerInput = Read-Host "GitHub-Organisation (Enter fuer '$credentialsOwner')"
+    if (-not [string]::IsNullOrWhiteSpace($ownerInput)) { $credentialsOwner = $ownerInput.Trim() }
+    $repoInput = Read-Host "Repository-Name (Enter fuer '$credentialsRepo')"
+    if (-not [string]::IsNullOrWhiteSpace($repoInput)) { $credentialsRepo = $repoInput.Trim() }
+    $credentialsKey = (Read-Host "Verschluesselungsschluessel (CMS_CREDENTIALS_ENCRYPTION_KEY aus dem anderen Projekt)").Trim()
+    $keyIdInput = Read-Host "Key-ID (Enter fuer '$credentialsKeyId')"
+    if (-not [string]::IsNullOrWhiteSpace($keyIdInput)) { $credentialsKeyId = $keyIdInput.Trim() }
+
+    if ([string]::IsNullOrWhiteSpace($credentialsToken) -or [string]::IsNullOrWhiteSpace($credentialsKey)) {
+        Write-Host "Token oder Schluessel fehlt - Online-Benutzerverwaltung wird NICHT aktiviert." -ForegroundColor Yellow
+        $credentialsToken = ""
+        $credentialsKey = ""
+    } else {
+        Write-Host "Token wird geprueft..."
+        $result = Test-GithubToken -token $credentialsToken -owner $credentialsOwner -repo $credentialsRepo
+        if ($result.Ok -eq $true) {
+            Write-Host $result.Message -ForegroundColor Green
+        } elseif ($result.Ok -eq $null) {
+            Write-Host $result.Message -ForegroundColor Yellow
+        } else {
+            Write-Host $result.Message -ForegroundColor Red
+            Write-Host "Wird trotzdem uebernommen - bei falschen Werten meldet das CMS beim Login einen Fehler." -ForegroundColor Yellow
+        }
+    }
+}
+
 $lines = @(
     "CMS_ADMIN_USER=$username",
     "CMS_ADMIN_PASSWORD_HASH=$hash",
@@ -162,7 +207,12 @@ $lines = @(
     "GITHUB_TOKEN=$githubToken",
     "GITHUB_OWNER=$githubOwner",
     "GITHUB_REPO=$githubRepo",
-    "GITHUB_BRANCH=$githubBranch"
+    "GITHUB_BRANCH=$githubBranch",
+    "CMS_CREDENTIALS_TOKEN=$credentialsToken",
+    "CMS_CREDENTIALS_OWNER=$credentialsOwner",
+    "CMS_CREDENTIALS_REPO=$credentialsRepo",
+    "CMS_CREDENTIALS_ENCRYPTION_KEY=$credentialsKey",
+    "CMS_CREDENTIALS_KEY_ID=$credentialsKeyId"
 )
 Set-Content -Path $envPath -Value $lines -Encoding UTF8
 
