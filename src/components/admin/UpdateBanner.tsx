@@ -1,24 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-type UpdateStatus = "unknown" | "checking" | "up-to-date" | "installing-dependencies" | "restarting" | "updated";
+type UpdateStatus = "unknown" | "checking" | "up-to-date" | "installing-dependencies" | "updated";
 
 interface StatusResponse {
   status: UpdateStatus;
   appliedAt?: string;
 }
 
-const NORMAL_POLL_MS = 20_000;
-const FAST_POLL_MS = 2_000;
+const POLL_MS = 20_000;
 const SEEN_UPDATE_KEY = "cms-last-seen-update";
 
 // Zeigt der Redaktion einen Hinweis, waehrend scripts/cms-supervisor.mjs im
-// Hintergrund ein gefundenes Update einspielt und den Server neu startet.
-// Ohne laufenden Supervisor (Status "unknown") wird nichts angezeigt.
+// Hintergrund ein gefundenes Update herunterlaedt. Der laufende Server wird
+// dabei bewusst NICHT live neu gestartet (das wuerde mitten in der Arbeit die
+// Sitzung unterbrechen) - der neue Code wird erst beim naechsten Start des
+// CMS aktiv. Ohne laufenden Supervisor (Status "unknown") wird nichts
+// angezeigt.
 export default function UpdateBanner() {
   const [status, setStatus] = useState<StatusResponse | null>(null);
-  const wasBusyRef = useRef(false);
 
   // Der Supervisor prueft absichtlich nicht schon beim Server-Start auf
   // Updates - das wuerde den Start verzoegern, bevor ueberhaupt jemand da
@@ -41,27 +42,12 @@ export default function UpdateBanner() {
         const res = await fetch("/api/admin/update-status", { cache: "no-store" });
         if (res.ok) {
           const data: StatusResponse = await res.json();
-          if (cancelled) return;
-
-          const busy = data.status === "installing-dependencies" || data.status === "restarting";
-          // Der Server kommt gerade wieder online, nachdem er fuer den
-          // Neustart kurz nicht erreichbar war - jetzt die Seite neu laden,
-          // damit der neue Code tatsaechlich zum Einsatz kommt.
-          if (wasBusyRef.current && !busy) {
-            window.location.reload();
-            return;
-          }
-          wasBusyRef.current = busy;
-          setStatus(data);
+          if (!cancelled) setStatus(data);
         }
       } catch {
-        // Server waehrend eines Neustarts kurz nicht erreichbar - das ist
-        // erwartet, einfach beim naechsten Poll weiter versuchen.
+        // Netzwerkproblem - einfach beim naechsten Poll weiter versuchen.
       } finally {
-        if (!cancelled) {
-          const nextDelay = wasBusyRef.current ? FAST_POLL_MS : NORMAL_POLL_MS;
-          timer = setTimeout(poll, nextDelay);
-        }
+        if (!cancelled) timer = setTimeout(poll, POLL_MS);
       }
     }
 
@@ -74,10 +60,10 @@ export default function UpdateBanner() {
 
   if (!status) return null;
 
-  if (status.status === "installing-dependencies" || status.status === "restarting") {
+  if (status.status === "installing-dependencies") {
     return (
       <div className="border-b border-accent/30 bg-accent/10 px-4 py-2.5 text-center text-sm text-accent-text sm:px-6">
-        Ein Update wird automatisch eingespielt - die Seite laedt gleich neu…
+        Ein Update wird im Hintergrund vorbereitet…
       </div>
     );
   }
@@ -93,7 +79,7 @@ export default function UpdateBanner() {
     }
     return (
       <div className="border-b border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-center text-sm text-emerald-400 sm:px-6">
-        Update wurde automatisch eingespielt - du nutzt jetzt die neueste Version.
+        Ein Update wurde heruntergeladen und wird automatisch aktiv, sobald das CMS das nächste Mal gestartet wird.
       </div>
     );
   }

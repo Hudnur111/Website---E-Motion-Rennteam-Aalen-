@@ -10,10 +10,14 @@
 //
 // Wird ein Update gefunden, wendet dieses Skript es an (per
 // scripts/cms-update.sh bzw. .ps1 - dieselbe, bereits beim Start verwendete
-// Update-Logik, inkl. Inhalte-Abgleich) und startet den Server bei echten
-// Code-Aenderungen automatisch neu. Reine Inhalte-Aenderungen (ueber das CMS
-// gespeicherte Texte/Bilder) erfordern keinen Neustart, da diese bei jeder
-// Anfrage frisch von der Festplatte gelesen werden.
+// Update-Logik, inkl. Inhalte-Abgleich). Bei echten Code-Aenderungen wird der
+// laufende Server bewusst NICHT live neu gestartet - das wuerde eine
+// eingeloggte Redaktion mitten in der Arbeit aus der Sitzung werfen. Der
+// neue Code liegt danach einfach auf der Platte und wird automatisch aktiv,
+// sobald das CMS das naechste Mal gestartet wird. Reine Inhalte-Aenderungen
+// (ueber das CMS gespeicherte Texte/Bilder) brauchen ohnehin nie einen
+// Neustart, da diese bei jeder Anfrage frisch von der Festplatte gelesen
+// werden.
 //
 // Der aktuelle Status wird in ".cms-update-status.json" im Projektordner
 // abgelegt; das Admin-Panel liest diese Datei ueber /api/admin/update-status
@@ -105,36 +109,6 @@ function startServer() {
   });
 }
 
-function killChild() {
-  return new Promise((resolve) => {
-    if (!child) return resolve();
-    child.once("exit", resolve);
-    if (isWin) {
-      spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"]);
-    } else {
-      try {
-        process.kill(-child.pid, "SIGTERM");
-      } catch {
-        try {
-          child.kill("SIGTERM");
-        } catch {
-          resolve();
-        }
-      }
-    }
-  });
-}
-
-async function restartServer() {
-  shuttingDown = true;
-  await killChild();
-  shuttingDown = false;
-  // Kurze Pause, damit der alte Prozess den Port sicher freigegeben hat,
-  // bevor der neue Server ihn wieder belegt.
-  await new Promise((r) => setTimeout(r, 800));
-  startServer();
-}
-
 async function checkForUpdate() {
   if (!existsSync(path.join(repoRoot, ".git"))) {
     writeStatus("git-repo-missing");
@@ -163,8 +137,8 @@ async function checkForUpdate() {
     return;
   }
 
-  // Nur bei tatsaechlichen Code-Aenderungen neu starten - ein reiner
-  // Inhalte-Abgleich (content/) wird ohne Neustart sofort wirksam, da
+  // Nur bei tatsaechlichen Code-Aenderungen ueberhaupt etwas melden - ein
+  // reiner Inhalte-Abgleich (content/) wird ohne Neustart sofort wirksam, da
   // Inhalte bei jeder Anfrage frisch von der Festplatte gelesen werden.
   const diff = runGitCommand(["diff", "--name-only", before, after]);
   const changedFiles = (diff || "").split("\n").filter(Boolean);
@@ -181,8 +155,13 @@ async function checkForUpdate() {
     await runAsync("npm", [hasLock ? "ci" : "install", "--no-audit", "--no-fund"]);
   }
 
-  writeStatus("restarting");
-  await restartServer();
+  // Der neue Code liegt jetzt auf der Platte (git pull s.o.), aber der
+  // laufende Server-Prozess haelt weiterhin den alten Code im Speicher.
+  // Bewusst KEIN Live-Neustart hier: das wuerde eine eingeloggte Redaktion
+  // mitten in der Arbeit aus der Sitzung werfen. Der neue Code wird
+  // stattdessen automatisch aktiv, sobald das CMS das naechste Mal gestartet
+  // wird (naechster CMS-Start.bat/.sh/.command-Aufruf) - startServer() laeuft
+  // dann ohnehin gegen den bereits aktualisierten Stand.
   writeStatus("updated", { appliedAt: new Date().toISOString() });
 }
 
@@ -245,7 +224,7 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 // when its controlling terminal goes away - without a handler, Node's
 // default action is to terminate immediately, skipping shutdown() entirely.
 // The Next.js server child is started with `detached: true` (needed so
-// killChild() can signal its whole process group at once) precisely
+// shutdown() can signal its whole process group at once) precisely
 // because it can outlive this process; without catching SIGHUP too, that
 // detached child becomes a permanent orphan still holding the port after
 // every single window close, forcing every next start to fail with
