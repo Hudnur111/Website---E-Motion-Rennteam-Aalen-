@@ -27,6 +27,20 @@ command -v npm >/dev/null 2>&1 || needs_terminal=true
 [ -f ".env.local" ] || needs_terminal=true
 [ -f "node_modules/.bin/next" ] || needs_terminal=true
 
+if [ "$needs_terminal" = false ]; then
+    # Laeuft schon eine Instanz (App versehentlich ein zweites Mal
+    # gestartet)? Dann NICHT versuchen, einen zweiten Server auf demselben
+    # Port zu starten - das wuerde nur mit einer kryptischen
+    # "EADDRINUSE"-Fehlermeldung im Absturz-Dialog enden. Stattdessen wie
+    # eine normale macOS-App beim zweiten Start einfach ein neues
+    # Fenster zur bereits laufenden Instanz oeffnen.
+    if (exec 3<>/dev/tcp/127.0.0.1/3000) 2>/dev/null; then
+        exec 3>&- 3<&-
+        bash "scripts/cms-open-app.sh" &
+        exit 0
+    fi
+fi
+
 if [ "$needs_terminal" = true ]; then
     # Ersteinrichtung, Installation oder eine Fehlermeldung, die jemand
     # tatsaechlich lesen koennen muss - dafuer ganz bewusst ein sichtbares
