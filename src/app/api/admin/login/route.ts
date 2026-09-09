@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/cms/auth";
-import { verifyPassword } from "@/lib/cms/password";
+import { hashPassword, verifyPassword } from "@/lib/cms/password";
 import { findUser } from "@/lib/cms/users";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+// A fixed, precomputed hash with no matching password. Verifying against it
+// when the username doesn't exist keeps the scrypt cost identical to the
+// "user found, wrong password" path, so response timing can't be used to
+// enumerate which usernames are valid.
+const DUMMY_PASSWORD_HASH = hashPassword("dummy-password-for-constant-time-login");
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
@@ -35,13 +41,19 @@ export async function POST(request: NextRequest) {
   let authenticated = false;
 
   if (typeof username === "string" && typeof password === "string") {
-    if (adminUser && adminHash && username === adminUser && verifyPassword(password, adminHash)) {
-      authenticated = true;
+    if (adminUser && adminHash && username === adminUser) {
+      if (verifyPassword(password, adminHash)) authenticated = true;
     } else {
       const user = findUser(username);
-      if (user && verifyPassword(password, user.passwordHash)) {
-        authenticated = true;
-        mustChangePassword = user.mustChangePassword;
+      if (user) {
+        if (verifyPassword(password, user.passwordHash)) {
+          authenticated = true;
+          mustChangePassword = user.mustChangePassword;
+        }
+      } else {
+        // Unknown username: still pay the scrypt cost so this branch takes
+        // the same time as a real "wrong password" check above.
+        verifyPassword(password, DUMMY_PASSWORD_HASH);
       }
     }
   }
