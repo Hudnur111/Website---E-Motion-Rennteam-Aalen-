@@ -205,6 +205,13 @@ export default function CollectionExplorer({
         </button>
       </div>
 
+      {collectionName === "page" && (
+        <p className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-300">
+          ⚠️ Hier werden feste Seiteninhalte (Hero-Texte, Kennzahlen, Abteilungsbeschreibungen) direkt bearbeitet.
+          Unerfahrene Mitarbeiter bitte aufpassen: Änderungen wirken sich sofort auf die entsprechende Seite aus.
+        </p>
+      )}
+
       {notice && (
         <p
           role="status"

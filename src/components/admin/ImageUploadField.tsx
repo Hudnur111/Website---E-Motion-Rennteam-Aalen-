@@ -103,7 +103,7 @@ function LibraryPickerModal({ onSelect, onClose }: { onSelect: (path: string) =>
                   />
                 </div>
                 <p className="truncate px-1.5 py-1 text-[11px] font-medium text-foreground" title={file.name}>
-                  {guessName(file.name)}
+                  {guessName(file.name.split("/").pop() ?? file.name)}
                 </p>
               </button>
             ))}

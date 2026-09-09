@@ -260,7 +260,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
             {/* Overlay with actions */}
             <div className="flex flex-col gap-1 p-2">
               <p className="truncate text-xs font-medium text-foreground" title={file.name}>
-                {file.name}
+                {file.name.split("/").pop()}
               </p>
               <p className="text-[10px] text-muted">{formatBytes(file.size)}</p>
               <div className="mt-1 flex gap-1.5">
