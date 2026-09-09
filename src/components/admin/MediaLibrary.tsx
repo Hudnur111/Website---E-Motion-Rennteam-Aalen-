@@ -194,6 +194,14 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         </div>
       </div>
 
+      {/* Direkter Upload läuft über den Server und wird per GitHub-Commit ins
+          Repo geschrieben (siehe saveUploadedImage) — dabei kommt es bei
+          manchen Dateien öfter zu Konvertierungs-/Commit-Fehlern. */}
+      <p className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-300">
+        Bei Upload-Fehlern hier: Bild lieber direkt im GitHub-Repo unter{" "}
+        <code className="font-mono">public/uploads/</code> hochladen.
+      </p>
+
       {/* Drop zone hint when library is empty */}
       {files.length === 0 && !dragOver && (
         <div className="mb-4 rounded-xl border-2 border-dashed border-border p-8 text-center text-sm text-muted transition-colors hover:border-accent">
