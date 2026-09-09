@@ -6,9 +6,10 @@ import Sidebar from "./Sidebar";
 
 interface Props {
   isAdmin: boolean;
+  visibleCollectionNames: readonly string[];
 }
 
-export default function MobileNav({ isAdmin }: Props) {
+export default function MobileNav({ isAdmin, visibleCollectionNames }: Props) {
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +76,7 @@ export default function MobileNav({ isAdmin }: Props) {
                   </svg>
                 </button>
               </div>
-              <Sidebar isAdmin={isAdmin} />
+              <Sidebar isAdmin={isAdmin} visibleCollectionNames={visibleCollectionNames} />
             </motion.div>
           </>
         )}

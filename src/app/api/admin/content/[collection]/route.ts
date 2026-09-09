@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCollection } from "@/lib/cms/collections";
 import { getItem, listItems, saveItem, slugify, ValidationError } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
+import { canAccessCollection } from "@/lib/cms/roles";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ collection: string }> }) {
   const user = await getSessionUser(request);
@@ -10,6 +11,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { collection: collectionName } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
+  if (!canAccessCollection(user, collectionName)) {
+    return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
+  }
 
   const items = await listItems(collectionName);
   return NextResponse.json({ collection, items });
@@ -22,6 +26,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const user = await getSessionUser(request);
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+  if (!canAccessCollection(user, collectionName)) {
+    return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
+  }
 
   let body: { slug?: string; data?: Record<string, unknown>; body?: string };
   try {

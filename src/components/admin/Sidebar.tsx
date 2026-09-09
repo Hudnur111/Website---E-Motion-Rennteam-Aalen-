@@ -6,10 +6,13 @@ import { collections } from "@/lib/cms/collections";
 
 interface SidebarProps {
   isAdmin: boolean;
+  /** Namen der Collections, die dieser Zugang sehen darf (siehe roles.ts). */
+  visibleCollectionNames: readonly string[];
 }
 
-export default function Sidebar({ isAdmin }: SidebarProps) {
+export default function Sidebar({ isAdmin, visibleCollectionNames }: SidebarProps) {
   const pathname = usePathname();
+  const visibleCollections = collections.filter((c) => visibleCollectionNames.includes(c.name));
 
   return (
     <nav className="space-y-1">
@@ -22,7 +25,7 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
         Übersicht
       </Link>
       <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Inhalte</p>
-      {collections.map((c) => {
+      {visibleCollections.map((c) => {
         const href = `/admin/${c.name}`;
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (

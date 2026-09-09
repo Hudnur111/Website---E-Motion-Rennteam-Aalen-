@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCollection } from "@/lib/cms/collections";
 import { getItem, saveItem, deleteItem, isValidSlug, ValidationError } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
+import { canAccessCollection } from "@/lib/cms/roles";
 
 export async function GET(
   request: NextRequest,
@@ -13,6 +14,9 @@ export async function GET(
   const { collection: collectionName, slug } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
+  if (!canAccessCollection(user, collectionName)) {
+    return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
+  }
 
   const item = await getItem(collectionName, slug);
   if (!item) return NextResponse.json({ error: "Eintrag nicht gefunden." }, { status: 404 });
@@ -29,6 +33,9 @@ export async function PUT(
 
   const user = await getSessionUser(request);
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+  if (!canAccessCollection(user, collectionName)) {
+    return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
+  }
 
   if (!isValidSlug(slug)) return NextResponse.json({ error: "Ungültiger Slug." }, { status: 400 });
 
@@ -60,6 +67,9 @@ export async function DELETE(
 
   const user = await getSessionUser(request);
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+  if (!canAccessCollection(user, collectionName)) {
+    return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
+  }
 
   if (!isValidSlug(slug)) return NextResponse.json({ error: "Ungültiger Slug." }, { status: 400 });
 
