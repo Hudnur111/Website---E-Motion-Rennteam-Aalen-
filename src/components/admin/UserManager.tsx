@@ -2,25 +2,33 @@
 
 import { useState } from "react";
 
+const ASSIGNABLE_ROLES = ["Admin", "Sponsoring-Management"] as const;
+
 interface UserRow {
   username: string;
   mustChangePassword: boolean;
+  roles: string[];
+  disabled: boolean;
 }
 
 interface UserManagerProps {
   adminUsername: string;
   initialUsers: UserRow[];
+  /** true = Zugänge liegen in der Online-Benutzerverwaltung (Rollen/Sperren editierbar), false = lokale Legacy-Liste. */
+  remote: boolean;
 }
 
-export default function UserManager({ adminUsername, initialUsers }: UserManagerProps) {
+export default function UserManager({ adminUsername, initialUsers, remote }: UserManagerProps) {
   const [users, setUsers] = useState<UserRow[]>(initialUsers);
   const [error, setError] = useState("");
 
   const [username, setUsername] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(["Admin"]);
   const [createdInfo, setCreatedInfo] = useState<{ username: string; password: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  const [busyUser, setBusyUser] = useState<string | null>(null);
 
   async function loadUsers() {
     setError("");
@@ -38,6 +46,10 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
     }
   }
 
+  function toggleRole(role: string) {
+    setSelectedRoles((prev) => (prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]));
+  }
+
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setFormError("");
@@ -51,13 +63,17 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
       setFormError("Das temporäre Passwort muss mindestens 8 Zeichen lang sein.");
       return;
     }
+    if (remote && selectedRoles.length === 0) {
+      setFormError("Bitte mindestens eine Rolle auswählen.");
+      return;
+    }
 
     setSubmitting(true);
     try {
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), temporaryPassword }),
+        body: JSON.stringify({ username: username.trim(), temporaryPassword, roles: selectedRoles }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -67,6 +83,7 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
       setCreatedInfo({ username: username.trim(), password: temporaryPassword });
       setUsername("");
       setTemporaryPassword("");
+      setSelectedRoles(["Admin"]);
       await loadUsers();
     } catch {
       setFormError("Verbindung zum Server fehlgeschlagen.");
@@ -87,6 +104,57 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
       await loadUsers();
     } catch {
       setError("Verbindung zum Server fehlgeschlagen.");
+    }
+  }
+
+  async function handleToggleRole(target: string, currentRoles: string[], role: string) {
+    const nextRoles = currentRoles.includes(role)
+      ? currentRoles.filter((r) => r !== role)
+      : [...currentRoles, role];
+    if (nextRoles.length === 0) {
+      setError("Mindestens eine Rolle muss zugewiesen bleiben.");
+      return;
+    }
+    setBusyUser(target);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(target)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roles: nextRoles }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Rolle konnte nicht geändert werden.");
+        return;
+      }
+      await loadUsers();
+    } catch {
+      setError("Verbindung zum Server fehlgeschlagen.");
+    } finally {
+      setBusyUser(null);
+    }
+  }
+
+  async function handleToggleDisabled(target: string, disabled: boolean) {
+    setBusyUser(target);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(target)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ disabled: !disabled }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Zugang konnte nicht gesperrt/entsperrt werden.");
+        return;
+      }
+      await loadUsers();
+    } catch {
+      setError("Verbindung zum Server fehlgeschlagen.");
+    } finally {
+      setBusyUser(null);
     }
   }
 
@@ -130,6 +198,28 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
               placeholder="mind. 8 Zeichen"
             />
           </div>
+
+          {remote && (
+            <div className="sm:col-span-2">
+              <span className="mb-1.5 block text-sm font-medium text-foreground">Rollen</span>
+              <div className="flex flex-wrap gap-3">
+                {ASSIGNABLE_ROLES.map((role) => (
+                  <label
+                    key={role}
+                    className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedRoles.includes(role)}
+                      onChange={() => toggleRole(role)}
+                      className="accent-accent"
+                    />
+                    {role}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {formError && (
             <p role="alert" className="sm:col-span-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-red-400">
@@ -185,19 +275,54 @@ export default function UserManager({ adminUsername, initialUsers }: UserManager
           )}
 
           {users.map((u) => (
-            <div key={u.username} className="flex items-center justify-between py-3">
+            <div key={u.username} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div>
                 <p className="text-sm font-medium text-foreground">{u.username}</p>
                 <p className="text-xs text-muted">
-                  {u.mustChangePassword ? "Wartet auf erste Anmeldung / eigenes Passwort" : "Aktiv"}
+                  {u.disabled
+                    ? "Gesperrt"
+                    : u.mustChangePassword
+                      ? "Wartet auf erste Anmeldung / eigenes Passwort"
+                      : "Aktiv"}
                 </p>
               </div>
-              <button
-                onClick={() => handleDelete(u.username)}
-                className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-400"
-              >
-                Entfernen
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                {remote &&
+                  ASSIGNABLE_ROLES.map((role) => {
+                    const active = u.roles.includes(role);
+                    return (
+                      <button
+                        key={role}
+                        type="button"
+                        disabled={busyUser === u.username}
+                        onClick={() => handleToggleRole(u.username, u.roles, role)}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                          active
+                            ? "bg-accent/15 text-accent-text"
+                            : "border border-border text-muted hover:text-foreground"
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    );
+                  })}
+                {remote && (
+                  <button
+                    type="button"
+                    disabled={busyUser === u.username}
+                    onClick={() => handleToggleDisabled(u.username, u.disabled)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-amber-500/50 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {u.disabled ? "Entsperren" : "Sperren"}
+                  </button>
+                )}
+                <button
+                  onClick={() => handleDelete(u.username)}
+                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-400"
+                >
+                  Entfernen
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
+import { canManageUsers } from "@/lib/cms/roles";
 
 export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
@@ -35,9 +36,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin/passwort-aendern", request.url));
   }
 
-  // Die Benutzerverwaltung ist dem Hauptadministrator (CMS_ADMIN_USER) vorbehalten.
+  // Die Benutzerverwaltung ist dem Hauptadministrator sowie Zugängen mit der
+  // Rolle "Admin" aus der Online-Benutzerverwaltung vorbehalten.
   const isUserManagement = pathname.startsWith("/admin/benutzer") || pathname.startsWith("/api/admin/users");
-  if (isUserManagement && session.username !== process.env.CMS_ADMIN_USER) {
+  if (isUserManagement && !canManageUsers(session)) {
     if (pathname.startsWith("/api/admin")) {
       return NextResponse.json({ error: "Nur der Hauptadministrator kann Benutzer verwalten." }, { status: 403 });
     }

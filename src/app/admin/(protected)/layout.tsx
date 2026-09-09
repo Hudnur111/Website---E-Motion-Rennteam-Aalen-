@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
+import { canManageUsers } from "@/lib/cms/roles";
 import Sidebar from "@/components/admin/Sidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
 import ShutdownButton from "@/components/admin/ShutdownButton";
@@ -16,6 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (session.mustChangePassword) redirect("/admin/passwort-aendern");
 
   const isAdmin = session.username === process.env.CMS_ADMIN_USER;
+  const canManage = canManageUsers(session);
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="sticky top-0 z-20 border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <MobileNav isAdmin={isAdmin} />
+            <MobileNav isAdmin={canManage} />
             <Link href="/admin" className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-2">
                 <Image src="/uploads/logo.png" alt="" width={20} height={20} className="h-5 w-5 object-contain" />
@@ -42,7 +44,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 sm:px-6">
         <aside className="hidden w-56 shrink-0 md:block">
           <div className="sticky top-20">
-            <Sidebar isAdmin={isAdmin} />
+            <Sidebar isAdmin={canManage} />
           </div>
         </aside>
         <main className="min-w-0 flex-1 pb-16">{children}</main>

@@ -10,6 +10,8 @@ interface SessionPayload {
   exp: number;
   /** Muss vor weiterer Nutzung erst ein eigenes Passwort vergeben. */
   p?: boolean;
+  /** Rollen aus dem Credentials-Repo (z.B. "Admin", "Sponsoring-Management"). Leer/fehlend für lokale/Bootstrap-Nutzer. */
+  r?: string[];
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {
@@ -46,11 +48,16 @@ function getSecret(): string {
   return secret;
 }
 
-export async function createSessionToken(username: string, mustChangePassword = false): Promise<string> {
+export async function createSessionToken(
+  username: string,
+  mustChangePassword = false,
+  roles: string[] = []
+): Promise<string> {
   const payload: SessionPayload = {
     u: username,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
     ...(mustChangePassword ? { p: true } : {}),
+    ...(roles.length > 0 ? { r: roles } : {}),
   };
   const payloadBytes = new TextEncoder().encode(JSON.stringify(payload));
   const payloadB64 = base64UrlEncode(payloadBytes);
@@ -62,7 +69,7 @@ export async function createSessionToken(username: string, mustChangePassword = 
 
 export async function verifySessionToken(
   token: string | undefined | null
-): Promise<{ username: string; mustChangePassword: boolean } | null> {
+): Promise<{ username: string; mustChangePassword: boolean; roles: string[] } | null> {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 2) return null;
@@ -88,7 +95,11 @@ export async function verifySessionToken(
     const payload: SessionPayload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64)));
     if (typeof payload.exp !== "number" || payload.exp < Math.floor(Date.now() / 1000)) return null;
     if (typeof payload.u !== "string" || !payload.u) return null;
-    return { username: payload.u, mustChangePassword: payload.p === true };
+    return {
+      username: payload.u,
+      mustChangePassword: payload.p === true,
+      roles: Array.isArray(payload.r) ? payload.r.filter((r): r is string => typeof r === "string") : [],
+    };
   } catch {
     return null;
   }
@@ -99,7 +110,7 @@ export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;
 /** Reads and verifies the session cookie from an incoming request. */
 export async function getSessionUser(
   request: Request
-): Promise<{ username: string; mustChangePassword: boolean } | null> {
+): Promise<{ username: string; mustChangePassword: boolean; roles: string[] } | null> {
   const cookieHeader = request.headers.get("cookie") || "";
   const match = cookieHeader
     .split(";")

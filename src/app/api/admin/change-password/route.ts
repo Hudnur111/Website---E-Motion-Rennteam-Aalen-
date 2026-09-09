@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, getSessionUser } from "@/lib/cms/auth";
 import { hashPassword } from "@/lib/cms/password";
-import { setUserPassword } from "@/lib/cms/users";
+import { setUserPassword, findUser } from "@/lib/cms/users";
+import {
+  isRemoteAuthEnabled,
+  getCredentialsClient,
+  changePassword as remoteChangePassword,
+  WeakPasswordError,
+  CredentialsError,
+} from "@/lib/cms/credentialsRepo";
 
 export async function POST(request: NextRequest) {
   const sessionSecret = process.env.CMS_SESSION_SECRET;
@@ -29,15 +36,46 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Das Passwort muss mindestens 8 Zeichen lang sein." }, { status: 400 });
   }
 
-  const updated = setUserPassword(session.username, hashPassword(newPassword));
-  if (!updated) {
+  // Session-Nutzer ist entweder lokal (.cms-users.json) oder ein Zugang aus
+  // der Online-Benutzerverwaltung (Rollen im Session-Token gesetzt). Ist der
+  // Nutzername lokal unbekannt und die Online-Benutzerverwaltung aktiv, wird
+  // dort geaendert - das deckt sowohl den Hauptadministrator (kein Passwort-
+  // Wechsel hier vorgesehen) als auch entfernte Zugaenge ab.
+  const isLocalUser = Boolean(findUser(session.username));
+
+  if (isLocalUser) {
+    const updated = setUserPassword(session.username, hashPassword(newPassword));
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Für diesen Benutzer kann das Passwort hier nicht geändert werden." },
+        { status: 400 }
+      );
+    }
+  } else if (isRemoteAuthEnabled() && session.roles.length > 0) {
+    try {
+      await remoteChangePassword(getCredentialsClient(), {
+        targetUsername: session.username,
+        newPassword,
+        actor: session.username,
+      });
+    } catch (err) {
+      if (err instanceof WeakPasswordError || err instanceof CredentialsError) {
+        return NextResponse.json({ error: err.message }, { status: 400 });
+      }
+      console.error("Online-Benutzerverwaltung: Passwortänderung fehlgeschlagen:", err);
+      return NextResponse.json(
+        { error: "Online-Benutzerverwaltung ist momentan nicht erreichbar. Bitte später erneut versuchen." },
+        { status: 502 }
+      );
+    }
+  } else {
     return NextResponse.json(
       { error: "Für diesen Benutzer kann das Passwort hier nicht geändert werden." },
       { status: 400 }
     );
   }
 
-  const token = await createSessionToken(session.username, false);
+  const token = await createSessionToken(session.username, false, session.roles);
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,

@@ -37,7 +37,7 @@ describe("POST /api/admin/upload", () => {
   });
 
   it("rejects a file whose content doesn't match its declared image type", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false });
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false, roles: [] });
     const saveSpy = vi.spyOn(content, "saveUploadedImage");
 
     // Plain text content, but claims to be a PNG - a spoofed Content-Type.
@@ -51,7 +51,7 @@ describe("POST /api/admin/upload", () => {
   });
 
   it("accepts a genuine PNG and saves it", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false });
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false, roles: [] });
     vi.spyOn(content, "saveUploadedImage").mockResolvedValue({
       publicPath: "/uploads/photo.png",
       committedToGithub: false,
@@ -67,7 +67,7 @@ describe("POST /api/admin/upload", () => {
   });
 
   it("rejects disallowed MIME types before signature checking", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false });
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue({ username: "admin", mustChangePassword: false, roles: [] });
 
     const file = new File(["<svg/>"], "logo.svg", { type: "image/svg+xml" });
     const response = await POST(uploadRequest(file));

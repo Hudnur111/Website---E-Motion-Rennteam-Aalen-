@@ -2,15 +2,30 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import { listUsers } from "@/lib/cms/users";
+import { canManageUsers } from "@/lib/cms/roles";
+import { isRemoteAuthEnabled, getCredentialsClient } from "@/lib/cms/credentialsRepo";
 import UserManager from "@/components/admin/UserManager";
 
 export default async function UsersPage() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
   if (!session) redirect("/admin/login");
-  if (session.username !== process.env.CMS_ADMIN_USER) redirect("/admin");
+  if (!canManageUsers(session)) redirect("/admin");
 
-  const initialUsers = listUsers().map(({ username, mustChangePassword }) => ({ username, mustChangePassword }));
+  const remote = isRemoteAuthEnabled();
+  const initialUsers = remote
+    ? (await getCredentialsClient().loadAdmins({ forceRefresh: true })).users.map((u) => ({
+        username: u.username,
+        mustChangePassword: u.mustChangePassword,
+        roles: u.roles,
+        disabled: u.disabled,
+      }))
+    : listUsers().map(({ username, mustChangePassword }) => ({
+        username,
+        mustChangePassword,
+        roles: [] as string[],
+        disabled: false,
+      }));
 
   return (
     <div>
@@ -20,9 +35,10 @@ export default async function UsersPage() {
           Lege weitere Redaktions-Zugänge an – z. B. für Teamkolleg:innen, die von ihrem eigenen Gerät aus
           Inhalte pflegen sollen. Jede:r neue Nutzer:in vergibt beim ersten Login ein eigenes, nur ihr/ihm
           bekanntes Passwort.
+          {remote && " Zugänge, Rollen und Passwort-Hashes werden verschlüsselt in der Online-Benutzerverwaltung gespeichert."}
         </p>
       </div>
-      <UserManager adminUsername={session.username} initialUsers={initialUsers} />
+      <UserManager adminUsername={session.username} initialUsers={initialUsers} remote={remote} />
     </div>
   );
 }

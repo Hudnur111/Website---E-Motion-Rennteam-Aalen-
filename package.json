@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "node scripts/fix-credentials-repo-pkg.mjs",
     "dev": "next dev",
     "build": "next build",
     "analyze": "next build --experimental-analyze",
@@ -13,6 +14,7 @@
     "test:a11y": "node scripts/a11y-check.mjs"
   },
   "dependencies": {
+    "credentials-repo": "git+https://github.com/E-Motion-Rennteam-Aalen-e-V/Login-Benutzerverwaltung.git#main",
     "framer-motion": "^13.0.0",
     "gray-matter": "^4.0.3",
     "marked": "^18.0.9",
