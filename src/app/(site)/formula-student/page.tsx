@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import DisciplinesChart from "@/components/DisciplinesChart";
 import FSTimeline from "@/components/FormulaStudent/FSTimeline";
@@ -29,7 +30,8 @@ export default function FormulaStudentPage() {
           </div>
           <p className="max-w-xl text-base text-muted">
             Ein internationaler Konstruktionswettbewerb, in dem Teams Elektrorennwagen entwickeln,
-            bauen und auf Rennstrecken testen – Technik trifft Teamgeist.
+            bauen und auf Rennstrecken testen – Technik trifft Teamgeist. Genau das machen wir mit
+            dem E-Motion Rennteam Aalen jedes Jahr aufs Neue.
           </p>
         </div>
       </Reveal>
@@ -90,6 +92,32 @@ export default function FormulaStudentPage() {
             </p>
           </div>
           <FSCompetitions />
+        </div>
+      </Reveal>
+
+      {/* CTA */}
+      <Reveal delay={0.3}>
+        <div className="rounded-2xl border border-border bg-surface/50 p-8 text-center sm:p-12">
+          <h2 className="text-2xl font-bold sm:text-3xl">Lust, selbst mitzubauen?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
+            Beim E-Motion Rennteam Aalen setzen wir Formula Student in die Praxis um – vom
+            CAD-Modell bis zur Zieldurchfahrt. Wir suchen laufend Studierende aus allen
+            Fachrichtungen.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/mitmachen"
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+            >
+              Offene Positionen ansehen <span aria-hidden>&rarr;</span>
+            </Link>
+            <Link
+              href="/team"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+            >
+              Unser Team kennenlernen <span aria-hidden>&rarr;</span>
+            </Link>
+          </div>
         </div>
       </Reveal>
     </div>
