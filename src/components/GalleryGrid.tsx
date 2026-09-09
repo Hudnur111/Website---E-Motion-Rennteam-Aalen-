@@ -38,14 +38,43 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
   }
 
   // Keyboard support for the lightbox: Escape closes it, arrow keys step
-  // through images. Also lock body scroll while it's open.
+  // through images. Also lock body scroll while it's open and trap focus.
   useEffect(() => {
     if (activeIndex === null) return;
+
+    const focusableElements = [closeButtonRef.current];
+    if (images.length > 1) {
+      const buttons = document.querySelectorAll(
+        'button[aria-label*="Bild"], button[aria-label="Schließen"]'
+      );
+      focusableElements.length = 0;
+      buttons.forEach((btn) => focusableElements.push(btn as HTMLButtonElement));
+    }
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") close();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "Tab") {
+        const focusable = Array.from(
+          document.querySelectorAll(
+            'button[aria-label*="Bild"], button[aria-label="Schließen"]'
+          )
+        ) as HTMLButtonElement[];
+        if (focusable.length === 0) return;
+        const currentIndex = focusable.indexOf(document.activeElement as HTMLButtonElement);
+        if (e.shiftKey) {
+          if (currentIndex <= 0) {
+            e.preventDefault();
+            focusable[focusable.length - 1].focus();
+          }
+        } else {
+          if (currentIndex === focusable.length - 1) {
+            e.preventDefault();
+            focusable[0].focus();
+          }
+        }
+      }
     }
 
     document.addEventListener("keydown", onKeyDown);

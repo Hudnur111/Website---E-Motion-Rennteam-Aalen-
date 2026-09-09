@@ -475,6 +475,7 @@ function ObjectListField({
               value={row.label}
               onChange={(e) => updateRow(i, "label", e.target.value)}
               placeholder="Bezeichnung"
+              aria-label={`Bezeichnung – Zeile ${i + 1}`}
               className="w-1/3 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
             />
             <input
@@ -482,6 +483,7 @@ function ObjectListField({
               value={row.value}
               onChange={(e) => updateRow(i, "value", e.target.value)}
               placeholder="Wert"
+              aria-label={`Wert – Zeile ${i + 1}`}
               className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
             />
             <button
