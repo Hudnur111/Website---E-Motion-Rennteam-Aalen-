@@ -63,3 +63,12 @@ durchklicken und diese Anleitung bei Bedarf korrigieren.
 - Ab da übernimmt exakt dieselbe Logik wie bei Windows: `scripts/cms-open-app.sh`
   öffnet das Browser-App-Fenster, `scripts/cms-supervisor.mjs` startet und
   überwacht den eigentlichen Next.js-Server.
+- Läuft bereits eine Instanz (App versehentlich ein zweites Mal gestartet),
+  wird kein zweiter Server versucht (das würde nur mit einer kryptischen
+  Fehlermeldung scheitern) — stattdessen öffnet sich einfach ein weiteres
+  Fenster zur bereits laufenden Instanz.
+- Wird die App über das Dock beendet (Rechtsklick → "Beenden", Cmd+Q,
+  Aktivitätsanzeige), beendet ein Cleanup-Trap den kompletten
+  CMS-Prozessbaum mit — der Server läuft dann nicht unsichtbar im
+  Hintergrund weiter. Der reguläre Weg bleibt trotzdem der
+  "Herunterfahren"-Button im CMS selbst.

@@ -66,6 +66,35 @@ LOG="$DIR/.cms-launcher.log"
 bash "CMS-Start.command" >> "$LOG" 2>&1 &
 server_pid=$!
 
+# Wird DIESER Launcher beendet (Dock-Symbol -> "Beenden", Cmd+Q,
+# Aktivitaetsanzeige), soll nicht nur das Dock-Icon verschwinden, waehrend
+# CMS-Start.command/Supervisor/Next.js unsichtbar im Hintergrund weiterlaufen
+# (Port 3000 bliebe belegt, ohne dass irgendwo ein sichtbarer Prozess auf
+# eine Person hindeutet) - stattdessen den kompletten Prozessbaum mit
+# beenden. Regulaeres Beenden ueber den "Herunterfahren"-Button im CMS
+# raeumt den Baum schon selbst auf, dann findet dieser Trap nichts mehr vor.
+collect_descendants() {
+    local parent="$1" pid
+    for pid in $(pgrep -P "$parent" 2>/dev/null); do
+        collect_descendants "$pid"
+        printf '%s\n' "$pid"
+    done
+}
+cleanup() {
+    # $? an dieser Stelle ist der eigentliche Exit-Code des Skripts (0 nach
+    # sauberem Herunterfahren, 1 nach dem Absturz-Dialog-Pfad usw.) - ohne
+    # ihn explizit zu sichern und zurueckzugeben, wuerde der letzte Befehl
+    # in dieser Funktion (typischerweise ein "kill" auf einen bereits toten
+    # Prozess, Exit-Code 1) ihn faelschlich ueberschreiben.
+    local exit_code=$?
+    local pids
+    pids="$(collect_descendants "$server_pid")"
+    [ -n "$pids" ] && kill -TERM $pids 2>/dev/null
+    kill -TERM "$server_pid" 2>/dev/null
+    return "$exit_code"
+}
+trap cleanup EXIT TERM INT
+
 # Kurze Wartezeit: stuerzt der Start sofort ab (z.B. Port dauerhaft von
 # einem fremden Programm blockiert), lieber eine sichtbare Fehlermeldung
 # zeigen statt eine App, die scheinbar gar nichts tut.
