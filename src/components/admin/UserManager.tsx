@@ -16,11 +16,13 @@ interface UserManagerProps {
   initialUsers: UserRow[];
   /** true = Zugänge liegen in der Online-Benutzerverwaltung (Rollen/Sperren editierbar), false = lokale Legacy-Liste. */
   remote: boolean;
+  /** Fehlermeldung vom serverseitigen Erstladen (z.B. Online-Benutzerverwaltung nicht erreichbar). */
+  initialError?: string | null;
 }
 
-export default function UserManager({ adminUsername, initialUsers, remote }: UserManagerProps) {
+export default function UserManager({ adminUsername, initialUsers, remote, initialError }: UserManagerProps) {
   const [users, setUsers] = useState<UserRow[]>(initialUsers);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError ?? "");
 
   const [username, setUsername] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState("");
@@ -29,6 +31,15 @@ export default function UserManager({ adminUsername, initialUsers, remote }: Use
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [busyUser, setBusyUser] = useState<string | null>(null);
+
+  // Die Online-Benutzerverwaltung erzwingt eine strengere Passwort-Richtlinie
+  // (mind. 11 Zeichen, 3 von 4 Zeichenklassen) als die lokale Legacy-Liste
+  // (nur Mindestlaenge 8) - der Hinweis muss dazu passen, sonst schlaegt das
+  // Anlegen nach Eingabe scheinbar grundlos fehl.
+  const passwordMinLength = remote ? 11 : 8;
+  const passwordPolicyHint = remote
+    ? "mind. 11 Zeichen, mind. 3 von 4 Zeichenklassen (Klein-/Großbuchstaben, Ziffern, Sonderzeichen)"
+    : "mind. 8 Zeichen";
 
   async function loadUsers() {
     setError("");
@@ -59,8 +70,8 @@ export default function UserManager({ adminUsername, initialUsers, remote }: Use
       setFormError("Bitte einen Benutzernamen angeben.");
       return;
     }
-    if (temporaryPassword.length < 8) {
-      setFormError("Das temporäre Passwort muss mindestens 8 Zeichen lang sein.");
+    if (temporaryPassword.length < passwordMinLength) {
+      setFormError(`Das temporäre Passwort muss ${passwordPolicyHint} enthalten.`);
       return;
     }
     if (remote && selectedRoles.length === 0) {
@@ -191,11 +202,11 @@ export default function UserManager({ adminUsername, initialUsers, remote }: Use
               id="new-temp-password"
               type="text"
               required
-              minLength={8}
+              minLength={passwordMinLength}
               value={temporaryPassword}
               onChange={(e) => setTemporaryPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              placeholder="mind. 8 Zeichen"
+              placeholder={passwordPolicyHint}
             />
           </div>
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/cms/auth";
 import { deleteUser } from "@/lib/cms/users";
-import { canManageUsers, isAssignableRole } from "@/lib/cms/roles";
+import { canManageUsers, isAssignableRole, ROLE_ADMIN } from "@/lib/cms/roles";
 import {
   isRemoteAuthEnabled,
   getCredentialsClient,
@@ -20,6 +20,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { username } = await params;
   const targetUsername = decodeURIComponent(username);
+
+  if (targetUsername.toLowerCase() === session.username.toLowerCase()) {
+    return NextResponse.json({ error: "Der eigene Zugang kann nicht entfernt werden." }, { status: 400 });
+  }
 
   const removedLocally = deleteUser(targetUsername);
   if (removedLocally) return NextResponse.json({ ok: true });
@@ -64,6 +68,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  }
+
+  const isSelf = targetUsername.toLowerCase() === session.username.toLowerCase();
+  if (isSelf && body.disabled === true) {
+    return NextResponse.json({ error: "Der eigene Zugang kann nicht gesperrt werden." }, { status: 400 });
+  }
+  if (isSelf && Array.isArray(body.roles) && !body.roles.includes(ROLE_ADMIN)) {
+    return NextResponse.json(
+      { error: "Die eigene Admin-Rolle kann nicht selbst entzogen werden - das würde vom Zugang aussperren." },
+      { status: 400 }
+    );
   }
 
   try {

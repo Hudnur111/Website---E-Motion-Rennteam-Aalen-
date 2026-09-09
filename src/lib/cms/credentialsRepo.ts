@@ -67,3 +67,8 @@ export function getCredentialsClient(): CredentialsClient {
   });
   return cachedClient;
 }
+
+/** Test-only: verwirft den gecachten Client, damit Tests mit wechselnder Env-Konfiguration nicht denselben Client wiederverwenden. */
+export function _resetCredentialsClientForTesting(): void {
+  cachedClient = null;
+}

@@ -13,19 +13,34 @@ export default async function UsersPage() {
   if (!canManageUsers(session)) redirect("/admin");
 
   const remote = isRemoteAuthEnabled();
-  const initialUsers = remote
-    ? (await getCredentialsClient().loadAdmins({ forceRefresh: true })).users.map((u) => ({
+  let initialUsers: { username: string; mustChangePassword: boolean; roles: string[]; disabled: boolean }[] = [];
+  let loadError: string | null = null;
+
+  if (remote) {
+    try {
+      const file = await getCredentialsClient().loadAdmins({ forceRefresh: true });
+      initialUsers = file.users.map((u) => ({
         username: u.username,
         mustChangePassword: u.mustChangePassword,
         roles: u.roles,
         disabled: u.disabled,
-      }))
-    : listUsers().map(({ username, mustChangePassword }) => ({
-        username,
-        mustChangePassword,
-        roles: [] as string[],
-        disabled: false,
       }));
+    } catch (err) {
+      // Serverseitiges Rendern darf hier nicht mit einer 500-Fehlerseite
+      // abbrechen, nur weil GitHub kurz nicht erreichbar ist - stattdessen
+      // die Seite mit leerer Liste + Fehlermeldung anzeigen (das clientseitige
+      // "Aktualisieren" in UserManager kann es danach erneut versuchen).
+      console.error("Online-Benutzerverwaltung: Laden fehlgeschlagen:", err);
+      loadError = "Online-Benutzerverwaltung ist momentan nicht erreichbar. Bitte die Seite neu laden.";
+    }
+  } else {
+    initialUsers = listUsers().map(({ username, mustChangePassword }) => ({
+      username,
+      mustChangePassword,
+      roles: [],
+      disabled: false,
+    }));
+  }
 
   return (
     <div>
@@ -38,7 +53,12 @@ export default async function UsersPage() {
           {remote && " Zugänge, Rollen und Passwort-Hashes werden verschlüsselt in der Online-Benutzerverwaltung gespeichert."}
         </p>
       </div>
-      <UserManager adminUsername={session.username} initialUsers={initialUsers} remote={remote} />
+      <UserManager
+        adminUsername={session.username}
+        initialUsers={initialUsers}
+        remote={remote}
+        initialError={loadError}
+      />
     </div>
   );
 }

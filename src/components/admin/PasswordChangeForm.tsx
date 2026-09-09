@@ -7,19 +7,26 @@ import { motion } from "framer-motion";
 interface PasswordChangeFormProps {
   username: string;
   forced: boolean;
+  /** true = Zugang liegt in der Online-Benutzerverwaltung, die eine strengere Passwort-Richtlinie durchsetzt. */
+  strongPolicy?: boolean;
 }
 
-export default function PasswordChangeForm({ username, forced }: PasswordChangeFormProps) {
+export default function PasswordChangeForm({ username, forced, strongPolicy = false }: PasswordChangeFormProps) {
   const router = useRouter();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
 
+  const minLength = strongPolicy ? 11 : 8;
+  const policyHint = strongPolicy
+    ? "mind. 11 Zeichen, mind. 3 von 4 Zeichenklassen (Klein-/Großbuchstaben, Ziffern, Sonderzeichen), ohne den Benutzernamen"
+    : "mind. 8 Zeichen";
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (newPassword.length < 8) {
-      setError("Das Passwort muss mindestens 8 Zeichen lang sein.");
+    if (newPassword.length < minLength) {
+      setError(`Das Passwort muss ${policyHint} enthalten.`);
       setStatus("error");
       return;
     }
@@ -84,11 +91,11 @@ export default function PasswordChangeForm({ username, forced }: PasswordChangeF
               autoComplete="new-password"
               required
               autoFocus
-              minLength={8}
+              minLength={minLength}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              placeholder="mind. 8 Zeichen"
+              placeholder={policyHint}
             />
           </div>
           <div>
@@ -101,7 +108,7 @@ export default function PasswordChangeForm({ username, forced }: PasswordChangeF
               type="password"
               autoComplete="new-password"
               required
-              minLength={8}
+              minLength={minLength}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
