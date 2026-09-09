@@ -30,15 +30,14 @@
   }
   .card {
     width: min(380px, 90vw);
+    -webkit-user-select: none;
+    user-select: none;
   }
   .head {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin-bottom: 28px;
-    -webkit-user-select: none;
-    user-select: none;
   }
   .mark {
     width: 48px;
@@ -64,43 +63,12 @@
     color: var(--muted);
     margin: 0;
   }
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--foreground);
-  }
-  input {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--foreground);
-    padding: 10px 14px;
-    font-size: 14px;
-    outline: none;
-  }
-  input:focus { border-color: var(--accent); }
-  .field { margin-bottom: 18px; }
-  button {
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    cursor: pointer;
-  }
-  button:disabled { opacity: 0.65; cursor: not-allowed; }
   .status-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 18px;
+    margin-top: 28px;
     min-height: 16px;
   }
   .spinner {
@@ -156,14 +124,6 @@
       <p class="sub">Redaktions-CMS</p>
     </div>
 
-    <form id="loginForm">
-      <div class="field">
-        <label for="password">Passwort</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" autofocus placeholder="••••••••" />
-      </div>
-      <button type="submit" id="submitBtn">Anmelden</button>
-    </form>
-
     <div class="status-row">
       <div class="spinner" id="spinner"></div>
       <p class="status" id="status">Verbinde mit Server…</p>
@@ -175,15 +135,14 @@
   </div>
 
   <script>
-    // Zeigt die Login-Maske sofort an, statt erst auf den Server zu warten
-    // - Benutzername/Passwort lassen sich also schon eintippen, waehrend der
-    // Server im Hintergrund noch hochfaehrt. Der Benutzername wird hier
-    // bewusst nicht abgefragt: die echte Login-Seite fuellt ihn automatisch
-    // aus CMS_ADMIN_USER vorbelegt aus (siehe src/app/admin/login/page.tsx),
-    // Passwoerter lassen sich aus Sicherheitsgruenden nicht ueber die
-    // Seitengrenze (file:// -> http://localhost) mitnehmen und muessen daher
-    // auf der echten Seite einmal eingegeben werden - typischerweise laengst
-    // erledigt, bevor der Server ueberhaupt bereit ist.
+    // Reiner Lade-Splash, keine eigene Login-Maske: fruehere Versionen
+    // zeigten hier schon ein Passwortfeld zum Vorab-Eintippen, aber das
+    // konnte nie wirklich einloggen (der Tastatur-Fokus/Wert geht beim
+    // Sprung auf die echte Seite ohnehin verloren, siehe Git-Historie) - das
+    // sorgte nur fuer Verwirrung ("ich habe mein Passwort eingegeben und
+    // nichts ist passiert"). Stattdessen jetzt: sobald der Server antwortet,
+    // wird IMMER automatisch zur echten Login-Seite weitergeleitet, ganz
+    // ohne Klick.
     //
     // Deliberately avoids fetch()/XHR to probe the server: this file is
     // opened via file://, and browsers block cross-origin fetch from a
@@ -200,14 +159,10 @@
       var cardEl = document.getElementById("card");
       var retryEl = document.getElementById("retry");
       var spinnerEl = document.getElementById("spinner");
-      var formEl = document.getElementById("loginForm");
-      var submitBtn = document.getElementById("submitBtn");
       document.getElementById("retryLink").href = TARGET;
 
       var startedAt = Date.now();
       var handedOff = false;
-      var serverReady = false;
-      var wantsSubmit = false;
       var messages = [
         [0, "Verbinde mit Server…"],
         [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
@@ -223,27 +178,13 @@
         window.location.replace(TARGET);
       }
 
-      formEl.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (handedOff) return;
-        if (serverReady) {
-          goToRealLogin();
-          return;
-        }
-        // Server ist noch nicht bereit: Klick merken und automatisch
-        // fortsetzen, sobald er antwortet - kein erneuter Klick noetig.
-        wantsSubmit = true;
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Verbinde…";
-      });
-
       function tick() {
         var elapsed = Date.now() - startedAt;
 
         for (var i = messages.length - 1; i >= 0; i--) {
           if (elapsed >= messages[i][0] && i !== currentMessage) {
             currentMessage = i;
-            if (!wantsSubmit) statusEl.textContent = messages[i][1];
+            statusEl.textContent = messages[i][1];
           }
         }
         if (elapsed >= 35000) {
@@ -264,19 +205,10 @@
         // fast for "connection refused" as for a broken response, so it
         // must NOT be treated as ready - it just means "try again".
         var probe = new Image();
-        probe.onload = function () {
-          if (handedOff) return;
-          serverReady = true;
-          if (wantsSubmit) {
-            goToRealLogin();
-            return;
-          }
-          statusEl.textContent = "Server ist bereit.";
-          spinnerEl.classList.add("hidden");
-        };
+        probe.onload = goToRealLogin;
         probe.src = PING + Date.now();
 
-        if (!handedOff && !serverReady) setTimeout(tick, 700);
+        if (!handedOff) setTimeout(tick, 700);
       }
 
       tick();
