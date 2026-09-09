@@ -53,7 +53,7 @@ export const collections: CollectionDef[] = [
           "Teamleitung",
         ],
       },
-      { name: "photo", label: "Foto", type: "image" },
+      { name: "photo", label: "Foto", type: "image", required: true },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },
       { name: "body", label: "Kurzbeschreibung", type: "richText" },
       { name: "order", label: "Reihenfolge", type: "number" },
