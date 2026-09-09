@@ -27,24 +27,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .card {
+    width: min(380px, 90vw);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 28px;
     -webkit-user-select: none;
     user-select: none;
   }
-  .card {
-    width: min(420px, 90vw);
-    text-align: center;
-  }
   .mark {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 28px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 14px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 19px;
     box-shadow: 0 8px 30px -8px rgba(74, 99, 247, 0.55);
   }
   h1 {
@@ -56,61 +62,112 @@
   .sub {
     font-size: 13px;
     color: var(--muted);
-    margin: 0 0 32px;
+    margin: 0;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  input {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--foreground);
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  .field { margin-bottom: 18px; }
+  button {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.65; cursor: not-allowed; }
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+    min-height: 16px;
   }
   .spinner {
-    width: 28px;
-    height: 28px;
-    margin: 0 auto 18px;
+    width: 13px;
+    height: 13px;
+    flex: none;
     border-radius: 50%;
-    border: 2.5px solid var(--border);
+    border: 2px solid var(--border);
     border-top-color: var(--accent);
     animation: spin 0.8s linear infinite;
   }
+  .spinner.hidden { display: none; }
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
   .status {
-    font-size: 14px;
-    font-weight: 500;
-    min-height: 20px;
-    transition: opacity 0.25s ease;
-  }
-  .hint {
-    margin-top: 10px;
     font-size: 12.5px;
     color: var(--muted);
-    min-height: 16px;
+  }
+  .error .status { color: var(--danger); }
+  .hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 14px;
   }
   .retry {
     display: none;
-    margin-top: 22px;
+    margin-top: 14px;
+    text-align: center;
   }
   .retry.visible { display: block; }
   .retry a {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface-2);
     color: var(--foreground);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 500;
   }
   .retry a:hover { border-color: var(--accent); }
-  .error .spinner { display: none; }
-  .error .mark { box-shadow: 0 8px 30px -8px rgba(248, 113, 113, 0.45); }
-  .error .status { color: var(--danger); }
 </style>
 </head>
 <body>
   <div class="card" id="card">
-    <div class="mark">EM</div>
-    <h1>E-Motion Rennteam Aalen</h1>
-    <p class="sub">Redaktions-CMS</p>
-    <div class="spinner" id="spinner"></div>
-    <p class="status" id="status">Server wird gestartet – einen Moment bitte…</p>
+    <div class="head">
+      <div class="mark">EM</div>
+      <h1>E-Motion Rennteam Aalen</h1>
+      <p class="sub">Redaktions-CMS</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="password">Passwort</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" autofocus placeholder="••••••••" />
+      </div>
+      <button type="submit" id="submitBtn">Anmelden</button>
+    </form>
+
+    <div class="status-row">
+      <div class="spinner" id="spinner"></div>
+      <p class="status" id="status">Verbinde mit Server…</p>
+    </div>
     <p class="hint" id="hint">&nbsp;</p>
     <div class="retry" id="retry">
       <a id="retryLink" href="http://localhost:3000/admin/login">Trotzdem öffnen</a>
@@ -118,12 +175,22 @@
   </div>
 
   <script>
-    // Polls the local CMS server until it responds, then hands off to the
-    // real app. Deliberately avoids fetch()/XHR: this file is opened via
-    // file://, and browsers block cross-origin fetch from a file:// page
-    // even for a same-machine http://localhost target. A plain <img> load
-    // has no such restriction (only *reading* the pixels would need CORS),
-    // and a full-page navigation at the end is never CORS-restricted either.
+    // Zeigt die Login-Maske sofort an, statt erst auf den Server zu warten
+    // - Benutzername/Passwort lassen sich also schon eintippen, waehrend der
+    // Server im Hintergrund noch hochfaehrt. Der Benutzername wird hier
+    // bewusst nicht abgefragt: die echte Login-Seite fuellt ihn automatisch
+    // aus CMS_ADMIN_USER vorbelegt aus (siehe src/app/admin/login/page.tsx),
+    // Passwoerter lassen sich aus Sicherheitsgruenden nicht ueber die
+    // Seitengrenze (file:// -> http://localhost) mitnehmen und muessen daher
+    // auf der echten Seite einmal eingegeben werden - typischerweise laengst
+    // erledigt, bevor der Server ueberhaupt bereit ist.
+    //
+    // Deliberately avoids fetch()/XHR to probe the server: this file is
+    // opened via file://, and browsers block cross-origin fetch from a
+    // file:// page even for a same-machine http://localhost target. A plain
+    // <img> load has no such restriction (only *reading* the pixels would
+    // need CORS), and a full-page navigation at the end is never
+    // CORS-restricted either.
     (function () {
       var PORT = 3000;
       var TARGET = "http://localhost:" + PORT + "/admin/login";
@@ -132,16 +199,43 @@
       var hintEl = document.getElementById("hint");
       var cardEl = document.getElementById("card");
       var retryEl = document.getElementById("retry");
+      var spinnerEl = document.getElementById("spinner");
+      var formEl = document.getElementById("loginForm");
+      var submitBtn = document.getElementById("submitBtn");
       document.getElementById("retryLink").href = TARGET;
 
       var startedAt = Date.now();
       var handedOff = false;
+      var serverReady = false;
+      var wantsSubmit = false;
       var messages = [
-        [0, "Server wird gestartet – einen Moment bitte…"],
+        [0, "Verbinde mit Server…"],
         [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
         [35000, "Das dauert gerade ungewöhnlich lange…"],
       ];
       var currentMessage = -1;
+
+      function goToRealLogin() {
+        if (handedOff) return;
+        handedOff = true;
+        statusEl.textContent = "Bereit.";
+        spinnerEl.classList.add("hidden");
+        window.location.replace(TARGET);
+      }
+
+      formEl.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (handedOff) return;
+        if (serverReady) {
+          goToRealLogin();
+          return;
+        }
+        // Server ist noch nicht bereit: Klick merken und automatisch
+        // fortsetzen, sobald er antwortet - kein erneuter Klick noetig.
+        wantsSubmit = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verbinde…";
+      });
 
       function tick() {
         var elapsed = Date.now() - startedAt;
@@ -149,7 +243,7 @@
         for (var i = messages.length - 1; i >= 0; i--) {
           if (elapsed >= messages[i][0] && i !== currentMessage) {
             currentMessage = i;
-            statusEl.textContent = messages[i][1];
+            if (!wantsSubmit) statusEl.textContent = messages[i][1];
           }
         }
         if (elapsed >= 35000) {
@@ -158,6 +252,7 @@
         }
         if (elapsed >= 180000 && !handedOff) {
           cardEl.classList.add("error");
+          spinnerEl.classList.add("hidden");
           statusEl.textContent = "Der Server antwortet nicht.";
           hintEl.textContent = "Bitte das Terminal-/Konsolenfenster auf Fehlermeldungen prüfen.";
           return;
@@ -171,13 +266,17 @@
         var probe = new Image();
         probe.onload = function () {
           if (handedOff) return;
-          handedOff = true;
-          statusEl.textContent = "Bereit.";
-          window.location.replace(TARGET);
+          serverReady = true;
+          if (wantsSubmit) {
+            goToRealLogin();
+            return;
+          }
+          statusEl.textContent = "Server ist bereit.";
+          spinnerEl.classList.add("hidden");
         };
         probe.src = PING + Date.now();
 
-        if (!handedOff) setTimeout(tick, 700);
+        if (!handedOff && !serverReady) setTimeout(tick, 700);
       }
 
       tick();
