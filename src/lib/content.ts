@@ -122,6 +122,15 @@ export type Position = {
   slug: string;
 };
 
+export type NavItem = {
+  label: string;
+  href: string;
+  group: "Hauptmenü" | "Aktuelles-Dropdown";
+  order?: number;
+  visible?: boolean;
+  slug: string;
+};
+
 export function getTeam(): TeamMember[] {
   return readCollection<TeamMember>("team").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
@@ -201,4 +210,12 @@ export function getResults(): Result[] {
 
 export function getPositions(): Position[] {
   return readCollection<Position>("positions");
+}
+
+// `visible` defaults to true when the frontmatter field is absent, so
+// existing/manually-added nav items without the flag still show up.
+export function getNavItems(): NavItem[] {
+  return readCollection<NavItem>("nav-items")
+    .filter((item) => item.visible !== false)
+    .sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 }

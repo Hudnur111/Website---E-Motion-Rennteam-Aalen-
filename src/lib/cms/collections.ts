@@ -186,6 +186,24 @@ export const collections: CollectionDef[] = [
     ],
   },
   {
+    name: "navItem",
+    label: "Menü-Navigation",
+    path: "content/nav-items",
+    fields: [
+      { name: "label", label: "Bezeichnung", type: "string", isTitle: true, required: true },
+      { name: "href", label: "Link (URL-Pfad)", type: "string", required: true },
+      {
+        name: "group",
+        label: "Position",
+        type: "select",
+        options: ["Hauptmenü", "Aktuelles-Dropdown"],
+        required: true,
+      },
+      { name: "order", label: "Reihenfolge", type: "number" },
+      { name: "visible", label: "Im Menü anzeigen", type: "boolean" },
+    ],
+  },
+  {
     name: "position",
     label: "Offene Positionen",
     path: "content/positions",

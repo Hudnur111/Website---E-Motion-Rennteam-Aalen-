@@ -42,6 +42,8 @@ function publicPreviewUrl(collectionName: string, slug: string): string | null {
       return "/erfolge";
     case "position":
       return "/mitmachen";
+    case "navItem":
+      return "/";
     case "page":
       // Map page slugs to their routes
       if (slug === "home") return "/";
