@@ -1,0 +1,71 @@
+#!/bin/bash
+# Der eigentliche Programm-Einstiegspunkt dieser .app (siehe
+# CFBundleExecutable in ../Info.plist) - macOS fuehrt diese Datei direkt aus,
+# wenn jemand im Finder auf "E-Motion CMS.app" doppelklickt. Kein Kompilat
+# noetig: ein ausfuehrbares Skript an dieser Stelle reicht als Bundle-
+# Executable voellig aus.
+#
+# Zweck dieses Launchers: das bereits vorhandene, gut getestete
+# CMS-Start.command (identische Logik wie CMS-Start.bat unter Windows)
+# aufrufen, aber wie eine echte, "fertig eingerichtete" App wirken lassen -
+# im Normalfall (Node.js vorhanden, node_modules installiert,
+# .env.local existiert) komplett ohne sichtbares Terminal-Fenster. Nur wenn
+# etwas Interaktion braucht (Ersteinrichtung, fehlende Abhaengigkeiten,
+# fehlendes Node.js) wird bewusst ein Terminal-Fenster geoeffnet, weil dort
+# echte Texteingabe und lesbare Fehlermeldungen noetig sind.
+set -u
+
+# Contents/MacOS/cms-launcher -> Contents -> <App>.app -> Projektordner
+# (die App liegt direkt im Repo-Root, wird zusammen mit dem Quellcode im
+# GitHub-ZIP ausgeliefert).
+DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+cd "$DIR" || exit 1
+
+needs_terminal=false
+command -v node >/dev/null 2>&1 || needs_terminal=true
+command -v npm >/dev/null 2>&1 || needs_terminal=true
+[ -f ".env.local" ] || needs_terminal=true
+[ -f "node_modules/.bin/next" ] || needs_terminal=true
+
+if [ "$needs_terminal" = true ]; then
+    # Ersteinrichtung, Installation oder eine Fehlermeldung, die jemand
+    # tatsaechlich lesen koennen muss - dafuer ganz bewusst ein sichtbares
+    # Terminal-Fenster statt eines lautlosen Hintergrundprozesses.
+    escaped_dir=${DIR//\\/\\\\}
+    escaped_dir=${escaped_dir//\"/\\\"}
+    osascript <<OSA
+tell application "Terminal"
+    activate
+    do script "cd \"$escaped_dir\" && bash \"CMS-Start.command\""
+end tell
+OSA
+    exit 0
+fi
+
+# Normalfall: alles ist schon eingerichtet, laeuft komplett im Hintergrund -
+# fuehlt sich wie eine normal installierte App an, kein Terminal-Fenster.
+LOG="$DIR/.cms-launcher.log"
+{
+    echo "=== CMS-Start $(date) ==="
+} > "$LOG"
+
+bash "CMS-Start.command" >> "$LOG" 2>&1 &
+server_pid=$!
+
+# Kurze Wartezeit: stuerzt der Start sofort ab (z.B. Port dauerhaft von
+# einem fremden Programm blockiert), lieber eine sichtbare Fehlermeldung
+# zeigen statt eine App, die scheinbar gar nichts tut.
+sleep 3
+if ! kill -0 "$server_pid" 2>/dev/null; then
+    tail_log="$(tail -n 8 "$LOG" 2>/dev/null)"
+    # AppleScript-String-Escaping: erst Backslashes verdoppeln, DANN
+    # Anführungszeichen escapen - sonst wuerden die gerade eingefuegten
+    # Escape-Backslashes selbst nochmal mit-escaped.
+    message=$(printf 'Das CMS konnte nicht gestartet werden.\n\n%s\n\nDetails in: %s' "$tail_log" "$LOG")
+    escaped_message=${message//\\/\\\\}
+    escaped_message=${escaped_message//\"/\\\"}
+    osascript -e "display dialog \"$escaped_message\" with title \"E-Motion CMS\" buttons {\"OK\"} with icon caution"
+    exit 1
+fi
+
+wait "$server_pid"
