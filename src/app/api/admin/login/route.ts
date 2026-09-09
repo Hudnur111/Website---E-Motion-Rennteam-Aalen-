@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/cms/auth";
-import { verifyPassword } from "@/lib/cms/password";
+import { burnPasswordVerificationTime, verifyPassword } from "@/lib/cms/password";
 import { findUser } from "@/lib/cms/users";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
@@ -50,6 +50,12 @@ export async function POST(request: NextRequest) {
       if (user && verifyPassword(password, user.passwordHash)) {
         authenticated = true;
         mustChangePassword = user.mustChangePassword;
+      } else if (!user) {
+        // No such user: still do scrypt-equivalent work so this branch
+        // takes about as long as a wrong-password attempt for a real user,
+        // closing the timing side channel that would otherwise let an
+        // attacker enumerate valid usernames (see password.ts).
+        burnPasswordVerificationTime(password);
       }
     }
   }

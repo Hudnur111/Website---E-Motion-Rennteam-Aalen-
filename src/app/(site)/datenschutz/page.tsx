@@ -25,7 +25,7 @@ export default async function DatenschutzPage() {
 
       <Reveal delay={0.05} className="mt-12 max-w-2xl">
         <div
-          className="prose prose-sm text-sm leading-relaxed text-muted [&_a]:text-accent-text [&_a]:underline [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:py-0.5 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-foreground [&_p]:mt-2"
+          className="prose prose-sm text-sm leading-relaxed text-muted [&_a]:text-accent-text [&_a]:underline [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-foreground [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-foreground [&_p]:mt-2"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
       </Reveal>
