@@ -2,23 +2,43 @@
 # Lesezeichenleiste), damit es sich wie eine richtige Desktop-Anwendung anfuehlt.
 # Wird von CMS-Start.bat im Hintergrund gestartet, waehrend der Server hochfaehrt.
 #
-# Das Fenster oeffnet sofort eine lokale Ladeseite (scripts/cms-loading.html)
-# statt zu warten, bis der Server bereit ist - die Ladeseite selbst wartet
-# (mit sichtbarer Rueckmeldung: "Server wird gestartet...") und leitet
-# automatisch weiter, sobald der Server tatsaechlich antwortet. So sieht die
-# Person sofort ein Fenster, statt auf einen leeren Bildschirm zu starren.
+# Es gibt bewusst KEINE lokale Ladeseite (frueher scripts/cms-loading.html)
+# mehr: die wartete selbst mit einem eigenen 180-Sekunden-Timeout, und auf
+# manchen Windows-Rechnern (langsamer erster Turbopack-Compile, Antivirus-
+# Scan der node_modules) dauert der Serverstart laenger als das - die
+# Ladeseite zeigte dann faelschlich "Der Server antwortet nicht", obwohl der
+# Server kurz danach ganz normal fertig wurde. Stattdessen wartet dieses
+# Skript hier (unsichtbar, da es bereits minimiert gestartet wird) direkt auf
+# den Server und oeffnet das Browser-Fenster erst, wenn er tatsaechlich
+# antwortet - ohne Zwischenseite und ohne eigenes Zeitlimit.
 
 $ErrorActionPreference = "SilentlyContinue"
 
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$loadingFile = Join-Path $scriptDir "cms-loading.html"
+$PORT = 3000
+$TARGET = "http://localhost:$PORT/admin/login"
 
-if (Test-Path $loadingFile) {
-    $loadingUrl = "file:///" + ($loadingFile -replace '\\', '/')
-} else {
-    # Sollte nicht passieren, aber lieber direkt auf die Login-Seite als gar
-    # nichts zu oeffnen.
-    $loadingUrl = "http://localhost:3000/admin/login"
+function Test-ServerReady {
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $task = $client.BeginConnect("localhost", $PORT, $null, $null)
+        $ok = $task.AsyncWaitHandle.WaitOne(1000)
+        if ($ok -and $client.Connected) {
+            $client.EndConnect($task)
+            $client.Close()
+            return $true
+        }
+        $client.Close()
+        return $false
+    } catch {
+        return $false
+    }
+}
+
+# Kein Zeitlimit hier: der Server startet garantiert irgendwann (oder das
+# Konsolenfenster von CMS-Start.bat zeigt einen Fehler an) - lieber laenger
+# warten als eine falsche Fehlermeldung zeigen.
+while (-not (Test-ServerReady)) {
+    Start-Sleep -Milliseconds 500
 }
 
 $candidatePaths = @(
@@ -40,10 +60,10 @@ foreach ($candidate in $candidatePaths) {
 if ($browserExe) {
     # --app=<url> startet ein eigenes Fenster ohne Browser-Bedienelemente.
     Start-Process -FilePath $browserExe -ArgumentList @(
-        "--app=$loadingUrl",
+        "--app=$TARGET",
         "--window-size=1360,900"
     )
 } else {
     # Weder Edge noch Chrome gefunden: normaler Standardbrowser als Rueckfall.
-    Start-Process $loadingUrl
+    Start-Process $TARGET
 }

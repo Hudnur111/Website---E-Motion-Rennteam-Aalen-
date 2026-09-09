@@ -1,7 +1,7 @@
 ---
-label: "Erfolge"
+label: "Timeline"
 href: "/erfolge"
 group: "Aktuelles-Dropdown"
-order: 5
+order: 3
 visible: true
 ---

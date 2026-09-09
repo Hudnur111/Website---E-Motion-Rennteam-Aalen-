@@ -2,6 +2,6 @@
 label: "Galerie"
 href: "/galerie"
 group: "Aktuelles-Dropdown"
-order: 4
+order: 2
 visible: true
 ---

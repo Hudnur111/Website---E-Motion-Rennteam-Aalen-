@@ -5,21 +5,31 @@
 # Wird von CMS-Start.command / CMS-Start.sh im Hintergrund gestartet, waehrend
 # der Server hochfaehrt.
 #
-# Das Fenster oeffnet sofort eine lokale Ladeseite (scripts/cms-loading.html)
-# statt zu warten, bis der Server bereit ist - die Ladeseite selbst wartet
-# (mit sichtbarer Rueckmeldung: "Server wird gestartet...") und leitet
-# automatisch weiter, sobald der Server tatsaechlich antwortet. So sieht die
-# Person sofort ein Fenster, statt auf einen leeren Bildschirm zu starren.
+# Es gibt bewusst KEINE lokale Ladeseite (frueher scripts/cms-loading.html)
+# mehr - siehe cms-open-app.ps1 fuer die ausfuehrliche Begruendung. Dieses
+# Skript wartet stattdessen selbst (unsichtbar im Hintergrund, siehe "&" beim
+# Aufruf) direkt auf den Server und oeffnet das Browser-Fenster erst, wenn er
+# tatsaechlich antwortet.
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-loading_file="$script_dir/cms-loading.html"
-loading_url="file://$loading_file"
+PORT=3000
+loading_url="http://localhost:$PORT/admin/login"
 
-if [ ! -f "$loading_file" ]; then
-    # Sollte nicht passieren, aber lieber direkt auf die Login-Seite als gar
-    # nichts zu oeffnen.
-    loading_url="http://localhost:3000/admin/login"
-fi
+wait_for_server() {
+    # Kein Zeitlimit: der Server startet garantiert irgendwann (oder das
+    # Terminalfenster von CMS-Start.sh/.command zeigt einen Fehler an).
+    while true; do
+        if command -v curl >/dev/null 2>&1; then
+            curl -s -o /dev/null --max-time 1 "$loading_url" && return 0
+        else
+            # Kein curl vorhanden: bloss pruefen, ob ueberhaupt jemand auf
+            # dem Port lauscht (kein echter HTTP-Request).
+            (exec 3<>"/dev/tcp/localhost/$PORT") 2>/dev/null && exec 3<&- 3>&- && return 0
+        fi
+        sleep 0.5
+    done
+}
+
+wait_for_server
 
 open_macos() {
     local chrome_app="/Applications/Google Chrome.app"

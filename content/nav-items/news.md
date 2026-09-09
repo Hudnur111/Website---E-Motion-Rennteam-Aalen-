@@ -2,6 +2,6 @@
 label: "News"
 href: "/news"
 group: "Aktuelles-Dropdown"
-order: 2
+order: 4
 visible: true
 ---
