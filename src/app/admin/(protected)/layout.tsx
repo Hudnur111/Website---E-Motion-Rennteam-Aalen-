@@ -5,6 +5,7 @@ import Image from "next/image";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import Sidebar from "@/components/admin/Sidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
+import ShutdownButton from "@/components/admin/ShutdownButton";
 import MobileNav from "@/components/admin/MobileNav";
 import UpdateBanner from "@/components/admin/UpdateBanner";
 
@@ -32,6 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-muted sm:inline">Angemeldet als {session.username}</span>
+            {isAdmin && <ShutdownButton />}
             <LogoutButton />
           </div>
         </div>

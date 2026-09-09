@@ -44,5 +44,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
+  // Das Beenden des CMS-Servers betrifft alle Redakteure gleichzeitig -
+  // ebenfalls dem Hauptadministrator vorbehalten.
+  if (pathname === "/api/admin/shutdown" && session.username !== process.env.CMS_ADMIN_USER) {
+    return NextResponse.json({ error: "Nur der Hauptadministrator kann das CMS beenden." }, { status: 403 });
+  }
+
   return NextResponse.next();
 }
