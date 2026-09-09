@@ -8,18 +8,26 @@ GitHub-ZIP ausgeliefert) ist das macOS-Gegenstück zum Windows-Weg über
 
 1. Diesen Branch als ZIP laden (GitHub → "Code" → "Download ZIP") und
    entpacken.
-2. `E-Motion CMS.app` doppelklicken.
-3. **Erster Start:** macOS zeigt "kann nicht geöffnet werden, da der
+2. **Wichtig:** den entpackten Ordner (den ganzen Ordner, nicht nur die
+   App) im Finder einmal an seinen endgültigen Ort ziehen, z. B. auf den
+   Schreibtisch oder nach "Dokumente" — nicht direkt aus dem
+   Downloads-Ordner starten. Sonst kann macOS die App aus Sicherheitsgründen
+   ("App Translocation") aus einem isolierten Ort ausführen, in dem sie den
+   Rest des Projektordners nicht findet. Passiert das doch, zeigt die App
+   einen Dialog mit genau dieser Lösung an, statt einfach nicht zu
+   funktionieren.
+3. `E-Motion CMS.app` doppelklicken.
+4. **Erster Start:** macOS zeigt "kann nicht geöffnet werden, da der
    Entwickler nicht verifiziert werden kann" — das ist normal für Apps
    ohne Apple-Entwicklerzertifikat (99 $/Jahr, hier nicht vorhanden) und
    passiert bei sehr vielen kleinen/Open-Source-Mac-Programmen. Einmalig
    im Finder **rechtsklicken → Öffnen** (nicht einfach doppelklicken) und
    im Dialog nochmal **Öffnen** bestätigen. Ab dann merkt sich macOS das
    und die App startet danach ganz normal per Doppelklick.
-4. Beim allerersten echten Start öffnet sich automatisch ein
+5. Beim allerersten echten Start öffnet sich automatisch ein
    Terminal-Fenster für den Einrichtungsassistenten (Admin-Zugangsdaten
    festlegen, Node.js-Abhängigkeiten installieren). Das ist einmalig.
-5. Ab dem zweiten Start läuft alles im Hintergrund, kein Terminal mehr
+6. Ab dem zweiten Start läuft alles im Hintergrund, kein Terminal mehr
    sichtbar — die App öffnet direkt ein eigenes Fenster mit der
    Login-Seite.
 
@@ -72,3 +80,8 @@ durchklicken und diese Anleitung bei Bedarf korrigieren.
   CMS-Prozessbaum mit — der Server läuft dann nicht unsichtbar im
   Hintergrund weiter. Der reguläre Weg bleibt trotzdem der
   "Herunterfahren"-Button im CMS selbst.
+- Startet macOS die App aus einem durch "App Translocation" isolierten,
+  schreibgeschützten Ort (siehe Schritt 2 oben), erkennt `cms-launcher`
+  das (fehlende `package.json`/`CMS-Start.command` neben der App oder ein
+  Pfad mit `AppTranslocation`) und zeigt einen erklärenden Dialog statt
+  einem kryptischen Terminal-Fehler oder stillem Fehlschlagen.

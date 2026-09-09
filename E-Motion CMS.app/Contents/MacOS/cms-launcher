@@ -21,6 +21,20 @@ set -u
 DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$DIR" || exit 1
 
+# Gatekeeper "App Translocation": wird diese .app direkt aus dem Ordner
+# gestartet, in dem sie nach dem ZIP-Download/Entpacken landete, OHNE dass
+# sie vorher per Finder irgendwohin verschoben wurde, fuehrt macOS sie u.U.
+# aus einer zufaelligen, schreibgeschuetzten Kopie aus (Pfad enthaelt
+# "AppTranslocation"). Dort liegen dann NUR die App-Dateien selbst, nicht
+# die daneben liegenden CMS-Start.command/package.json/scripts/ - das oben
+# berechnete DIR zeigt also ins Leere. Ohne diese Pruefung wuerde das
+# entweder zu einem kryptischen "No such file or directory" im Terminal
+# fuehren oder (schlimmer) lautlos falsch weiterlaufen.
+if [[ "$DIR" == *AppTranslocation* ]] || [ ! -f "$DIR/CMS-Start.command" ] || [ ! -f "$DIR/package.json" ]; then
+    osascript -e 'display dialog "macOS hat \"E-Motion CMS.app\" aus einem isolierten, schreibgeschützten Ort gestartet (Gatekeeper-Schutz \"App Translocation\") - dadurch findet sie den restlichen Projektordner nicht.\n\nLösung: Diesen kompletten entpackten Ordner (nicht nur die App) im Finder z. B. auf den Schreibtisch ziehen und die App von dort aus erneut per Doppelklick starten." with title "E-Motion CMS" buttons {"OK"} with icon caution' >/dev/null 2>&1
+    exit 1
+fi
+
 needs_terminal=false
 command -v node >/dev/null 2>&1 || needs_terminal=true
 command -v npm >/dev/null 2>&1 || needs_terminal=true
