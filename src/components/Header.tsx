@@ -6,23 +6,19 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import HeaderPulseLine from "@/components/HeaderPulseLine";
+import { NAV_ITEMS } from "@/lib/nav";
 
-const NAV_LINKS = [
-  { href: "/team", label: "Team" },
-  { href: "/fahrzeuge", label: "Fahrzeuge" },
-  { href: "/sponsoren", label: "Sponsoren" },
-];
+interface HeaderProps {
+  /** IDs (NavItemDef.id) of menu items hidden via das CMS - siehe src/lib/nav.ts. */
+  hiddenIds?: string[];
+}
 
-const MORE_LINKS = [
-  { href: "/formula-student", label: "Formula Student" },
-  { href: "/galerie", label: "Galerie" },
-  { href: "/erfolge", label: "Timeline" },
-  { href: "/news", label: "News" },
-  { href: "/blog", label: "Blog" },
-  { href: "/kontakt", label: "Kontakt" },
-];
+export default function Header({ hiddenIds = [] }: HeaderProps) {
+  const hidden = new Set(hiddenIds);
+  const NAV_LINKS = NAV_ITEMS.filter((item) => item.group === "main" && !hidden.has(item.id));
+  const MORE_LINKS = NAV_ITEMS.filter((item) => item.group === "more" && !hidden.has(item.id));
+  const showCta = !hidden.has("mitmachen");
 
-export default function Header() {
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -162,12 +158,14 @@ export default function Header() {
             </AnimatePresence>
           </div>
 
-          <Link
-            href="/mitmachen"
-            className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
-          >
-            Mitmachen
-          </Link>
+          {showCta && (
+            <Link
+              href="/mitmachen"
+              className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+            >
+              Mitmachen
+            </Link>
+          )}
         </nav>
 
         <button
@@ -224,19 +222,21 @@ export default function Header() {
                   </motion.div>
                 )
               )}
-              <motion.div
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.32 }}
-                className="mt-2"
-              >
-                <Link
-                  href="/mitmachen"
-                  className="block rounded-md bg-accent px-3 py-2.5 text-center text-sm font-semibold text-accent-foreground"
+              {showCta && (
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.32 }}
+                  className="mt-2"
                 >
-                  Mitmachen
-                </Link>
-              </motion.div>
+                  <Link
+                    href="/mitmachen"
+                    className="block rounded-md bg-accent px-3 py-2.5 text-center text-sm font-semibold text-accent-foreground"
+                  >
+                    Mitmachen
+                  </Link>
+                </motion.div>
+              )}
             </div>
           </motion.nav>
         )}

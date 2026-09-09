@@ -26,7 +26,7 @@ const CONTENT_SYNC_MARKER = "[cms-content-sync]";
  * silent: if git isn't installed/available here, the GitHub commit above is
  * already the source of truth, so this is a nicety, not a requirement.
  */
-async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
+export async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
   try {
     const git = (args: string[]) => execFileAsync("git", args, { cwd: ROOT, timeout: 5000 });
 
