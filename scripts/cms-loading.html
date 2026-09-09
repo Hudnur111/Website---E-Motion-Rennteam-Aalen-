@@ -144,16 +144,16 @@
     // wird IMMER automatisch zur echten Login-Seite weitergeleitet, ganz
     // ohne Klick.
     //
-    // Deliberately avoids fetch()/XHR to probe the server: this file is
-    // opened via file://, and browsers block cross-origin fetch from a
-    // file:// page even for a same-machine http://localhost target. A plain
-    // <img> load has no such restriction (only *reading* the pixels would
-    // need CORS), and a full-page navigation at the end is never
-    // CORS-restricted either.
+    // Probing uses fetch(TARGET, { mode: "no-cors" }) rather than reading
+    // the response: this file is opened via file://, and browsers block
+    // *reading* a cross-origin response body/status without CORS headers -
+    // but a "no-cors" request is still sent and its promise still resolves
+    // once the server actually answers, which is all that's needed here to
+    // know the page is ready. A full-page navigation at the end is never
+    // CORS-restricted either way.
     (function () {
       var PORT = 3000;
       var TARGET = "http://localhost:" + PORT + "/admin/login";
-      var PING = "http://localhost:" + PORT + "/favicon.ico?_=";
       var statusEl = document.getElementById("status");
       var hintEl = document.getElementById("hint");
       var cardEl = document.getElementById("card");
@@ -163,6 +163,7 @@
 
       var startedAt = Date.now();
       var handedOff = false;
+      var probing = false;
       var messages = [
         [0, "Verbinde mit Server…"],
         [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
@@ -199,16 +200,32 @@
           return;
         }
 
-        // Only onload counts as "ready": favicon.ico is a real file Next.js
-        // serves once it's actually up, so a successful image load means
-        // there's a real server behind that port. onerror fires just as
-        // fast for "connection refused" as for a broken response, so it
-        // must NOT be treated as ready - it just means "try again".
-        var probe = new Image();
-        probe.onload = goToRealLogin;
-        probe.src = PING + Date.now();
+        // Probes the REAL target page (not just favicon.ico): next dev/
+        // Turbopack compiles each route lazily on its first request, so
+        // pinging only favicon.ico used to mean the redirect below hit an
+        // as-yet-uncompiled /admin/login and the browser sat on a blank tab
+        // for that compile - invisible extra wait, not covered by this
+        // spinner. Fetching TARGET itself here means that compile happens
+        // *while this branded splash is still showing*, and the eventual
+        // redirect below lands on an already-warm, instantly-ready page.
+        // mode: "no-cors" is required (file:// -> http://localhost is
+        // cross-origin) and is enough: the promise only needs to resolve to
+        // prove the server actually answered, the opaque response body is
+        // never read. Guarded by `probing` so a slow first compile doesn't
+        // pile up overlapping requests - only one probe in flight at a time.
+        if (!probing) {
+          probing = true;
+          fetch(TARGET, { mode: "no-cors", cache: "no-store" })
+            .then(goToRealLogin)
+            .catch(function () {
+              // Connection refused - server not listening yet, try again.
+            })
+            .finally(function () {
+              probing = false;
+            });
+        }
 
-        if (!handedOff) setTimeout(tick, 700);
+        if (!handedOff) setTimeout(tick, 400);
       }
 
       tick();
