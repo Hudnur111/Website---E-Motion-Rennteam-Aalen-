@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveUploadedImage } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
+import { matchesImageSignature } from "@/lib/imageSignature";
 
 const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 // SVG is deliberately excluded. It's an XML document format that can carry
@@ -40,6 +41,13 @@ export async function POST(request: NextRequest) {
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!matchesImageSignature(bytes, file.type)) {
+    return NextResponse.json(
+      { error: "Datei-Inhalt passt nicht zum angegebenen Dateityp." },
+      { status: 400 }
+    );
+  }
+
   try {
     const result = await saveUploadedImage(file.name, file.type, bytes, user.username);
     return NextResponse.json(result);

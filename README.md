@@ -109,6 +109,34 @@ Ein separates Redaktionssystem (Login, Editor, GitHub-Commits) existiert
 unabhängig davon im `cms-app`-Branch als eigenes Deployment. Dadurch enthält
 die öffentliche Website selbst keinen Admin-/Login-Code.
 
+## 🔐 Betrieb & Sicherheitshinweise (Produktion)
+
+Checkliste vor dem Go-Live des `cms-app`-Deployments:
+
+- **`FORM_WEBHOOK_URL` setzen.** Ohne diese Variable werden Formular-
+  Einsendungen (Kontakt, Bewerbung, Sponsoring, Mediakit) nicht live
+  zugestellt, sondern nur lokal in `.pending-form-submissions.jsonl`
+  gepuffert (siehe `src/lib/formDelivery.ts`) — inklusive eines lauten
+  `console.error`, damit das in jedem Log-/Monitoring-System auffällt.
+  Diese Datei ist ein Notfall-Fallback, kein Ersatz für einen echten
+  Webhook: sie sollte regelmäßig geprüft/geleert werden.
+- **TLS/Reverse-Proxy zwingend.** `next.config.ts` setzt strikte
+  Security-Header inkl. HSTS und `upgrade-insecure-requests`. Läuft
+  `next start` direkt ohne TLS-terminierenden Reverse-Proxy davor, sperren
+  Browser sich nach dem ersten Aufruf selbst auf HTTPS ein — auch wenn nur
+  HTTP verfügbar ist.
+- **Rate-Limiting ist In-Memory** (`src/lib/rateLimit.ts`, bewusst
+  dokumentiert). Es schützt zuverlässig einen einzelnen, langlebigen
+  Node-Prozess, greift aber pro Instanz separat, sobald mehrere
+  Server-/Container-Instanzen parallel laufen. Bei Multi-Instanz-Hosting
+  auf einen gemeinsamen Store (z. B. Redis/Upstash) umstellen.
+- **`.cms-users.json` ist lokal, nicht verschlüsselt und nicht
+  versioniert** (siehe `src/lib/cms/users.ts`). Setzt einen persistenten
+  Server mit eigenem, geschütztem Dateisystem voraus — auf ephemeren/
+  serverless Hosts gehen zusätzlich angelegte CMS-Benutzer bei jedem
+  Deploy verloren; der Haupt-Administrator (`CMS_ADMIN_USER`/
+  `CMS_ADMIN_PASSWORD_HASH`) ist davon nicht betroffen.
+
 ## 📁 Projektstruktur
 
 ```

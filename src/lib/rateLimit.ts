@@ -67,10 +67,22 @@ export function _getTrackedBucketCountForTesting(): number {
   return buckets.size;
 }
 
-/** Best-effort client IP extraction behind typical reverse proxies. */
+/**
+ * Best-effort client IP extraction behind a single trusted reverse proxy
+ * (e.g. Vercel's edge network). `x-forwarded-for` is a comma-separated list
+ * that each hop *appends* to rather than replaces, so a client can freely
+ * set their own value before the request reaches the proxy - only the
+ * *last* entry is the one the trusted proxy itself added and is safe to
+ * key rate limits on. Taking the first (leftmost, client-controlled) entry
+ * would let anyone bypass rate limiting simply by sending a different
+ * `x-forwarded-for` value on every request.
+ */
 export function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  if (forwardedFor) {
+    const parts = forwardedFor.split(",").map((p) => p.trim()).filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  }
 
   const realIp = request.headers.get("x-real-ip");
   if (realIp) return realIp.trim();

@@ -49,6 +49,9 @@ next-env.d.ts
 /.cms-update-status.json
 /.cms-update-trigger
 
+# Formulare: lokaler Fallback, falls FORM_WEBHOOK_URL fehlt oder unerreichbar ist
+/.pending-form-submissions.jsonl
+
 # tinacms
 /tina/__generated__
 /public/admin
