@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { _getTrackedBucketCountForTesting, checkRateLimit } from "@/lib/rateLimit";
+import { NextRequest } from "next/server";
+import { _getTrackedBucketCountForTesting, checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 describe("checkRateLimit", () => {
   beforeEach(() => {
@@ -83,5 +84,29 @@ describe("checkRateLimit", () => {
 
     expect(_getTrackedBucketCountForTesting()).toBeLessThanOrEqual(maxTrackedBuckets);
     vi.useRealTimers();
+  });
+});
+
+describe("getClientIp", () => {
+  it("uses the last x-forwarded-for entry, not the client-controlled first one", () => {
+    // The trusted proxy (e.g. Vercel's edge) appends its own value as the
+    // last entry; anything before that is attacker-supplied and must not
+    // be trusted, or rate limiting could be bypassed by spoofing it.
+    const request = new NextRequest("http://localhost/api/admin/login", {
+      headers: { "x-forwarded-for": "203.0.113.1, 198.51.100.7" },
+    });
+    expect(getClientIp(request)).toBe("198.51.100.7");
+  });
+
+  it("falls back to x-real-ip when x-forwarded-for is absent", () => {
+    const request = new NextRequest("http://localhost/api/admin/login", {
+      headers: { "x-real-ip": "198.51.100.9" },
+    });
+    expect(getClientIp(request)).toBe("198.51.100.9");
+  });
+
+  it("falls back to 'unknown' when neither header is present", () => {
+    const request = new NextRequest("http://localhost/api/admin/login");
+    expect(getClientIp(request)).toBe("unknown");
   });
 });
