@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
 const COOKIE_NAME = "cookie-consent";
@@ -47,7 +48,14 @@ function writeConsentCookie(value: "accepted" | "declined") {
 }
 
 export default function CookieConsent() {
+  const pathname = usePathname();
   const consent = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  // Das CMS-Admin-Panel ist kein öffentlicher Seitenbereich und setzt keine
+  // Tracking-/Marketing-Cookies - der Hinweis ist dort fehl am Platz und
+  // überlagert (fixed, volle Breite, unten) sonst die Speichern-Buttons der
+  // Editier-Panels, sodass Redakteur:innen nicht speichern können, bevor sie
+  // ihn weggeklickt haben.
+  if (pathname?.startsWith("/admin")) return null;
   const visible = consent === undefined;
 
   if (!visible) return null;
