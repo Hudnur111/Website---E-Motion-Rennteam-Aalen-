@@ -67,4 +67,17 @@ describe("CMS session tokens", () => {
     expect(await verifySessionToken("not-a-valid-token")).toBeNull();
     expect(await verifySessionToken("a.b.c")).toBeNull();
   });
+
+  it("rejects a forged token whose signature is not valid base64 instead of throwing", async () => {
+    // Regression: an attacker-supplied cookie like "<payload>.fakesignature"
+    // previously crashed verifySessionToken with an uncaught
+    // InvalidCharacterError from atob() (base64UrlDecode was called outside
+    // the try/catch), turning a forged cookie into a 500 instead of a 401.
+    const payload = Buffer.from(JSON.stringify({ u: "hacker", exp: Math.floor(Date.now() / 1000) + 3600 }))
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    expect(await verifySessionToken(`${payload}.fakesignature`)).toBeNull();
+  });
 });

@@ -84,7 +84,12 @@ export async function verifySessionToken(
 
   const key = await hmacKey(secret);
   const expectedSig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payloadB64));
-  const providedSig = base64UrlDecode(sigB64);
+  let providedSig: Uint8Array;
+  try {
+    providedSig = base64UrlDecode(sigB64);
+  } catch {
+    return null;
+  }
   const expected = new Uint8Array(expectedSig);
   if (expected.length !== providedSig.length) return null;
   let diff = 0;

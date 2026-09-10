@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { cookies } from "next/headers";
 import { collections } from "@/lib/cms/collections";
 import { listItems } from "@/lib/cms/content";
 import { getGithubConfig } from "@/lib/cms/github";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
+import { accessibleCollectionNames } from "@/lib/cms/roles";
 
 const ALLOWED_MEDIA_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
@@ -17,8 +20,15 @@ async function countUploads(): Promise<number> {
 }
 
 export default async function AdminDashboard() {
+  const cookieStore = await cookies();
+  const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
+  const visibleCollectionNames = new Set(
+    accessibleCollectionNames(session ?? { username: "" }, collections.map((c) => c.name))
+  );
+  const visibleCollections = collections.filter((c) => visibleCollectionNames.has(c.name));
+
   const [counts, mediaCount] = await Promise.all([
-    Promise.all(collections.map((c) => listItems(c.name).then((items) => items.length))),
+    Promise.all(visibleCollections.map((c) => listItems(c.name).then((items) => items.length))),
     countUploads(),
   ]);
   const githubConnected = Boolean(getGithubConfig());
@@ -46,7 +56,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {collections.map((c, i) => (
+        {visibleCollections.map((c, i) => (
           <Link
             key={c.name}
             href={`/admin/${c.name}`}
