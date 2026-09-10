@@ -1,7 +1,8 @@
 ---
 name: AMK motion
-tier: Gold
-website: "https://www.amk-motion.com"
+tier: Partner
+website: ''
+logo: /uploads/1789064539772-amk.webp
 ---
 
 Liefert die Antriebstechnik für unsere Radnabenmotoren.
