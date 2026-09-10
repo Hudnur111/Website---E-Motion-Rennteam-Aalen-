@@ -1,7 +1,7 @@
 ---
 name: Merkle
 tier: Gold
-logo: /Sponsoren-Logo/Merkle-Logo.png
+logo: /uploads/1789068093944-merkle.webp
 website: 'https://www.merkle-cae.de'
 ---
 
