@@ -1,6 +1,6 @@
 ---
 name: Jannik Eisenhardt
-role: Mitglied
+role: Teamlead
 department: Vehicle Dynamics
 photo: /uploads/single-bilder-upload/Jannik_VHD.jpg
 ---
