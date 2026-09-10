@@ -74,4 +74,37 @@ describe("POST /api/newsletter", () => {
 
     expect(lastResponse?.status).toBe(429);
   });
+
+  // Regression: unlike the other four form endpoints (contact, mitmachen,
+  // sponsoring, mediakit), this route was missing the isTrustedOrigin/
+  // hasJsonContentType checks entirely, leaving it open to cross-site
+  // submissions via the "enctype=text/plain" CSRF technique (a plain HTML
+  // form can craft a body that parses as valid JSON without triggering a
+  // CORS preflight, since no explicit application/json Content-Type check
+  // was enforced).
+  it("rejects requests from a foreign Origin", async () => {
+    const request = new NextRequest("http://localhost/api/newsletter", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "7.7.7.7",
+        origin: "https://evil.example",
+      },
+      body: JSON.stringify({ email: "ada@example.com" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(403);
+  });
+
+  it("rejects non-JSON content types", async () => {
+    const request = new NextRequest("http://localhost/api/newsletter", {
+      method: "POST",
+      headers: { "content-type": "text/plain", "x-forwarded-for": "7.7.7.6" },
+      body: JSON.stringify({ email: "ada@example.com" }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(415);
+  });
 });
