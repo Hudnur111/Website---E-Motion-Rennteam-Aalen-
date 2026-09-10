@@ -1,7 +1,7 @@
 ---
 name: TDK
 tier: Platin
-logo: /Sponsoren-Logo/TDK-Logo.png
+logo: /uploads/1789068041307-tdk.webp
 website: 'https://www.tdk.com'
 ---
 
