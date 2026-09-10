@@ -11,17 +11,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/team" },
 };
 
-const DEPARTMENT_IMAGES: Record<string, string> = {
-  "Project Management": "/uploads/Team%20wdp/Vorstand.jpg",
-  "Chassis and Ergonomics": "/uploads/Team%20wdp/CCBOM.jpg",
-  Powertrain: "/uploads/Team%20wdp/Powertrain.jpg",
-  Aerodynamics: "/uploads/Team%20wdp/Aero.jpg",
-  "Suspension and Steering Systems": "/uploads/Team%20wdp/Wheelpackage.jpg",
-  Driverless: "/uploads/Team%20wdp/Driverless.jpg",
-  "Vehicle Dynamics": "/uploads/Team%20wdp/Vehicle%20Dynamics.jpg",
-  "Media and Marketing": "/uploads/Team%20wdp/Media.jpg",
-};
-
 const TEAM_DESCRIPTIONS: Record<string, string> = {
   "Project Management":
     "Koordiniert das Gesamtprojekt, die Wettbewerbsplanung und die Zusammenarbeit aller Fachteams.",
@@ -74,37 +63,13 @@ export default function TeamPage() {
       <div className="mt-14 space-y-14">
         {TEAM_DEPARTMENTS.map((department, di) => {
           const members = team.filter((member) => member.department === department);
-          const banner = DEPARTMENT_IMAGES[department];
           return (
             <Reveal key={department} delay={di * 0.03}>
               <div className="overflow-hidden rounded-2xl border border-border bg-surface/50">
-                {banner && (
-                  <div className="relative h-64 w-full overflow-hidden sm:h-80">
-                    <Image
-                      src={banner}
-                      alt=""
-                      aria-hidden="true"
-                      fill
-                      sizes="(min-width: 1024px) 1024px, 100vw"
-                      className="scale-110 object-cover object-top blur-2xl brightness-50"
-                    />
-                    <Image
-                      src={banner}
-                      alt={`Team ${department}`}
-                      fill
-                      sizes="(min-width: 1024px) 1024px, 100vw"
-                      className="object-contain"
-                      priority={di === 0}
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent p-6 sm:p-8">
-                      <h2 className="text-2xl font-extrabold text-white sm:text-3xl">{department}</h2>
-                    </div>
-                  </div>
-                )}
                 <div className="p-6 sm:p-8">
                 <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
                   <div>
-                    {!banner && <h2 className="text-xl font-bold">{department}</h2>}
+                    <h2 className="text-xl font-bold">{department}</h2>
                     {TEAM_DESCRIPTIONS[department] && (
                       <p className="mt-1.5 max-w-xl text-sm text-muted">
                         {TEAM_DESCRIPTIONS[department]}
