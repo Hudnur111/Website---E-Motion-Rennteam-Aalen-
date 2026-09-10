@@ -109,6 +109,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
             );
           })}
 
+          {MORE_LINKS.length > 0 && (
           <div className="relative" ref={moreRef}>
             <button
               type="button"
@@ -157,6 +158,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
               )}
             </AnimatePresence>
           </div>
+          )}
 
           {showCta && (
             <Link
