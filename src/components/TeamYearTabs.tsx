@@ -17,12 +17,12 @@ export default function TeamYearTabs({ allMembers, departments, descriptions, de
   const [activeSeason, setActiveSeason] = useState<string>(DEFAULT_SEASON);
 
   const seasonMembers = allMembers.filter(
-    (m) => (m.season ?? DEFAULT_SEASON) === activeSeason
+    (m) => (m.season || DEFAULT_SEASON) === activeSeason
   );
 
   // Only show seasons that actually have members
   const availableSeasons = TEAM_SEASONS.filter((s) =>
-    allMembers.some((m) => (m.season ?? DEFAULT_SEASON) === s)
+    allMembers.some((m) => (m.season || DEFAULT_SEASON) === s)
   );
 
   return (

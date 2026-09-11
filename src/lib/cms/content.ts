@@ -137,7 +137,10 @@ export async function getItem(collectionName: string, slug: string): Promise<Con
 }
 
 function serialize(data: Record<string, unknown>, body: string): string {
-  return matter.stringify(body ? `\n${body}\n` : "\n", data);
+  const cleaned = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== "" && v !== undefined && v !== null)
+  );
+  return matter.stringify(body ? `\n${body}\n` : "\n", cleaned);
 }
 
 /** Thrown for invalid/incomplete input, as opposed to storage/network failures. */
