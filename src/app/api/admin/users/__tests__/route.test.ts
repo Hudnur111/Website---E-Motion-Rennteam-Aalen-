@@ -83,7 +83,10 @@ describe("/api/admin/users (Online-Benutzerverwaltung aktiv)", () => {
   });
 
   it("POST defaults to the Admin role when no valid role is supplied", async () => {
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Only superadmins get the implicit Admin-role default (see roles.ts /
+    // route.ts: a non-superadmin actor supplying no assignable role gets a
+    // 400 instead, since it can't assign Admin itself).
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
     await POST(
       request("POST", { username: "charlie", temporaryPassword: "Temp-Passwort-9!", roles: ["not-a-real-role"] })
@@ -98,7 +101,12 @@ describe("/api/admin/users (Online-Benutzerverwaltung aktiv)", () => {
 
     // 8 chars, single character class - passes our own >=8 guard but fails
     // the library's assertPasswordPolicy (11 chars minimum, 3 of 4 classes).
-    const response = await POST(request("POST", { username: "dora", temporaryPassword: "aaaaaaaa", roles: ["Admin"] }));
+    // Role kept non-privileged (Admin/superadmin need a superadmin actor to
+    // assign, see roles.ts canAssignRoles) so this exercises the password
+    // check, not the role-assignment permission check.
+    const response = await POST(
+      request("POST", { username: "dora", temporaryPassword: "aaaaaaaa", roles: ["Sponsoring-Management"] })
+    );
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -112,8 +120,10 @@ describe("/api/admin/users (Online-Benutzerverwaltung aktiv)", () => {
     mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
     await createAdmin(remote.store, { username: "eve", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
 
+    // Role kept non-privileged, see comment above - this test is about the
+    // duplicate-username check, not the role-assignment permission check.
     const response = await POST(
-      request("POST", { username: "eve", temporaryPassword: "Correct-Horse-9!", roles: ["Admin"] })
+      request("POST", { username: "eve", temporaryPassword: "Correct-Horse-9!", roles: ["Sponsoring-Management"] })
     );
     expect(response.status).toBe(400);
   });

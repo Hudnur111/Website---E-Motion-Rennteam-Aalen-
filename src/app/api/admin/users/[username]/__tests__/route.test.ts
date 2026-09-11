@@ -41,7 +41,9 @@ describe("/api/admin/users/[username] (Online-Benutzerverwaltung aktiv)", () => 
 
   it("DELETE removes a remote admin", async () => {
     await createAdmin(remote.store, { username: "target", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Managing an Admin-role target requires a superadmin actor (see
+    // roles.ts canManageTarget) - a plain Admin actor gets 403 here.
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
     const response = await DELETE(request("DELETE"), params("target"));
     expect(response.status).toBe(200);
@@ -71,7 +73,9 @@ describe("/api/admin/users/[username] (Online-Benutzerverwaltung aktiv)", () => 
 
   it("PATCH updates roles for another user", async () => {
     await createAdmin(remote.store, { username: "target", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Managing an Admin-role target requires a superadmin actor (see
+    // roles.ts canManageTarget) - a plain Admin actor gets 403 here.
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
     const response = await PATCH(request("PATCH", { roles: ["Sponsoring-Management"] }), params("target"));
     expect(response.status).toBe(200);
@@ -104,7 +108,9 @@ describe("/api/admin/users/[username] (Online-Benutzerverwaltung aktiv)", () => 
 
   it("PATCH still allows disabling someone else", async () => {
     await createAdmin(remote.store, { username: "target", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Managing an Admin-role target requires a superadmin actor (see
+    // roles.ts canManageTarget) - a plain Admin actor gets 403 here.
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
     const response = await PATCH(request("PATCH", { disabled: true }), params("target"));
     expect(response.status).toBe(200);
@@ -115,7 +121,10 @@ describe("/api/admin/users/[username] (Online-Benutzerverwaltung aktiv)", () => 
 
   it("PATCH rejects an empty role list instead of silently locking the target account out of every role", async () => {
     await createAdmin(remote.store, { username: "target", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Managing an Admin-role target requires a superadmin actor (see
+    // roles.ts canManageTarget) - a plain Admin actor gets 403 here, which
+    // would mask the empty-role-list check this test is actually about.
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
     const response = await PATCH(request("PATCH", { roles: [] }), params("target"));
     expect(response.status).toBe(400);
@@ -123,9 +132,16 @@ describe("/api/admin/users/[username] (Online-Benutzerverwaltung aktiv)", () => 
 
   it("PATCH filters out unknown role strings and 400s if nothing valid remains", async () => {
     await createAdmin(remote.store, { username: "target", password: "Correct-Horse-9!", roles: ["Admin"], actor: "x" });
-    mockSession({ username: "alice", mustChangePassword: false, roles: ["Admin"] });
+    // Superadmin actor, see comment above.
+    mockSession({ username: "alice", mustChangePassword: false, roles: ["superadmin"] });
 
-    const response = await PATCH(request("PATCH", { roles: ["superadmin", "not-a-role"] }), params("target"));
+    // "superadmin" is now itself a real assignable role (see roles.ts) so
+    // it no longer belongs in the "unknown role" payload here - use two
+    // genuinely invalid strings so isAssignableRole filters out both.
+    const response = await PATCH(
+      request("PATCH", { roles: ["not-a-role", "also-not-a-role"] }),
+      params("target")
+    );
     expect(response.status).toBe(400);
   });
 
