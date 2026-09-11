@@ -7,7 +7,7 @@
  * source of truth so the Team page's season switcher and the CMS admin UI
  * can't drift apart.
  */
-export const TEAM_SEASONS = ["ERT-15/27", "ERT-14/26", "Team unter Julian (CEO)"] as const;
+export const TEAM_SEASONS = ["ERT-15/27", "ERT-14/26", "unter Julian (CEO)"] as const;
 
 /** Season shown on /team when no ?season= query param is set. */
 export const DEFAULT_TEAM_SEASON: (typeof TEAM_SEASONS)[number] = "ERT-15/27";
