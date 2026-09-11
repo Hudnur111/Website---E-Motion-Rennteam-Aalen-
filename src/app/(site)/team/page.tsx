@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getTeam, TEAM_DEPARTMENTS, TEAM_STRUCTURE } from "@/lib/content";
+import Link from "next/link";
+import {
+  getTeam,
+  TEAM_DEPARTMENTS,
+  TEAM_STRUCTURE,
+  TEAM_SEASONS,
+  DEFAULT_TEAM_SEASON,
+} from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -44,20 +51,61 @@ const TEAM_DESCRIPTIONS: Record<string, string> = {
 
 const SHOW_TEAM_MEMBERS = true;
 
-export default function TeamPage() {
-  const team = SHOW_TEAM_MEMBERS ? getTeam() : [];
+export default async function TeamPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ season?: string }>;
+}) {
+  const requestedSeason = (await searchParams).season;
+  const season = TEAM_SEASONS.includes(requestedSeason as (typeof TEAM_SEASONS)[number])
+    ? (requestedSeason as (typeof TEAM_SEASONS)[number])
+    : DEFAULT_TEAM_SEASON;
+
+  const allTeam = SHOW_TEAM_MEMBERS ? getTeam() : [];
+  const team = allTeam.filter((member) => (member.season ?? DEFAULT_TEAM_SEASON) === season);
+
+  const heading = season.startsWith("ERT-") ? `Die Köpfe hinter dem ${season}` : season;
 
   return (
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
-        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Die Köpfe hinter dem ERT-14/26</h1>
+        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">{heading}</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
           gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
         </p>
+
+        <div className="mt-8 flex flex-wrap gap-2">
+          {TEAM_SEASONS.map((s) => {
+            const active = s === season;
+            return (
+              <Link
+                key={s}
+                href={s === DEFAULT_TEAM_SEASON ? "/team" : `/team?season=${encodeURIComponent(s)}`}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  active
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border text-foreground hover:border-accent hover:bg-surface"
+                }`}
+              >
+                {s}
+              </Link>
+            );
+          })}
+        </div>
       </Reveal>
 
+      {team.length === 0 ? (
+        <Reveal delay={0.05}>
+          <div className="mt-14 rounded-2xl border border-border bg-surface/50 p-10 text-center">
+            <p className="text-muted">
+              Für die Saison <span className="font-semibold text-foreground">{season}</span> sind
+              noch keine Mitglieder hinterlegt.
+            </p>
+          </div>
+        </Reveal>
+      ) : (
       <div className="mt-14 space-y-20">
         {TEAM_STRUCTURE.map((group, gi) => (
           <div key={group.category}>
@@ -161,6 +209,7 @@ export default function TeamPage() {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

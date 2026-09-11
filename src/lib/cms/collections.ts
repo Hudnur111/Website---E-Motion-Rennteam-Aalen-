@@ -2,6 +2,7 @@
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
 import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+import { TEAM_SEASONS } from "@/lib/team-seasons";
 import { SPONSOR_TIERS_BASE } from "@/lib/sponsor-tiers";
 
 export type FieldType =
@@ -47,6 +48,13 @@ export const collections: CollectionDef[] = [
         label: "Abteilung",
         type: "select",
         options: [...TEAM_DEPARTMENTS],
+      },
+      {
+        name: "season",
+        label: "Saison / Fahrzeug-Generation",
+        type: "select",
+        options: [...TEAM_SEASONS],
+        required: true,
       },
       { name: "photo", label: "Foto", type: "image", required: true },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },

@@ -23,11 +23,13 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
 }
 
 export { TEAM_DEPARTMENTS, TEAM_STRUCTURE } from "@/lib/team-departments";
+export { TEAM_SEASONS, DEFAULT_TEAM_SEASON } from "@/lib/team-seasons";
 
 export type TeamMember = {
   name: string;
   role: string;
   department: string;
+  season?: string;
   order?: number;
   photo?: string;
   linkedin?: string;
