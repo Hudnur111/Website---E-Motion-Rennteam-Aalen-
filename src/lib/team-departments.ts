@@ -24,3 +24,10 @@ export const TEAM_DEPARTMENTS = [
   "Eventmanagement",
   "Finance",
 ] as const;
+
+/**
+ * Official sponsoring tiers, single source of truth for the CMS sponsor
+ * collection's "Sponsoring-Stufe" field and the sponsoring inquiry form's
+ * tier selection.
+ */
+export const SPONSOR_TIERS = ["Platin", "Gold", "Silber", "Partner"] as const;

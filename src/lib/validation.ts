@@ -5,6 +5,8 @@
  * API route handler under `src/app/api`.
  */
 
+import { SPONSOR_TIERS as SHARED_SPONSOR_TIERS, TEAM_DEPARTMENTS } from "@/lib/team-departments";
+
 export type FieldErrors = Record<string, string>;
 
 export type ValidationResult<T> =
@@ -183,24 +185,10 @@ export const MEMBER_SKILLS = [
   { id: "video_photo", label: "Video & Foto Editing" },
 ] as const;
 
-export const MEMBER_DEPARTMENTS = [
-  "Project Management",
-  "Workshop",
-  "Chassis and Ergonomics",
-  "Electrics",
-  "Powertrain",
-  "Aerodynamics",
-  "Suspension and Steering Systems",
-  "Driverless",
-  "Vehicle Dynamics",
-  "Testing and Data Acquisition",
-  "Media and Marketing",
-  "Business Plan",
-  "Sponsoring",
-  "Eventmanagement",
-  "Finance",
-  "Noch unentschlossen",
-] as const;
+// Reuses the same single source of truth as the Team page and CMS
+// "Abteilung" field (see team-departments.ts), plus the form-only fallback
+// option for applicants who haven't decided on a department yet.
+export const MEMBER_DEPARTMENTS = [...TEAM_DEPARTMENTS, "Noch unentschlossen"] as const;
 
 export function validateMemberApplicationForm(
   body: unknown
@@ -251,13 +239,10 @@ export type SponsorFormData = {
   message: string;
 };
 
-export const SPONSOR_TIERS = [
-  "Platin",
-  "Gold",
-  "Silber",
-  "Partner",
-  "Noch unentschlossen",
-] as const;
+// Reuses the same single source of truth as the CMS sponsor collection's
+// "Sponsoring-Stufe" field (see team-departments.ts), plus the form-only
+// fallback option for prospective sponsors who haven't decided on a tier yet.
+export const SPONSOR_TIERS = [...SHARED_SPONSOR_TIERS, "Noch unentschlossen"] as const;
 
 export function validateSponsorForm(body: unknown): ValidationResult<SponsorFormData> {
   const data = asRecord(body);
