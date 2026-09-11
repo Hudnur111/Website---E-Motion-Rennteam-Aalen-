@@ -24,3 +24,19 @@ export const TEAM_DEPARTMENTS = [
   "Eventmanagement",
   "Finance",
 ] as const;
+
+/**
+ * Known race seasons, newest first. Used for the year-filter tabs on /team
+ * and as the CMS "Saison" select options. Extend this list when a new car
+ * season starts; the oldest entry is used as the default for members whose
+ * season field is empty (backwards-compat with existing content).
+ */
+export const TEAM_SEASONS = [
+  "ERT-15/27",
+  "ERT-14/26",
+] as const;
+
+export type TeamSeason = (typeof TEAM_SEASONS)[number];
+
+/** The season shown by default (current active season). */
+export const DEFAULT_SEASON: TeamSeason = "ERT-14/26";

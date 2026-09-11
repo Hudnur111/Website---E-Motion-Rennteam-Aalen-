@@ -1,7 +1,7 @@
 // Single source of truth for the editable content collections. Both the
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
-import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+import { TEAM_DEPARTMENTS, TEAM_SEASONS } from "@/lib/team-departments";
 
 export type FieldType =
   | "string"
@@ -52,6 +52,12 @@ export const collections: CollectionDef[] = [
         // Mitglied auf /team in keiner Abteilungs-Sektion auftaucht, ohne
         // dass ein Fehler angezeigt wird.
         options: [...TEAM_DEPARTMENTS],
+      },
+      {
+        name: "season",
+        label: "Saison",
+        type: "select",
+        options: [...TEAM_SEASONS],
       },
       { name: "photo", label: "Foto", type: "image" },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },
