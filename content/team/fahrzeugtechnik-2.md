@@ -2,6 +2,7 @@
 name: Caroline
 role: Composites & Fertigung
 department: Chassis and Ergonomics
+generation: "ERT-14/26"
 order: 11
 photo: /uploads/single-bilder-upload/Caroline.jpg
 ---

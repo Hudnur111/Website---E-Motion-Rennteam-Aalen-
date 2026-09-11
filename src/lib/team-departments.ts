@@ -26,6 +26,13 @@ export const TEAM_DEPARTMENTS = [
 ] as const;
 
 /**
+ * Fallback "Jahrgang" (generation) assigned to team members whose content
+ * file predates the `generation` field, so they still show up under the
+ * current generation on the Team page instead of disappearing.
+ */
+export const DEFAULT_GENERATION = "ERT-14/26";
+
+/**
  * Official sponsoring tiers, single source of truth for the CMS sponsor
  * collection's "Sponsoring-Stufe" field and the sponsoring inquiry form's
  * tier selection.

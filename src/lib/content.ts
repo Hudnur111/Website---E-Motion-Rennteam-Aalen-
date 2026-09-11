@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { DEFAULT_GENERATION } from "@/lib/team-departments";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -30,12 +31,13 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
   return items;
 }
 
-export { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+export { TEAM_DEPARTMENTS, DEFAULT_GENERATION } from "@/lib/team-departments";
 
 export type TeamMember = {
   name: string;
   role: string;
   department: string;
+  generation: string;
   order?: number;
   photo?: string;
   linkedin?: string;
@@ -132,9 +134,9 @@ export type NavItem = {
 };
 
 export function getTeam(): TeamMember[] {
-  return readCollection<TeamMember>("team").sort(
-    (a, b) => (a.order ?? 99) - (b.order ?? 99)
-  );
+  return readCollection<TeamMember>("team")
+    .map((member) => ({ ...member, generation: member.generation || DEFAULT_GENERATION }))
+    .sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 }
 
 export function getVehicles(): Vehicle[] {

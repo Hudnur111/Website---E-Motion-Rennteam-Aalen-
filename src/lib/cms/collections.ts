@@ -53,6 +53,12 @@ export const collections: CollectionDef[] = [
         // dass ein Fehler angezeigt wird.
         options: [...TEAM_DEPARTMENTS],
       },
+      {
+        name: "generation",
+        label: "Jahrgang (z. B. ERT-14/26)",
+        type: "string",
+        required: true,
+      },
       { name: "photo", label: "Foto", type: "image" },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },
       { name: "body", label: "Kurzbeschreibung", type: "richText" },
