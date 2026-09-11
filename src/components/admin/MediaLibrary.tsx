@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface MediaFile {
@@ -186,7 +187,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       )}
 
       {notice && (
-        <p
+        <div
           role="status"
           className={`mb-4 rounded-lg border px-3.5 py-2.5 text-sm ${
             notice.kind === "ok"
@@ -196,8 +197,14 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
                 : "border-red-500/30 bg-red-500/10 text-red-400"
           }`}
         >
-          {notice.message}
-        </p>
+          <p>{notice.message}</p>
+          {notice.kind === "error" && (
+            <p className="mt-1 opacity-80">
+              Workaround: Bild direkt im GitHub-Repo unter <code>public/uploads/</code> hochladen –
+              es taucht danach automatisch hier in der Mediathek auf.
+            </p>
+          )}
+        </div>
       )}
 
       {files.length >= 6 && (
@@ -224,13 +231,16 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
             className="group relative overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent"
           >
             {/* Thumbnail */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={file.path}
-              alt={file.name}
-              className="aspect-square w-full object-cover"
-              loading="lazy"
-            />
+            <div className="relative aspect-square w-full">
+              <Image
+                src={file.path}
+                alt={file.name}
+                fill
+                sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                className="object-cover"
+                unoptimized
+              />
+            </div>
 
             {/* Overlay with actions */}
             <div className="flex flex-col gap-1 p-2">
