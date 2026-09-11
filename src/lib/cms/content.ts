@@ -181,8 +181,13 @@ export async function saveItem(
 ): Promise<SaveResult> {
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
-  if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
+  // Muss vor der Slug-Pruefung laufen: beim Anlegen (POST .../[collection])
+  // wird der Slug aus dem Titelfeld abgeleitet, das fehlt/leer ist, wenn ein
+  // Pflichtfeld fehlt (z.B. Titel leer). Sonst schlaegt hier zuerst die
+  // Slug-Pruefung mit einer generischen "Ungueltiger Slug"-Meldung (-> 502)
+  // an, statt der eigentlichen, aussagekraeftigen Pflichtfeld-Meldung (-> 400).
   validateRequiredFields(collection, data, body);
+  if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
   const content = serialize(data, body);
 
