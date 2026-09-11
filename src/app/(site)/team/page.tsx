@@ -176,7 +176,7 @@ export default async function TeamPage({
                                 )}
                               </div>
                               <div className="mt-4 flex items-center justify-between">
-                                <h4 className="font-semibold">{member.name}</h4>
+                                <h4 className="font-sans font-semibold leading-normal">{member.name}</h4>
                                 {member.linkedin && (
                                   <a
                                     href={member.linkedin}
