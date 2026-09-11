@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/cms/auth";
 import { hashPassword } from "@/lib/cms/password";
 import { listUsers, upsertUser } from "@/lib/cms/users";
-import { canManageUsers, isAssignableRole, ROLE_ADMIN } from "@/lib/cms/roles";
+import { canAssignRoles, canManageUsers, isAssignableRole, isSuperadmin, ROLE_ADMIN } from "@/lib/cms/roles";
 import {
   isRemoteAuthEnabled,
   getCredentialsClient,
@@ -77,11 +77,21 @@ export async function POST(request: NextRequest) {
 
   if (isRemoteAuthEnabled()) {
     const requestedRoles = Array.isArray(body.roles) ? body.roles.filter(isAssignableRole) : [];
+    const rolesToAssign = requestedRoles.length > 0 ? requestedRoles : isSuperadmin(session) ? [ROLE_ADMIN] : [];
+    if (rolesToAssign.length === 0) {
+      return NextResponse.json({ error: "Bitte mindestens eine Rolle auswählen." }, { status: 400 });
+    }
+    if (!canAssignRoles(session, rolesToAssign)) {
+      return NextResponse.json(
+        { error: "Nur Superadmins dürfen Administrator- oder Superadmin-Zugänge anlegen." },
+        { status: 403 }
+      );
+    }
     try {
       await createAdmin(getCredentialsClient(), {
         username,
         password: temporaryPassword,
-        roles: requestedRoles.length > 0 ? requestedRoles : [ROLE_ADMIN],
+        roles: rolesToAssign,
         actor: session.username,
         mustChangePassword: true,
       });

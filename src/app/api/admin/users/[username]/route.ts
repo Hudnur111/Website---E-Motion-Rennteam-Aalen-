@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/cms/auth";
 import { deleteUser } from "@/lib/cms/users";
-import { canManageUsers, isAssignableRole, ROLE_ADMIN } from "@/lib/cms/roles";
+import {
+  canAssignRoles,
+  canManageTarget,
+  canManageUsers,
+  isAssignableRole,
+  ROLE_ADMIN,
+  ROLE_SUPERADMIN,
+} from "@/lib/cms/roles";
 import {
   isRemoteAuthEnabled,
   getCredentialsClient,
@@ -30,7 +37,16 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   if (isRemoteAuthEnabled()) {
     try {
-      await removeAdmin(getCredentialsClient(), { targetUsername, actor: session.username });
+      const client = getCredentialsClient();
+      const file = await client.loadAdmins();
+      const target = file.users.find((u) => u.username.toLowerCase() === targetUsername.toLowerCase());
+      if (target && !canManageTarget(session, target.roles)) {
+        return NextResponse.json(
+          { error: "Nur Superadmins dürfen Administrator- oder Superadmin-Zugänge entfernen." },
+          { status: 403 }
+        );
+      }
+      await removeAdmin(client, { targetUsername, actor: session.username });
       return NextResponse.json({ ok: true });
     } catch (err) {
       if (err instanceof CredentialsError) {
@@ -74,7 +90,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (isSelf && body.disabled === true) {
     return NextResponse.json({ error: "Der eigene Zugang kann nicht gesperrt werden." }, { status: 400 });
   }
-  if (isSelf && Array.isArray(body.roles) && !body.roles.includes(ROLE_ADMIN)) {
+  if (isSelf && Array.isArray(body.roles) && !body.roles.includes(ROLE_ADMIN) && !body.roles.includes(ROLE_SUPERADMIN)) {
     return NextResponse.json(
       { error: "Die eigene Admin-Rolle kann nicht selbst entzogen werden - das würde vom Zugang aussperren." },
       { status: 400 }
@@ -83,10 +99,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   try {
     const client = getCredentialsClient();
+    const file = await client.loadAdmins();
+    const target = file.users.find((u) => u.username.toLowerCase() === targetUsername.toLowerCase());
+    if (target && !canManageTarget(session, target.roles)) {
+      return NextResponse.json(
+        { error: "Nur Superadmins dürfen Administrator- oder Superadmin-Zugänge bearbeiten." },
+        { status: 403 }
+      );
+    }
     if (Array.isArray(body.roles)) {
       const roles = body.roles.filter(isAssignableRole);
       if (roles.length === 0) {
         return NextResponse.json({ error: "Mindestens eine gültige Rolle ist erforderlich." }, { status: 400 });
+      }
+      if (!canAssignRoles(session, roles)) {
+        return NextResponse.json(
+          { error: "Nur Superadmins dürfen die Rolle Administrator oder Superadmin vergeben." },
+          { status: 403 }
+        );
       }
       await setRoles(client, { targetUsername, roles, actor: session.username });
     }

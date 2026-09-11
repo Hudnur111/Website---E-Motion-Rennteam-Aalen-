@@ -17,13 +17,13 @@ describe("UserManager", () => {
   });
 
   it("shows the 8-char hint and no role picker in legacy (non-remote) mode", () => {
-    render(<UserManager adminUsername="admin" initialUsers={[]} remote={false} />);
+    render(<UserManager adminUsername="admin" initialUsers={[]} remote={false} canAssignPrivilegedRoles={true} />);
     expect(screen.getByPlaceholderText("mind. 8 Zeichen")).toBeInTheDocument();
     expect(screen.queryByText("Rollen")).not.toBeInTheDocument();
   });
 
   it("shows the strict 11-char/3-class hint and the role picker in remote mode", () => {
-    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} />);
+    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} canAssignPrivilegedRoles={true} />);
     expect(screen.getByPlaceholderText(/mind\. 11 Zeichen/)).toBeInTheDocument();
     expect(screen.getByText("Rollen")).toBeInTheDocument();
     expect(screen.getByLabelText("Sponsoring-Management")).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe("UserManager", () => {
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
 
-    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} />);
+    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} canAssignPrivilegedRoles={true} />);
     await user.type(screen.getByLabelText("Benutzername"), "bob");
     await user.type(screen.getByLabelText("Temporäres Passwort"), "short1!A");
     await user.click(screen.getByRole("button", { name: "Benutzer anlegen" }));
@@ -48,7 +48,7 @@ describe("UserManager", () => {
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
 
-    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} />);
+    render(<UserManager adminUsername="admin" initialUsers={[]} remote={true} canAssignPrivilegedRoles={true} />);
     await user.type(screen.getByLabelText("Benutzername"), "bob");
     await user.type(screen.getByLabelText("Temporäres Passwort"), "Correct-Horse-9!");
     // "Admin" is pre-selected by default; also select Sponsoring-Management.
@@ -77,6 +77,7 @@ describe("UserManager", () => {
         adminUsername="admin"
         initialUsers={[{ username: "alice", mustChangePassword: false, roles: ["Admin"], disabled: false }]}
         remote={true}
+        canAssignPrivilegedRoles={true}
       />
     );
 

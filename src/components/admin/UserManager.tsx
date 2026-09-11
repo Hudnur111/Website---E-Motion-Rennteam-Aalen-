@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-const ASSIGNABLE_ROLES = ["Admin", "Sponsoring-Management"] as const;
+const ALL_ROLES = ["superadmin", "Admin", "Sponsoring-Management"] as const;
+const PRIVILEGED_ROLES = ["superadmin", "Admin"] as const;
 
 interface UserRow {
   username: string;
@@ -18,15 +19,27 @@ interface UserManagerProps {
   remote: boolean;
   /** Fehlermeldung vom serverseitigen Erstladen (z.B. Online-Benutzerverwaltung nicht erreichbar). */
   initialError?: string | null;
+  /** true = eigener Zugang ist Superadmin, darf also "superadmin"/"Admin" vergeben und diese Zugänge bearbeiten. */
+  canAssignPrivilegedRoles: boolean;
 }
 
-export default function UserManager({ adminUsername, initialUsers, remote, initialError }: UserManagerProps) {
+export default function UserManager({
+  adminUsername,
+  initialUsers,
+  remote,
+  initialError,
+  canAssignPrivilegedRoles,
+}: UserManagerProps) {
   const [users, setUsers] = useState<UserRow[]>(initialUsers);
   const [error, setError] = useState(initialError ?? "");
 
+  const assignableRoles = canAssignPrivilegedRoles
+    ? ALL_ROLES
+    : ALL_ROLES.filter((role) => !(PRIVILEGED_ROLES as readonly string[]).includes(role));
+
   const [username, setUsername] = useState("");
   const [temporaryPassword, setTemporaryPassword] = useState("");
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(["Admin"]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(canAssignPrivilegedRoles ? ["Admin"] : []);
   const [createdInfo, setCreatedInfo] = useState<{ username: string; password: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
@@ -94,7 +107,7 @@ export default function UserManager({ adminUsername, initialUsers, remote, initi
       setCreatedInfo({ username: username.trim(), password: temporaryPassword });
       setUsername("");
       setTemporaryPassword("");
-      setSelectedRoles(["Admin"]);
+      setSelectedRoles(canAssignPrivilegedRoles ? ["Admin"] : []);
       await loadUsers();
     } catch {
       setFormError("Verbindung zum Server fehlgeschlagen.");
@@ -214,7 +227,7 @@ export default function UserManager({ adminUsername, initialUsers, remote, initi
             <div className="sm:col-span-2">
               <span className="mb-1.5 block text-sm font-medium text-foreground">Rollen</span>
               <div className="flex flex-wrap gap-3">
-                {ASSIGNABLE_ROLES.map((role) => (
+                {assignableRoles.map((role) => (
                   <label
                     key={role}
                     className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -298,41 +311,64 @@ export default function UserManager({ adminUsername, initialUsers, remote, initi
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {remote &&
-                  ASSIGNABLE_ROLES.map((role) => {
-                    const active = u.roles.includes(role);
+                {(() => {
+                  const targetHasPrivilegedRole = u.roles.some((r) => (PRIVILEGED_ROLES as readonly string[]).includes(r));
+                  const canManageThisTarget = canAssignPrivilegedRoles || !targetHasPrivilegedRole;
+                  if (!canManageThisTarget) {
                     return (
-                      <button
-                        key={role}
-                        type="button"
-                        disabled={busyUser === u.username}
-                        onClick={() => handleToggleRole(u.username, u.roles, role)}
-                        className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                          active
-                            ? "bg-accent/15 text-accent-text"
-                            : "border border-border text-muted hover:text-foreground"
-                        }`}
-                      >
-                        {role}
-                      </button>
+                      <>
+                        {u.roles.map((role) => (
+                          <span
+                            key={role}
+                            className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-text"
+                          >
+                            {role}
+                          </span>
+                        ))}
+                        <span className="text-xs text-muted">Nur Superadmin kann diesen Zugang bearbeiten</span>
+                      </>
                     );
-                  })}
-                {remote && (
-                  <button
-                    type="button"
-                    disabled={busyUser === u.username}
-                    onClick={() => handleToggleDisabled(u.username, u.disabled)}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-amber-500/50 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {u.disabled ? "Entsperren" : "Sperren"}
-                  </button>
-                )}
-                <button
-                  onClick={() => handleDelete(u.username)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-400"
-                >
-                  Entfernen
-                </button>
+                  }
+                  return (
+                    <>
+                      {remote &&
+                        assignableRoles.map((role) => {
+                          const active = u.roles.includes(role);
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              disabled={busyUser === u.username}
+                              onClick={() => handleToggleRole(u.username, u.roles, role)}
+                              className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                                active
+                                  ? "bg-accent/15 text-accent-text"
+                                  : "border border-border text-muted hover:text-foreground"
+                              }`}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      {remote && (
+                        <button
+                          type="button"
+                          disabled={busyUser === u.username}
+                          onClick={() => handleToggleDisabled(u.username, u.disabled)}
+                          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-amber-500/50 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {u.disabled ? "Entsperren" : "Sperren"}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDelete(u.username)}
+                        className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-400"
+                      >
+                        Entfernen
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           ))}

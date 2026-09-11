@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import { listUsers } from "@/lib/cms/users";
-import { canManageUsers } from "@/lib/cms/roles";
+import { canManageUsers, isSuperadmin } from "@/lib/cms/roles";
 import { isRemoteAuthEnabled, getCredentialsClient } from "@/lib/cms/credentialsRepo";
 import UserManager from "@/components/admin/UserManager";
 
@@ -58,6 +58,7 @@ export default async function UsersPage() {
         initialUsers={initialUsers}
         remote={remote}
         initialError={loadError}
+        canAssignPrivilegedRoles={isSuperadmin(session)}
       />
     </div>
   );
