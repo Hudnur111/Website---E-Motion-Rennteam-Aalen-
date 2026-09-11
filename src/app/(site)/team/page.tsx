@@ -127,7 +127,7 @@ export default function TeamPage() {
                                   </div>
                                 )}
                               </div>
-                              <div className="mt-4 flex items-center gap-4">
+                              <div className="mt-4 flex items-center gap-10">
                                 <h4 className="font-semibold">{member.name}</h4>
                                 {member.linkedin && (
                                   <a
