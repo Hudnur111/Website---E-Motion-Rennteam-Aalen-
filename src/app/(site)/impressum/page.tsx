@@ -42,10 +42,10 @@ export default function ImpressumPage() {
             <br />
             E-Mail:{" "}
             <a
-              href="mailto:denny.svalia@emotion-rennteam.de"
+              href="mailto:denny.svalina@emotion-rennteam.de"
               className="text-accent-text underline"
             >
-              denny.svalia@emotion-rennteam.de
+              denny.svalina@emotion-rennteam.de
             </a>
           </p>
         </section>
