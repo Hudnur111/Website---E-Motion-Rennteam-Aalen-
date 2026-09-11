@@ -5,6 +5,9 @@
  * API route handler under `src/app/api`.
  */
 
+import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+import { SPONSOR_TIERS_BASE } from "@/lib/sponsor-tiers";
+
 export type FieldErrors = Record<string, string>;
 
 export type ValidationResult<T> =
@@ -167,23 +170,7 @@ export const MEMBER_SKILLS = [
   { id: "video_photo", label: "Video & Foto Editing" },
 ] as const;
 
-export const MEMBER_DEPARTMENTS = [
-  "Board",
-  "Workshop",
-  "Aerodynamics",
-  "Chassis and Ergonomics",
-  "Suspension and Steering Systems",
-  "Powertrain",
-  "Electrics",
-  "Vehicle Performance",
-  "Driverless",
-  "Media and Marketing",
-  "Business Plan / Statistics",
-  "Sponsoring",
-  "Event Management",
-  "Finance",
-  "Noch unentschlossen",
-] as const;
+export const MEMBER_DEPARTMENTS = [...TEAM_DEPARTMENTS, "Noch unentschlossen"] as const;
 
 export function validateMemberApplicationForm(
   body: unknown
@@ -234,13 +221,7 @@ export type SponsorFormData = {
   message: string;
 };
 
-export const SPONSOR_TIERS = [
-  "Platin",
-  "Gold",
-  "Silber",
-  "Partner",
-  "Noch unentschlossen",
-] as const;
+export const SPONSOR_TIERS = [...SPONSOR_TIERS_BASE, "Noch unentschlossen"] as const;
 
 export function validateSponsorForm(body: unknown): ValidationResult<SponsorFormData> {
   const data = asRecord(body);
