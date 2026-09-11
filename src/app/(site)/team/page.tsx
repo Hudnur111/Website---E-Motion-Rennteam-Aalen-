@@ -127,7 +127,22 @@ export default function TeamPage() {
                                   </div>
                                 )}
                               </div>
-                              <h4 className="mt-4 font-semibold">{member.name}</h4>
+                              <div className="mt-4 flex items-center gap-1.5">
+                                <h4 className="font-semibold">{member.name}</h4>
+                                {member.linkedin && (
+                                  <a
+                                    href={member.linkedin}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={`${member.name} auf LinkedIn`}
+                                    className="text-muted transition-colors hover:text-accent-text"
+                                  >
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                                      <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
+                                    </svg>
+                                  </a>
+                                )}
+                              </div>
                               <p className="text-sm text-accent-text">{member.role}</p>
                               {member.body && (
                                 <p className="mt-2 text-sm text-muted">{member.body}</p>

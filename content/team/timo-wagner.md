@@ -4,5 +4,6 @@ role: Teamleiter
 department: Suspension and Steering Systems
 photo: /uploads/single-bilder-upload/Timo W..jpg
 order: 1
+linkedin: https://www.linkedin.com/in/timo-wagner-830181436
 ---
 
