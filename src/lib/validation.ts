@@ -168,20 +168,19 @@ export const MEMBER_SKILLS = [
 ] as const;
 
 export const MEMBER_DEPARTMENTS = [
-  "Project Management",
+  "Board",
   "Workshop",
-  "Chassis and Ergonomics",
-  "Electrics",
-  "Powertrain",
   "Aerodynamics",
+  "Chassis and Ergonomics",
   "Suspension and Steering Systems",
+  "Powertrain",
+  "Electrics",
+  "Vehicle Performance",
   "Driverless",
-  "Vehicle Dynamics",
-  "Testing and Data Acquisition",
   "Media and Marketing",
-  "Business Plan",
+  "Business Plan / Statistics",
   "Sponsoring",
-  "Eventmanagement",
+  "Event Management",
   "Finance",
   "Noch unentschlossen",
 ] as const;

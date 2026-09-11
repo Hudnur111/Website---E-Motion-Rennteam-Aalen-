@@ -77,7 +77,7 @@ export default function Header() {
       }`}
     >
       <div className="relative">
-      <div className="container-page flex h-16 items-center justify-between">
+      <div className="container-page flex h-20 items-center justify-between">
         <Link href="/" className="group relative flex items-center">
           <Image
             src="/uploads/logo.png"
@@ -85,7 +85,7 @@ export default function Header() {
             width={1000}
             height={563}
             priority
-            className="h-9 w-auto"
+            className="h-14 w-auto"
           />
           <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>

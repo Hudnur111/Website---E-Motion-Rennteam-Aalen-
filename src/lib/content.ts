@@ -28,21 +28,54 @@ function readCollection<T>(collection: string): (T & { slug: string })[] {
  * application form can't drift apart again.
  */
 export const TEAM_DEPARTMENTS = [
-  "Project Management",
+  "Board",
   "Workshop",
-  "Chassis and Ergonomics",
-  "Electrics",
-  "Powertrain",
   "Aerodynamics",
+  "Chassis and Ergonomics",
   "Suspension and Steering Systems",
+  "Powertrain",
+  "Electrics",
+  "Vehicle Performance",
   "Driverless",
-  "Vehicle Dynamics",
-  "Testing and Data Acquisition",
   "Media and Marketing",
-  "Business Plan",
+  "Business Plan / Statistics",
   "Sponsoring",
-  "Eventmanagement",
+  "Event Management",
   "Finance",
+] as const;
+
+/**
+ * Grouping of TEAM_DEPARTMENTS into the team's three organizational units
+ * (Board / Workshop / Media and Marketing), for org-chart-style display on
+ * the Team page. "Workshop" and "Media and Marketing" stay selectable
+ * departments themselves (for members without a more specific sub-team),
+ * in addition to heading their respective sub-teams.
+ */
+export const TEAM_STRUCTURE = [
+  { category: "Board", departments: ["Board"] },
+  {
+    category: "Workshop",
+    departments: [
+      "Workshop",
+      "Aerodynamics",
+      "Chassis and Ergonomics",
+      "Suspension and Steering Systems",
+      "Powertrain",
+      "Electrics",
+      "Vehicle Performance",
+      "Driverless",
+    ],
+  },
+  {
+    category: "Media and Marketing",
+    departments: [
+      "Media and Marketing",
+      "Business Plan / Statistics",
+      "Sponsoring",
+      "Event Management",
+      "Finance",
+    ],
+  },
 ] as const;
 
 export type TeamMember = {

@@ -170,12 +170,11 @@ select:focus-visible,
   background:
     linear-gradient(var(--surface), var(--surface)) padding-box,
     linear-gradient(135deg, var(--tier-border-glow), transparent 45%, var(--tier-border-glow)) border-box;
-  animation: sponsor-glow-pulse 3.6s ease-in-out infinite;
+  animation: sponsor-glow-pulse 1.8s ease-in-out 1;
   transition: box-shadow 0.25s ease;
 }
 
 .sponsor-card--tier:hover {
-  animation-play-state: paused;
   box-shadow: 0 0 34px -4px var(--tier-glow);
 }
 
@@ -189,8 +188,7 @@ select:focus-visible,
   background-size: 250% 100%;
   background-position: -150% 0;
   opacity: 0;
-  animation: sponsor-shimmer 3.6s ease-in-out infinite;
-  animation-delay: var(--shimmer-delay, 0s);
+  animation: sponsor-shimmer 1.8s ease-in-out 1;
 }
 
 @keyframes sponsor-shimmer {

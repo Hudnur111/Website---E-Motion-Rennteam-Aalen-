@@ -39,9 +39,9 @@ export default function SponsorsPage() {
               </h2>
             </Reveal>
             <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map((sponsor, si) => (
+              {list.map((sponsor) => (
                 <StaggerItem key={sponsor.slug}>
-                  <SponsorCard sponsor={sponsor} index={si} />
+                  <SponsorCard sponsor={sponsor} />
                 </StaggerItem>
               ))}
             </StaggerGroup>

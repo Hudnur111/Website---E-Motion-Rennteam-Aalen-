@@ -38,7 +38,7 @@ const TIER_STYLES: Partial<Record<Sponsor["tier"], TierStyle>> = {
 
 const TILT_RANGE_DEG = 12;
 
-export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; index: number }) {
+export default function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
   const style = TIER_STYLES[sponsor.tier];
   const ref = useRef<HTMLAnchorElement>(null);
   const reduceMotion = useReducedMotion();
@@ -91,7 +91,6 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
           "--tier-shimmer": style.shimmer,
           "--tier-glow": style.glow,
           "--tier-border-glow": style.borderGlow,
-          "--shimmer-delay": `${(index % 6) * 0.35}s`,
         } as CSSProperties
       }
       className="sponsor-card--tier group relative flex h-full flex-col items-center justify-center overflow-hidden rounded-xl bg-surface p-8 text-center"
