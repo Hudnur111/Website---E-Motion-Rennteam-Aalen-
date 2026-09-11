@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateContactForm } from "@/lib/validation";
+import { hasDeliverableDomain, isMxCheckEnabled } from "@/lib/emailDeliverability";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { deliverFormSubmission } from "@/lib/formDelivery";
 import { hasJsonContentType, isTrustedOrigin } from "@/lib/apiSecurity";
@@ -32,6 +33,13 @@ export async function POST(request: NextRequest) {
   const result = validateContactForm(body);
   if (!result.valid) {
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 400 });
+  }
+
+  if (isMxCheckEnabled() && !(await hasDeliverableDomain(result.data.email))) {
+    return NextResponse.json(
+      { ok: false, errors: { email: "Diese E-Mail-Adresse scheint nicht erreichbar zu sein (keine Mail-Server gefunden)." } },
+      { status: 400 }
+    );
   }
 
   // Second limiter keyed by the submitted address (shared across all three
