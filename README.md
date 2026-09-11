@@ -125,17 +125,33 @@ Checkliste vor dem Go-Live des `cms-app`-Deployments:
   `next start` direkt ohne TLS-terminierenden Reverse-Proxy davor, sperren
   Browser sich nach dem ersten Aufruf selbst auf HTTPS ein — auch wenn nur
   HTTP verfügbar ist.
-- **Rate-Limiting ist In-Memory** (`src/lib/rateLimit.ts`, bewusst
-  dokumentiert). Es schützt zuverlässig einen einzelnen, langlebigen
-  Node-Prozess, greift aber pro Instanz separat, sobald mehrere
-  Server-/Container-Instanzen parallel laufen. Bei Multi-Instanz-Hosting
-  auf einen gemeinsamen Store (z. B. Redis/Upstash) umstellen.
+- **Rate-Limiting: `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+  setzen, sobald mehrere Instanzen parallel laufen** (`src/lib/rateLimit.ts`).
+  Ohne diese beiden Variablen fällt der Limiter auf einen In-Memory-Zähler
+  pro Prozess zurück — der schützt zuverlässig einen einzelnen, langlebigen
+  Node-Prozess, greift aber bei Multi-Instanz-/Serverless-Hosting (z. B.
+  Vercel) pro Instanz separat und lässt sich durch Verteilen der Anfragen
+  umgehen. Mit gesetzten Upstash-Variablen nutzt der Limiter automatisch
+  einen gemeinsamen Redis-Store (REST-API, kein zusätzliches npm-Paket
+  nötig) und fällt bei einem Upstash-Fehler übergangsweise auf die
+  In-Memory-Zählung zurück, statt den Traffic zu blockieren.
 - **`.cms-users.json` ist lokal, nicht verschlüsselt und nicht
   versioniert** (siehe `src/lib/cms/users.ts`). Setzt einen persistenten
   Server mit eigenem, geschütztem Dateisystem voraus — auf ephemeren/
   serverless Hosts gehen zusätzlich angelegte CMS-Benutzer bei jedem
   Deploy verloren; der Haupt-Administrator (`CMS_ADMIN_USER`/
   `CMS_ADMIN_PASSWORD_HASH`) ist davon nicht betroffen.
+- **Pflicht-Env-Vars vor dem ersten Start:** `CMS_ADMIN_USER`,
+  `CMS_ADMIN_PASSWORD_HASH`, `CMS_SESSION_SECRET` (≥16 Zeichen), sowie
+  `FORM_WEBHOOK_URL` (siehe oben). Ohne `CMS_SESSION_SECRET` verweigert der
+  Login-Endpunkt jede Anmeldung; ohne `CMS_ADMIN_USER`/
+  `CMS_ADMIN_PASSWORD_HASH` (und ohne Online-Benutzerverwaltung) ist der
+  Login serverseitig nicht konfiguriert.
+- **Kein Error-Tracking in Produktion.** Fehlgeschlagene Webhook-
+  Zustellungen und CMS-GitHub-Commit-Fehler landen nur in den
+  Server-Logs (`console.error`). Für Produktionsbetrieb einen
+  Error-Tracking-Dienst (z. B. Sentry) anbinden, damit solche Fehler
+  nicht nur bei manueller Log-Sichtung auffallen.
 
 ## 📁 Projektstruktur
 

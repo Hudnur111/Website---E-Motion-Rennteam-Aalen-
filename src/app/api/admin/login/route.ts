@@ -14,7 +14,7 @@ import {
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
-  if (!checkRateLimit(`cms-login:${ip}`, 5, 5 * 60 * 1000)) {
+  if (!(await checkRateLimit(`cms-login:${ip}`, 5, 5 * 60 * 1000))) {
     return NextResponse.json(
       { error: "Zu viele Anmeldeversuche. Bitte in ein paar Minuten erneut versuchen." },
       { status: 429 }

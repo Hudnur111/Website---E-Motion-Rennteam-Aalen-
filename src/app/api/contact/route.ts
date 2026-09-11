@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = getClientIp(request);
-  if (!checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000))) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
       { status: 429 }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   // Second limiter keyed by the submitted address (shared across all three
   // form endpoints, see rateLimit.ts) so rotating IPs can't be used to spam
   // the same inbox past the per-IP limit above.
-  if (!checkRateLimit(`email:${result.data.email.toLowerCase()}`, 5, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`email:${result.data.email.toLowerCase()}`, 5, 60 * 60 * 1000))) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
       { status: 429 }

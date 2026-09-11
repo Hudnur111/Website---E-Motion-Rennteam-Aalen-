@@ -11,39 +11,39 @@ describe("checkRateLimit", () => {
     vi.useRealTimers();
   });
 
-  it("allows requests up to the configured limit", () => {
+  it("allows requests up to the configured limit", async () => {
     const key = `test-${Math.random()}`;
-    expect(checkRateLimit(key, 3, 60_000)).toBe(true);
-    expect(checkRateLimit(key, 3, 60_000)).toBe(true);
-    expect(checkRateLimit(key, 3, 60_000)).toBe(true);
+    expect(await checkRateLimit(key, 3, 60_000)).toBe(true);
+    expect(await checkRateLimit(key, 3, 60_000)).toBe(true);
+    expect(await checkRateLimit(key, 3, 60_000)).toBe(true);
   });
 
-  it("blocks requests once the limit is exceeded", () => {
+  it("blocks requests once the limit is exceeded", async () => {
     const key = `test-${Math.random()}`;
-    checkRateLimit(key, 2, 60_000);
-    checkRateLimit(key, 2, 60_000);
-    expect(checkRateLimit(key, 2, 60_000)).toBe(false);
+    await checkRateLimit(key, 2, 60_000);
+    await checkRateLimit(key, 2, 60_000);
+    expect(await checkRateLimit(key, 2, 60_000)).toBe(false);
   });
 
-  it("keeps separate counters per key", () => {
+  it("keeps separate counters per key", async () => {
     const keyA = `test-a-${Math.random()}`;
     const keyB = `test-b-${Math.random()}`;
-    checkRateLimit(keyA, 1, 60_000);
-    expect(checkRateLimit(keyA, 1, 60_000)).toBe(false);
-    expect(checkRateLimit(keyB, 1, 60_000)).toBe(true);
+    await checkRateLimit(keyA, 1, 60_000);
+    expect(await checkRateLimit(keyA, 1, 60_000)).toBe(false);
+    expect(await checkRateLimit(keyB, 1, 60_000)).toBe(true);
   });
 
-  it("resets the counter once the window has elapsed", () => {
+  it("resets the counter once the window has elapsed", async () => {
     vi.useFakeTimers();
     const key = `test-window-${Math.random()}`;
-    expect(checkRateLimit(key, 1, 1_000)).toBe(true);
-    expect(checkRateLimit(key, 1, 1_000)).toBe(false);
+    expect(await checkRateLimit(key, 1, 1_000)).toBe(true);
+    expect(await checkRateLimit(key, 1, 1_000)).toBe(false);
     vi.advanceTimersByTime(1_001);
-    expect(checkRateLimit(key, 1, 1_000)).toBe(true);
+    expect(await checkRateLimit(key, 1, 1_000)).toBe(true);
     vi.useRealTimers();
   });
 
-  it("evicts expired buckets instead of growing the in-memory map forever", () => {
+  it("evicts expired buckets instead of growing the in-memory map forever", async () => {
     // Without eviction, one bucket per distinct key would stay in memory
     // for the life of the process — e.g. an attacker cycling through
     // spoofed `x-forwarded-for` values, or just many years of real
@@ -54,12 +54,12 @@ describe("checkRateLimit", () => {
     const overflowPrefix = `overflow-${Math.random()}-`;
     const bucketsToFill = 5_000; // matches MAX_TRACKED_BUCKETS in rateLimit.ts
     for (let i = 0; i < bucketsToFill; i += 1) {
-      checkRateLimit(`${overflowPrefix}${i}`, 1, 1_000);
+      await checkRateLimit(`${overflowPrefix}${i}`, 1, 1_000);
     }
     expect(_getTrackedBucketCountForTesting()).toBeGreaterThanOrEqual(bucketsToFill);
 
     vi.advanceTimersByTime(1_001);
-    checkRateLimit(`${overflowPrefix}trigger`, 1, 1_000);
+    await checkRateLimit(`${overflowPrefix}trigger`, 1, 1_000);
 
     // The sweep should have dropped all the now-expired buckets, leaving
     // only the freshly inserted one (plus whatever unrelated, unexpired
@@ -68,7 +68,7 @@ describe("checkRateLimit", () => {
     vi.useRealTimers();
   });
 
-  it("still enforces the cap when a flood of distinct keys never expires", () => {
+  it("still enforces the cap when a flood of distinct keys never expires", async () => {
     // A sweep only reclaims *expired* buckets. If an attacker (or a genuine
     // traffic spike) sends more distinct keys than the cap within a single
     // window — so nothing has expired yet when the cap is hit — the sweep
@@ -83,11 +83,46 @@ describe("checkRateLimit", () => {
     for (let i = 0; i < floodSize; i += 1) {
       // A long window (10 minutes) so none of these buckets expire during
       // this test — mirrors the real form routes' rate-limit windows.
-      checkRateLimit(`${overflowPrefix}${i}`, 1, 10 * 60_000);
+      await checkRateLimit(`${overflowPrefix}${i}`, 1, 10 * 60_000);
     }
 
     expect(_getTrackedBucketCountForTesting()).toBeLessThanOrEqual(maxTrackedBuckets);
     vi.useRealTimers();
+  });
+
+  it("uses the shared Upstash Redis store when configured", async () => {
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://example.upstash.io");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "test-token");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify([{ result: 1 }, { result: 1 }]), { status: 200 })
+    );
+
+    const allowed = await checkRateLimit(`redis-${Math.random()}`, 3, 60_000);
+
+    expect(allowed).toBe(true);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://example.upstash.io/pipeline",
+      expect.objectContaining({ method: "POST" })
+    );
+
+    fetchMock.mockRestore();
+    vi.unstubAllEnvs();
+  });
+
+  it("falls back to the in-memory limiter when Upstash requests fail", async () => {
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://example.upstash.io");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "test-token");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("", { status: 500 }));
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const allowed = await checkRateLimit(`redis-fallback-${Math.random()}`, 3, 60_000);
+
+    expect(allowed).toBe(true);
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    fetchMock.mockRestore();
+    consoleErrorSpy.mockRestore();
+    vi.unstubAllEnvs();
   });
 });
 

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = getClientIp(request);
-  if (!checkRateLimit(`sponsoring:${ip}`, 5, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`sponsoring:${ip}`, 5, 10 * 60 * 1000))) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
       { status: 429 }
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 400 });
   }
 
-  if (!checkRateLimit(`email:${result.data.email.toLowerCase()}`, 5, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`email:${result.data.email.toLowerCase()}`, 5, 60 * 60 * 1000))) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
       { status: 429 }
