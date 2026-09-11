@@ -6,7 +6,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/"],
+      // /admin/* is the CMS login + editor UI, not public content - it has
+      // no business being crawled or showing up in search results.
+      disallow: ["/api/", "/admin/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
