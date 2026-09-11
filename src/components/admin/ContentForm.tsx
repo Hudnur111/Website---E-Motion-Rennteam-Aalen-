@@ -30,7 +30,13 @@ interface Props {
   onDirtyChange?: (dirty: boolean) => void;
 }
 
-type FieldValue = string | number | boolean | { label: string; value: string }[] | undefined;
+type FieldValue = string | number | boolean | Record<string, string>[] | undefined;
+
+/** Sub-field schema an objectList field falls back to when it defines none. */
+const DEFAULT_OBJECT_LIST_FIELDS: FieldDef[] = [
+  { name: "label", label: "Bezeichnung", type: "string" },
+  { name: "value", label: "Wert", type: "string" },
+];
 
 // Every collection has at most one `richText` field, and — regardless of the
 // `isBody` flag, which is only used for `isBody: true` at the schema level —
@@ -403,7 +409,7 @@ function FieldEditor({
         </TextField>
       );
     case "objectList":
-      return <ObjectListField field={field} value={(value as { label: string; value: string }[]) ?? []} onChange={onChange} />;
+      return <ObjectListField field={field} value={(value as Record<string, string>[]) ?? []} onChange={onChange} />;
     default:
       return null;
   }
@@ -427,10 +433,21 @@ function ObjectListField({
   onChange,
 }: {
   field: FieldDef;
-  value: { label: string; value: string }[];
-  onChange: (v: { label: string; value: string }[]) => void;
+  value: Record<string, string>[];
+  onChange: (v: Record<string, string>[]) => void;
 }) {
-  function updateRow(index: number, key: "label" | "value", val: string) {
+  // Reads the row schema from the collection definition instead of
+  // hardcoding "label"/"value" column names, so an objectList field with a
+  // differently-named sub-schema (see collections.ts FieldDef.fields)
+  // actually renders and edits its own columns instead of silently doing
+  // nothing with them.
+  const columns = field.fields && field.fields.length > 0 ? field.fields : DEFAULT_OBJECT_LIST_FIELDS;
+
+  function emptyRow(): Record<string, string> {
+    return Object.fromEntries(columns.map((col) => [col.name, ""]));
+  }
+
+  function updateRow(index: number, key: string, val: string) {
     const next = value.map((row, i) => (i === index ? { ...row, [key]: val } : row));
     onChange(next);
   }
@@ -470,20 +487,16 @@ function ObjectListField({
                 ▼
               </button>
             </div>
-            <input
-              type="text"
-              value={row.label}
-              onChange={(e) => updateRow(i, "label", e.target.value)}
-              placeholder="Bezeichnung"
-              className="w-1/3 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            />
-            <input
-              type="text"
-              value={row.value}
-              onChange={(e) => updateRow(i, "value", e.target.value)}
-              placeholder="Wert"
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
-            />
+            {columns.map((col, colIndex) => (
+              <input
+                key={col.name}
+                type="text"
+                value={row[col.name] ?? ""}
+                onChange={(e) => updateRow(i, col.name, e.target.value)}
+                placeholder={col.label}
+                className={`${colIndex === 0 ? "w-1/3" : "flex-1"} rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent`}
+              />
+            ))}
             <button
               type="button"
               onClick={() => onChange(value.filter((_, idx) => idx !== i))}
@@ -496,7 +509,7 @@ function ObjectListField({
       </div>
       <button
         type="button"
-        onClick={() => onChange([...value, { label: "", value: "" }])}
+        onClick={() => onChange([...value, emptyRow()])}
         className="mt-2 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-foreground"
       >
         + Zeile hinzufügen
