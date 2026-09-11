@@ -175,7 +175,7 @@ export default async function TeamPage({
                                   </div>
                                 )}
                               </div>
-                              <div className="mt-4 flex items-center gap-1.5">
+                              <div className="mt-4 flex items-center justify-between">
                                 <h4 className="font-semibold">{member.name}</h4>
                                 {member.linkedin && (
                                   <a
