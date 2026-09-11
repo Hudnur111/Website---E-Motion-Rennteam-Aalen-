@@ -78,7 +78,7 @@ export default function Header() {
     >
       <div className="relative">
       <div className="container-page flex h-20 items-center justify-between">
-        <Link href="/" className="group relative flex items-center">
+        <Link href="/" className="group relative -ml-3 flex items-center">
           <Image
             src="/uploads/logo.png"
             alt="E-Motion Rennteam Aalen"
