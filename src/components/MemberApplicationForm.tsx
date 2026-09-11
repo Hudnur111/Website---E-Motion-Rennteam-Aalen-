@@ -128,13 +128,13 @@ export default function MemberApplicationForm() {
             </div>
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="member-message" className="text-sm font-medium">Motivation</label>
+            <label htmlFor="member-message" className="text-sm font-medium">Weitere Informationen</label>
             <textarea
               id="member-message"
               name="message"
               rows={4}
               maxLength={4000}
-              placeholder="Erzähl uns kurz, warum du beim E-Motion Rennteam mitmachen möchtest."
+              placeholder="Gibt es noch etwas, das wir über dich wissen sollten?"
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
           </div>
