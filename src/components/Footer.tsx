@@ -2,7 +2,26 @@ import Image from "next/image";
 import Link from "next/link";
 import SocialIcons from "@/components/SocialIcons";
 
-export default function Footer() {
+interface FooterProps {
+  hiddenIds?: string[];
+}
+
+const NAV_ITEMS = [
+  { id: "formula-student", href: "/formula-student", label: "Formula Student", group: "nav" },
+  { id: "team", href: "/team", label: "Team", group: "nav" },
+  { id: "fahrzeuge", href: "/fahrzeuge", label: "Fahrzeuge", group: "nav" },
+  { id: "erfolge", href: "/erfolge", label: "Timeline", group: "nav" },
+  { id: "sponsoren", href: "/sponsoren", label: "Sponsoren", group: "nav" },
+  { id: "mitmachen", href: "/mitmachen", label: "Mitmachen", group: "nav" },
+  { id: "galerie", href: "/galerie", label: "Galerie", group: "aktuelles" },
+  { id: "kontakt", href: "/kontakt", label: "Kontakt", group: "aktuelles" },
+] as const;
+
+export default function Footer({ hiddenIds = [] }: FooterProps) {
+  const hidden = new Set(hiddenIds);
+  const navLinks = NAV_ITEMS.filter((i) => i.group === "nav" && !hidden.has(i.id));
+  const aktuellesLinks = NAV_ITEMS.filter((i) => i.group === "aktuelles" && !hidden.has(i.id));
+
   return (
     <footer className="border-t border-border bg-surface">
       <div className="checkered-divider" />
@@ -22,24 +41,28 @@ export default function Footer() {
           <SocialIcons className="mt-4 flex gap-3" />
         </div>
 
+        {navLinks.length > 0 && (
         <div>
           <div className="text-sm font-semibold text-foreground">Navigation</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
-            <li><Link href="/team" className="transition-colors hover:text-accent-text">Team</Link></li>
-            <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent-text">Fahrzeuge</Link></li>
-            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Timeline</Link></li>
-            <li><Link href="/sponsoren" className="transition-colors hover:text-accent-text">Sponsoren</Link></li>
-            <li><Link href="/mitmachen" className="transition-colors hover:text-accent-text">Mitmachen</Link></li>
+            {navLinks.map((item) => (
+              <li key={item.id}><Link href={item.href} className="transition-colors hover:text-accent-text">{item.label}</Link></li>
+            ))}
           </ul>
         </div>
+        )}
 
         <div>
+          {aktuellesLinks.length > 0 && (
+          <>
           <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
-            <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
+            {aktuellesLinks.map((item) => (
+              <li key={item.id}><Link href={item.href} className="transition-colors hover:text-accent-text">{item.label}</Link></li>
+            ))}
           </ul>
+          </>
+          )}
           <div className="mt-4 space-y-1 text-sm text-muted">
             <p>Hochschule Aalen</p>
             <p>Beethovenstraße 1, 73430 Aalen</p>
