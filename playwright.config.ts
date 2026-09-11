@@ -29,6 +29,11 @@ export default defineConfig({
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
+    // isTrustedOrigin() (src/lib/apiSecurity.ts) rejects any form POST whose
+    // Origin header doesn't match SITE_URL, which otherwise defaults to the
+    // production domain and would 403 every form submission made against
+    // this local dev server.
+    env: { NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${PORT}` },
   },
   projects: [
     {

@@ -11,7 +11,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "node scripts/a11y-check.mjs"
+    "test:a11y": "node scripts/a11y-check.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "credentials-repo": "git+https://github.com/E-Motion-Rennteam-Aalen-e-V/Login-Benutzerverwaltung.git#main",

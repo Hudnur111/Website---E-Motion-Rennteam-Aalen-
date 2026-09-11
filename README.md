@@ -168,6 +168,7 @@ src/components/      # Wiederverwendbare UI-Komponenten
 | ESLint | `npm run lint` |
 | TypeScript | `npx tsc --noEmit` |
 | Unit-/Komponententests (Vitest) | `npm test` |
+| E2E-Smoke-Tests (Playwright: Navigation, Kontaktformular, CMS-Login) | `npm run test:e2e` |
 | Accessibility-Scan (axe-core, gegen Produktions-Build) | `npm run test:a11y` |
 | Bundle-Analyse (Turbopack) | `npm run analyze` |
 

@@ -69,6 +69,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Playwright (and some other local tooling) talks to the dev server via
+  // 127.0.0.1 rather than localhost; without this, Next.js blocks its own
+  // HMR websocket for that origin, which then forces periodic full-page
+  // reloads that raced with e2e test interactions (a form submit clicked
+  // right as the page reloaded fell back to a plain native GET instead of
+  // being intercepted by React). Dev-only — production serves no HMR socket.
+  ...(isDev ? { allowedDevOrigins: ["127.0.0.1"] } : {}),
   images: {
     formats: ["image/avif", "image/webp"],
     // Uploaded photos are immutable-cached at the edge for a year (see the
