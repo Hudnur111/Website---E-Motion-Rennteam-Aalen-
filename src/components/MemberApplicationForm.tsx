@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget from "@/components/TurnstileWidget";
 import { MEMBER_DEPARTMENTS, MEMBER_SKILLS } from "@/lib/validation";
 
 export default function MemberApplicationForm() {
@@ -156,6 +157,7 @@ export default function MemberApplicationForm() {
               . *
             </label>
           </div>
+          <TurnstileWidget />
           <button
             type="submit"
             disabled={status === "sending"}

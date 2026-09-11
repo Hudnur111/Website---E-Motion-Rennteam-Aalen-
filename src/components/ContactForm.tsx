@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget from "@/components/TurnstileWidget";
 import { CONTACT_SUBJECTS } from "@/lib/validation";
 
 export default function ContactForm() {
@@ -138,6 +139,7 @@ export default function ContactForm() {
               . *
             </label>
           </div>
+          <TurnstileWidget />
           <button
             type="submit"
             disabled={status === "sending"}

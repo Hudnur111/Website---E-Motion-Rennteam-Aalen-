@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateMemberApplicationForm } from "@/lib/validation";
 import { hasDeliverableDomain, isMxCheckEnabled } from "@/lib/emailDeliverability";
+import { isTurnstileEnabled, verifyTurnstileToken } from "@/lib/turnstile";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { deliverFormSubmission } from "@/lib/formDelivery";
 import { hasJsonContentType, isTrustedOrigin } from "@/lib/apiSecurity";
@@ -28,6 +29,17 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Ungültige Anfrage." }, { status: 400 });
+  }
+
+  if (isTurnstileEnabled()) {
+    const rawToken = (body as Record<string, unknown> | null)?.["cf-turnstile-response"];
+    const token = typeof rawToken === "string" ? rawToken : "";
+    if (!(await verifyTurnstileToken(token, ip))) {
+      return NextResponse.json(
+        { ok: false, error: "Sicherheitsprüfung fehlgeschlagen. Bitte lade die Seite neu und versuche es erneut." },
+        { status: 403 }
+      );
+    }
   }
 
   const result = validateMemberApplicationForm(body);

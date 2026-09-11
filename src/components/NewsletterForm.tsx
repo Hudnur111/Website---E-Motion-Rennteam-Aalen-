@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget from "@/components/TurnstileWidget";
 
 export default function NewsletterForm() {
   const { status, errorMessage, submit } = useFormSubmit("/api/newsletter");
@@ -50,6 +51,7 @@ export default function NewsletterForm() {
             >
               {status === "sending" ? "…" : "Anmelden"}
             </button>
+            <TurnstileWidget />
           </form>
           {errorMessage && (
             <p role="alert" className="mt-2 text-xs text-red-500">

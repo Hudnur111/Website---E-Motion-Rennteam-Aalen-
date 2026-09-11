@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget from "@/components/TurnstileWidget";
 import { MEDIAKIT_CATEGORIES } from "@/lib/validation";
 
 export default function MediaKitRequestForm() {
@@ -173,6 +174,7 @@ export default function MediaKitRequestForm() {
               . *
             </label>
           </div>
+          <TurnstileWidget />
           <button
             type="submit"
             disabled={status === "sending"}

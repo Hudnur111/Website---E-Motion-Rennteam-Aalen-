@@ -14,18 +14,27 @@ import type { NextConfig } from "next";
 // Production never uses eval() (see Next's CSP docs) and stays without it.
 const isDev = process.env.NODE_ENV !== "production";
 
+// Only relax the CSP for Cloudflare Turnstile (see TurnstileWidget.tsx /
+// src/lib/turnstile.ts) when a deployment actually has it configured - most
+// installs don't, and there's no reason to allow-list a third-party origin
+// nothing on the page ever loads.
+const turnstileEnabled = Boolean(process.env.TURNSTILE_SECRET_KEY);
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${
+    turnstileEnabled ? " https://challenges.cloudflare.com" : ""
+  }`,
   // React/framer-motion set inline `style` attributes at render time, so
   // style-src needs 'unsafe-inline' too. CSS injection is a much
   // lower-severity risk than script injection.
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self'${turnstileEnabled ? " https://challenges.cloudflare.com" : ""}`,
   "object-src 'none'",
-  "frame-ancestors 'none'",
+  `frame-ancestors 'none'`,
+  ...(turnstileEnabled ? [`frame-src https://challenges.cloudflare.com`] : []),
   "base-uri 'self'",
   "form-action 'self'",
   // Rewrites every http:// subresource/navigation on the page to https://.
