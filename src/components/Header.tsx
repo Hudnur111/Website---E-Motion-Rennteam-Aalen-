@@ -142,21 +142,29 @@ export default function Header() {
             <AnimatePresence>
               {moreOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-3 w-40 overflow-hidden rounded-lg border border-border bg-surface shadow-xl"
+                  className="absolute right-0 top-full mt-3 w-52 origin-top-right rounded-xl border border-border bg-surface p-1.5 shadow-2xl"
                 >
-                  {MORE_LINKS.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="block px-4 py-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {MORE_LINKS.map((link) => {
+                    const linkActive =
+                      pathname === link.href || pathname?.startsWith(`${link.href}/`);
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`block rounded-lg px-3.5 py-2.5 text-sm transition-colors ${
+                          linkActive
+                            ? "bg-accent/10 font-semibold text-accent"
+                            : "text-muted hover:bg-surface-2 hover:text-foreground"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
                 </motion.div>
               )}
             </AnimatePresence>
