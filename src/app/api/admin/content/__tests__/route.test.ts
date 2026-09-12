@@ -10,8 +10,12 @@ vi.mock("@/lib/cms/content", async () => {
   };
 });
 
-import { GET as listGET } from "@/app/api/admin/content/[collection]/route";
-import { GET as itemGET } from "@/app/api/admin/content/[collection]/[slug]/route";
+import { GET as listGET, POST as listPOST } from "@/app/api/admin/content/[collection]/route";
+import {
+  GET as itemGET,
+  PUT as itemPUT,
+  DELETE as itemDELETE,
+} from "@/app/api/admin/content/[collection]/[slug]/route";
 import { createSessionToken, SESSION_COOKIE } from "@/lib/cms/auth";
 
 async function authedRequest(url: string) {
@@ -51,6 +55,52 @@ describe("GET /api/admin/content/[collection]", () => {
     const request = await authedRequest("http://localhost/api/admin/content/nope");
     const response = await listGET(request, { params: Promise.resolve({ collection: "nope" }) });
     expect(response.status).toBe(404);
+  });
+});
+
+describe("POST /api/admin/content/[collection]", () => {
+  beforeEach(() => {
+    process.env.CMS_SESSION_SECRET = "test-secret-at-least-16-chars-long";
+  });
+
+  it("rejects unauthenticated requests with 401 (auth before collection check)", async () => {
+    const request = new NextRequest("http://localhost/api/admin/content/nope", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const response = await listPOST(request, { params: Promise.resolve({ collection: "nope" }) });
+    expect(response.status).toBe(401);
+  });
+});
+
+describe("PUT /api/admin/content/[collection]/[slug]", () => {
+  beforeEach(() => {
+    process.env.CMS_SESSION_SECRET = "test-secret-at-least-16-chars-long";
+  });
+
+  it("rejects unauthenticated requests with 401 (auth before collection check)", async () => {
+    const request = new NextRequest("http://localhost/api/admin/content/nope/slug", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const response = await itemPUT(request, { params: Promise.resolve({ collection: "nope", slug: "slug" }) });
+    expect(response.status).toBe(401);
+  });
+});
+
+describe("DELETE /api/admin/content/[collection]/[slug]", () => {
+  beforeEach(() => {
+    process.env.CMS_SESSION_SECRET = "test-secret-at-least-16-chars-long";
+  });
+
+  it("rejects unauthenticated requests with 401 (auth before collection check)", async () => {
+    const request = new NextRequest("http://localhost/api/admin/content/nope/slug", {
+      method: "DELETE",
+    });
+    const response = await itemDELETE(request, { params: Promise.resolve({ collection: "nope", slug: "slug" }) });
+    expect(response.status).toBe(401);
   });
 });
 

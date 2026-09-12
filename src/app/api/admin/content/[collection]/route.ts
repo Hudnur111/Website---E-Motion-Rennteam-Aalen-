@@ -20,12 +20,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ collection: string }> }) {
+  const user = await getSessionUser(request);
+  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+
   const { collection: collectionName } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
-
-  const user = await getSessionUser(request);
-  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
   if (!canAccessCollection(user, collectionName)) {
     return NextResponse.json({ error: "Keine Berechtigung für diese Collection." }, { status: 403 });
   }
