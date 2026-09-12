@@ -7,8 +7,13 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 // A fixed, precomputed hash with no matching password. Verifying against it
 // when the username doesn't exist keeps the scrypt cost identical to the
 // "user found, wrong password" path, so response timing can't be used to
-// enumerate which usernames are valid.
-const DUMMY_PASSWORD_HASH = hashPassword("dummy-password-for-constant-time-login");
+// enumerate which usernames are valid. Computed lazily on first use so the
+// blocking scryptSync call does not run at module-load time.
+let _dummyHash: string | null = null;
+function getDummyPasswordHash(): string {
+  if (_dummyHash === null) _dummyHash = hashPassword("dummy-password-for-constant-time-login");
+  return _dummyHash;
+}
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
@@ -53,7 +58,7 @@ export async function POST(request: NextRequest) {
       } else {
         // Unknown username: still pay the scrypt cost so this branch takes
         // the same time as a real "wrong password" check above.
-        verifyPassword(password, DUMMY_PASSWORD_HASH);
+        verifyPassword(password, getDummyPasswordHash());
       }
     }
   }

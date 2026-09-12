@@ -28,13 +28,11 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
   }
 
   function next() {
-    if (activeIndex === null) return;
-    setActiveIndex((activeIndex + 1) % images.length);
+    setActiveIndex((i) => (i !== null ? (i + 1) % images.length : null));
   }
 
   function prev() {
-    if (activeIndex === null) return;
-    setActiveIndex((activeIndex - 1 + images.length) % images.length);
+    setActiveIndex((i) => (i !== null ? (i - 1 + images.length) % images.length : null));
   }
 
   // Keyboard support for the lightbox: Escape closes it, arrow keys step

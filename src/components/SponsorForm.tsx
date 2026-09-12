@@ -138,23 +138,31 @@ export default function SponsorForm() {
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
           </div>
-          <div className="flex items-start gap-2.5 sm:col-span-2">
-            <input
-              id="sponsor-consent"
-              name="consent"
-              type="checkbox"
-              required
-              aria-invalid={Boolean(errors.consent)}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
-            />
-            <label htmlFor="sponsor-consent" className="text-xs text-muted">
-              Wir stimmen zu, dass unsere Angaben zur Bearbeitung der Anfrage gespeichert werden.
-              Weitere Infos in der{" "}
-              <Link href="/datenschutz" className="text-accent-text underline">
-                Datenschutzerklärung
-              </Link>
-              . *
-            </label>
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <div className="flex items-start gap-2.5">
+              <input
+                id="sponsor-consent"
+                name="consent"
+                type="checkbox"
+                required
+                aria-invalid={Boolean(errors.consent)}
+                aria-describedby={errors.consent ? "sponsor-consent-error" : undefined}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
+              />
+              <label htmlFor="sponsor-consent" className="text-xs text-muted">
+                Wir stimmen zu, dass unsere Angaben zur Bearbeitung der Anfrage gespeichert werden.
+                Weitere Infos in der{" "}
+                <Link href="/datenschutz" className="text-accent-text underline">
+                  Datenschutzerklärung
+                </Link>
+                . *
+              </label>
+            </div>
+            {errors.consent && (
+              <p id="sponsor-consent-error" className="ml-6 text-xs text-red-500">
+                {errors.consent}
+              </p>
+            )}
           </div>
           <button
             type="submit"
