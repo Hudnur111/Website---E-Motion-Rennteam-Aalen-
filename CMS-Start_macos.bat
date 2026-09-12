@@ -1,4 +1,17 @@
 #!/bin/bash
+# ===========================================================================
+# HINWEIS FUER macOS-NUTZER / NOTE FOR macOS USERS
+# ===========================================================================
+#
+# Diese Datei oeffnet sich auf macOS im Texteditor - das ist normal.
+# Bitte verwende stattdessen:
+#
+#   -> CMS-Start.command  (Doppelklick im Finder genuegt)
+#
+# This file opens in a text editor on macOS. Use CMS-Start.command instead
+# (just double-click it in Finder).
+#
+# ===========================================================================
 # Doppelklick-Start des Redaktions-CMS fuer macOS.
 # Inhaltlich identisch mit CMS-Start.command (Gegenstueck zu CMS-Start.bat
 # unter Windows) - diese Datei traegt bewusst den Dateinamen

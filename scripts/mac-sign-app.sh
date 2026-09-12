@@ -16,7 +16,7 @@
 # laufen, sonst greift die alte Signatur nicht mehr / macOS beschwert sich.
 set -euo pipefail
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
+if [[  "$(uname -s)" != "Darwin" ]]; then
     echo "[FEHLER] Dieses Skript funktioniert nur auf macOS (braucht codesign)." >&2
     exit 1
 fi
@@ -38,6 +38,14 @@ fi
 
 echo "Entferne evtl. vorhandenes Quarantaene-Flag..."
 xattr -cr "$app_path"
+
+# Stelle sicher, dass der Launcher ausfuehrbar ist. Geht das Executable-Bit
+# verloren (z.B. durch Oeffnen und Speichern in einem Editor, der 644 setzt,
+# oder durch unvollstaendiges ZIP-Entpacken), wuerde macOS die App mit
+# "beschaedigt und kann nicht geoeffnet werden" ablehnen - obwohl codesign
+# selbst keinen Fehler meldet. Explizites chmod +x hier verhindert das.
+echo "Setze Ausfuehrungsrechte fuer Launcher..."
+chmod +x "$app_path/Contents/MacOS/cms-launcher"
 
 echo "Signiere \"$app_path\" ad-hoc (Signatur: -, kein Zertifikat noetig)..."
 codesign --force --deep --sign - "$app_path"
