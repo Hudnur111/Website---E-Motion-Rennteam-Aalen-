@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import ImageWithFallback from "@/components/ImageWithFallback";
 import { AnimatePresence, motion } from "framer-motion";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
@@ -10,6 +10,47 @@ type GalleryImage = {
   title: string;
   image: string;
 };
+
+// Thumbnail with a pulsing skeleton until the image has actually decoded, so
+// a slow connection reads as "loading" instead of "broken" (the gap this was
+// added to close). Falls back to ImageWithFallback's placeholder on a real
+// load error (e.g. a moved/deleted file).
+function GalleryThumbnail({
+  src,
+  priority,
+}: {
+  src: string;
+  priority: boolean;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // An image served from the browser cache can finish loading before this
+  // component's onLoad handler is even attached, so the load event never
+  // reaches us and the thumbnail would stay stuck at opacity-0 forever.
+  // Catch that case once on mount by checking the native `complete` flag.
+  useLayoutEffect(() => {
+    if (imgRef.current?.complete) setLoaded(true);
+  }, []);
+
+  return (
+    <>
+      {!loaded && <div className="absolute inset-0 animate-pulse bg-surface-2" aria-hidden />}
+      <ImageWithFallback
+        ref={imgRef}
+        src={src}
+        alt=""
+        fill
+        sizes="(max-width: 768px) 100vw, 33vw"
+        className={`object-cover transition-all duration-500 group-hover:scale-110 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        priority={priority}
+        onLoad={() => setLoaded(true)}
+      />
+    </>
+  );
+}
 
 export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -103,14 +144,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
             >
               {/* alt="" - the caption span below already gives this button an accessible
                   name via img.title; a non-empty alt here would announce it twice. */}
-              <Image
-                src={img.image}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                priority={i < 3}
-              />
+              <GalleryThumbnail src={img.image} priority={i < 3} />
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-background/80 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <span className="text-sm font-semibold text-foreground">{img.title}</span>
               </div>
@@ -140,7 +174,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border">
-                <Image
+                <ImageWithFallback
                   src={active.image}
                   alt={active.title}
                   fill
