@@ -9,6 +9,7 @@ import {
   WeakPasswordError,
   CredentialsError,
 } from "@/lib/cms/credentialsRepo";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
   const sessionSecret = process.env.CMS_SESSION_SECRET;
@@ -16,6 +17,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_SESSION_SECRET fehlt oder ist zu kurz)." },
       { status: 500 }
+    );
+  }
+
+  // Rate-Limit: max. 10 Passwortaenderungsversuche pro IP in 5 Minuten.
+  // Verhindert Brute-Force-Angriffe auf das neue Passwort, auch wenn der
+  // Angreifer bereits eine gueltige Sitzung besitzt.
+  const ip = getClientIp(request);
+  if (!(await checkRateLimit(`cms-change-password:${ip}`, 10, 5 * 60 * 1000))) {
+    return NextResponse.json(
+      { error: "Zu viele Anfragen. Bitte in ein paar Minuten erneut versuchen." },
+      { status: 429 }
     );
   }
 
