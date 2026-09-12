@@ -168,10 +168,9 @@ export const collections: CollectionDef[] = [
       { name: "title", label: "Titel", type: "string", isTitle: true, required: true },
       { name: "image", label: "Bild", type: "image", required: true },
       {
-        name: "category",
-        label: "Kategorie",
-        type: "select",
-        options: ["Wettbewerb", "Werkstatt", "Team", "Event"],
+        name: "album",
+        label: "Album",
+        type: "string",
       },
       { name: "order", label: "Reihenfolge", type: "number" },
     ],
