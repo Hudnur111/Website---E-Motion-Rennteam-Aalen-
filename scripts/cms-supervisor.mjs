@@ -97,6 +97,27 @@ function runAsync(cmd, args) {
   });
 }
 
+// Warms up the Turbopack compilation of key CMS routes immediately after the
+// server starts, so the first real page load (after the loading screen
+// redirects) is already compiled and feels instant.
+async function preWarmRoutes() {
+  const routes = [`http://localhost:${port}/admin/login`, `http://localhost:${port}/admin`];
+  // Poll until the server responds, then fetch each route once to trigger compilation.
+  for (let attempt = 0; attempt < 120; attempt++) {
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+      const res = await fetch(routes[0], { signal: AbortSignal.timeout(5000) });
+      if (res.status < 600) {
+        // Server is up and /admin/login is compiled. Warm the dashboard too.
+        await fetch(routes[1], { signal: AbortSignal.timeout(10000) }).catch(() => {});
+        return;
+      }
+    } catch {
+      // Not ready yet, keep polling.
+    }
+  }
+}
+
 function startServer() {
   child = spawn("npm", ["run", "dev", "--", "-p", port], {
     cwd: repoRoot,
@@ -196,6 +217,7 @@ setInterval(() => {
 
 writeStatus("up-to-date");
 startServer();
+preWarmRoutes().catch(() => {});
 
 function shutdown(signal) {
   shuttingDown = true;

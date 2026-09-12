@@ -3,7 +3,7 @@
 // Crypto so it also works from the edge-runtime middleware.
 
 export const SESSION_COOKIE = "cms_session";
-const SESSION_TTL_SECONDS = 60 * 60 * 8; // 8h
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
 interface SessionPayload {
   u: string;
